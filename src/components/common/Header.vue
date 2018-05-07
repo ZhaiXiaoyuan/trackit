@@ -1,0 +1,119 @@
+<template>
+    <div class="header">
+      <!--  <div class="collapse-btn" @click="collapseChage">
+            <i class="el-icon-menu"></i>
+        </div>-->
+        <div class="logo"><i class="text-logo-icon"></i></div>
+        <div class="user-info">
+            <img class="user-logo" src="../../../static/img/img.jpg">
+            <span class="greet">欢迎登陆Trac*it  中午好！</span>
+            <div class="cm-btn logout-btn">
+                退出登录
+                <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#icon-tuichu"></use>
+                </svg>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+    import Vue from 'vue'
+    import bus from '../common/bus';
+    export default {
+        data() {
+            return {
+                collapse: false,
+                name: 'linxin',
+                accountInfo:{},
+            }
+        },
+        computed:{
+
+        },
+        methods:{
+            handleCommand(command) {
+                if(command == 'loginout'){
+                    Vue.cookie.set('account','');
+                    let loginPage=localStorage.getItem('loginPage');
+                    this.$router.push({name:loginPage?loginPage:'login'});
+                }
+            },
+            collapseChage(){
+                this.collapse = !this.collapse;
+                bus.$emit('collapse', this.collapse);
+            }
+        },
+        created(){
+            this.accountInfo=this.getAccountInfo();
+        }
+    }
+</script>
+<style lang="less" rel="stylesheet/less" scoped>
+    .header {
+        position: relative;
+        box-sizing: border-box;
+        width: 100%;
+        height: 70px;
+        font-size: 22px;
+        line-height: 70px;
+        color: #fff;
+        background: #48b4ff !important;
+    }
+    .collapse-btn{
+        float: left;
+        padding: 0 21px;
+        cursor: pointer;
+    }
+    .collapse-btn:hover{
+        background: rgb(40,52,70);
+    }
+    .header .logo{
+        margin-left: 40px;
+        display: flex !important;
+        align-items: center;
+        float: left;
+        width:250px;
+        height: 100%;
+        /* text-align: center; */
+    }
+    .user-info {
+        display: flex;
+        align-items: center;
+        position: relative;
+        float: right;
+        padding-right: 50px;
+        font-size: 16px;
+        color: #fff;
+    }
+    .user-info .el-dropdown-link{
+        position: relative;
+        display: inline-block;
+        padding-left: 50px;
+        color: #fff;
+        cursor: pointer;
+        vertical-align: middle;
+    }
+    .user-info .user-logo{
+       /* position: absolute;
+        left:0;
+        top:15px;*/
+        width:40px;
+        height:40px;
+        border-radius: 50%;
+    }
+    .greet{
+        margin-left: 15px;
+    }
+    .logout-btn{
+        margin-left: 50px;
+        display: flex;
+        align-items: center;
+        .icon{
+            margin-left: 2px;
+            font-size: 24px;
+        }
+    }
+    .el-dropdown-menu__item{
+        text-align: center;
+    }
+</style>
