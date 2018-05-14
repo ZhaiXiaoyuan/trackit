@@ -136,26 +136,7 @@
                 this.collapse = msg;
             });
             //
-            this.accountInfo=this.getAccountInfo();
-            this.accountAccess=null;
-            if(this.accountInfo.type=='superManager'){
-                this.accountAccess='all';
-            }else if(this.accountInfo.type=='marketManager'){
-                this.accountAccess=['02'];
-            }else if(this.accountInfo.type=='accountantManager'){
-                this.accountAccess=['03'];
-            }
-            if(this.accountAccess=='all'){
-                this.items=this.itemsConfig;
-            }else if(this.accountAccess&&this.accountAccess.length>0){
-                this.accountAccess.forEach((value,index)=>{
-                    for(let i=0;i<this.itemsConfig.length;i++){
-                        if(value==this.itemsConfig[i].code){
-                            this.items.push(this.itemsConfig[i]);
-                        }
-                    }
-                })
-            }
+            this.items=this.itemsConfig;
         }
     }
 </script>

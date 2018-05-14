@@ -3,116 +3,94 @@
         <div class="crumbs">
             <el-breadcrumb separator="-">
                 <el-breadcrumb-item>首页</el-breadcrumb-item>
-                <el-breadcrumb-item>外贸平台</el-breadcrumb-item>
                 <el-breadcrumb-item class="active">任务</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
-            <el-row class="handle-box">
-                <el-col :span="14">
-                    <el-input v-model="keyword" placeholder="筛选关键词" class="handle-input mr10"></el-input>
-                    <el-button type="primary" icon="search" @click="getList()">搜索</el-button>
-                </el-col>
-                <el-col :span="10" style="text-align: right">
-                    <el-button type="primary" icon="el-icon-plus" @click="dialogFormVisible=true">新建用户</el-button>
-                    <el-button type="primary" class="mr10" @click="uploadFile()">
-                        批量导入
-                        <input type="file" @change="importFile(this)" id="imFile" style="display: none"
-                               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"/>
-                    </el-button>
-                </el-col>
-            </el-row>
-            <el-table :data="entryList" border style="width: 100%;" ref="multipleTable">
-                <el-table-column label="序号" align="center" width="50">
-                    <template slot-scope="scope">
-                        {{scope.$index+1}}
-                    </template>
-                </el-table-column>
-                <el-table-column prop="phoneNums" label="手机号" align="center"></el-table-column>
-                <el-table-column prop="name" label="姓名"  align="center"></el-table-column>
-                <el-table-column prop="idCard" label="身份证"  align="center"></el-table-column>
-                <el-table-column prop="email" label="邮箱"  align="center"></el-table-column>
-                <el-table-column prop="revenue" :formatter="percentFormatter" label="返点比例"  align="center"></el-table-column>
-                <el-table-column prop="bankName" label="开户行"  align="center"></el-table-column>
-                <el-table-column prop="subbranch" label="支行" align="center"></el-table-column>
-                <el-table-column prop="bankAccount" label="银行账户" width="200"  align="center"></el-table-column>
-                <el-table-column label="操作"  align="center">
-                    <template slot-scope="scope">
-                        <router-link :to="'/userDetail/'+scope.row.id" size="small">查看详情</router-link>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <div class="pagination">
-                <el-pagination
-                    @current-change ="getList"
-                    layout="prev, pager, next"
-                    :total="pager.total">
-                </el-pagination>
-            </div>
-            <el-dialog title="新建" class="edit-dialog" :visible.sync="dialogFormVisible" width="40%">
-                <el-row type="flex">
-                    <el-col :sm="24" :md="22" :lg="20">
-                        <el-form :model="form">
-                            <el-form-item label="手机号码" :label-width="formLabelWidth">
-                                <el-input v-model="form.phoneNums" maxLength="50" auto-complete="off"></el-input>
-                            </el-form-item>
-                            <el-form-item label="姓名" :label-width="formLabelWidth">
-                                <el-input v-model="form.name" maxLength="50" auto-complete="off"></el-input>
-                            </el-form-item>
-                            <el-form-item label="身份证" :label-width="formLabelWidth">
-                                <el-input v-model="form.idCard" maxLength="50" auto-complete="off"></el-input>
-                            </el-form-item>
-                            <el-form-item label="邮件" :label-width="formLabelWidth">
-                                <el-input v-model="form.email" maxLength="50" auto-complete="off"></el-input>
-                            </el-form-item>
-                            <el-form-item label="银行名称" :label-width="formLabelWidth">
-                                <el-input v-model="form.bankName" maxLength="50" auto-complete="off"></el-input>
-                            </el-form-item>
-                            <el-form-item label="分行" :label-width="formLabelWidth">
-                                <el-input v-model="form.subbranch" maxLength="50" auto-complete="off"></el-input>
-                            </el-form-item>
-                            <el-form-item label="银行账号" :label-width="formLabelWidth">
-                                <el-input v-model="form.bankAccount" maxLength="50" auto-complete="off"></el-input>
-                            </el-form-item>
-                            <el-form-item label="地区" :label-width="formLabelWidth">
-                                <v-distpicker class="cm-area-picker"  :callback="addUserChangeArea"></v-distpicker>
-                            </el-form-item>
-                            <el-form-item label="详细地址" :label-width="formLabelWidth">
-                                <el-input v-model="form.address" maxLength="100" auto-complete="off"></el-input>
-                            </el-form-item>
-                        </el-form>
+            <div class="condition-panel">
+                <el-row class="type-list">
+                    <el-button-group>
+                        <el-button type="primary">全部</el-button>
+                        <el-button type="">进行中</el-button>
+                        <el-button type="">已完成</el-button>
+                        <el-button type="">已取消</el-button>
+                    </el-button-group>
+                </el-row>
+                <el-row class="condition-row" style="margin-top: 20px;">
+                    <el-col :span="3">
+                        订单量：<span class="blue">3单</span>
+                    </el-col>
+                    <el-col :span="9">
+                        <span>时间:</span>
+                        <el-date-picker
+                            v-model="dateRange"
+                            type="daterange"
+                            range-separator="至"
+                            start-placeholder="开始日期"
+                            end-placeholder="结束日期">
+                        </el-date-picker>
+                    </el-col>
+                    <span>关键字：</span>
+                    <el-col :span="5">
+                        <el-input placeholder="请输入内容" v-model="keyword">
+                            <el-button slot="append" icon="el-icon-search"></el-button>
+                        </el-input>
+                    </el-col>
+                    <el-col :span="5" style="text-align: right;">
+                        <el-button size="small" type="primary">新建任务</el-button>
+                        <el-button size="small" type="">导出</el-button>
                     </el-col>
                 </el-row>
-                <div slot="footer" class="dialog-footer">
-                    <el-button @click="dialogFormVisible = false">取 消</el-button>
-                    <el-button type="primary"
-                               :disabled="!form.phoneNums||form.phoneNums==''
-                           ||!form.name||form.name==''
-                           ||!form.idCard||form.idCard==''
-                           ||!form.email||form.email==''
-                           ||!form.bankName||form.bankName==''
-                           ||!form.subbranch||form.subbranch==''
-                           ||!form.bankAccount||form.bankAccount==''
-                           ||!form.province||form.province==''
-                           ||!form.city||form.city==''
-                           ||!form.county||form.county==''
-                           ||!form.address||form.address==''"
-                               @click="add()">提交</el-button>
+            </div>
+            <div class="list-panel">
+                <el-table :data="entryList" border style="width: 100%;" ref="multipleTable">
+                    <el-table-column prop="phoneNums" label="任务单号" align="center"></el-table-column>
+                    <el-table-column prop="name" label="客户编号"  align="center"></el-table-column>
+                    <el-table-column prop="idCard" label="客户参考"  align="center"></el-table-column>
+                    <el-table-column prop="email" label="物料完成时间"  align="center"></el-table-column>
+                    <el-table-column prop="bankName" label="任务种类"  align="center"></el-table-column>
+                    <el-table-column prop="subbranch" label="下单时间" align="center"></el-table-column>
+                    <el-table-column prop="bankAccount" label="任务状态" width="200"  align="center"></el-table-column>
+                    <el-table-column label="操作"  align="center">
+                        <template slot-scope="scope">
+                            <router-link :to="'/userDetail/'+scope.row.id" size="small">查看详情</router-link>
+                            <i class="icon emergency-icon" v-if="false"></i>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <div class="pagination">
+                    <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="1"
+                        :page-sizes="[10, 20, 50, 100]"
+                        :page-size="100"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="400">
+                    </el-pagination>
                 </div>
-            </el-dialog>
+            </div>
         </div>
     </div>
 </template>
-<style scoped>
-    .handle-box{
-        margin-bottom: 20px;
+<style lang="less" rel="stylesheet/less" scoped>
+    .type-list{
+        text-align: center;
+        button{
+            width: 120px;
+        }
     }
-    .handle-select{
-        width: 120px;
+    .condition-row{
+        display: flex;
+        align-items: center;
     }
-    .handle-input{
-        width: 300px;
-        display: inline-block;
+    .list-panel{
+        margin-top: 20px;
+    }
+    .emergency-icon{
+        position: absolute;
+        top:5px;
+        right: 5px;
     }
 </style>
 <script>
@@ -121,33 +99,15 @@
     export default {
         data() {
             return {
-                url: './static/vuetable.json',
-                tableData: [],
-                cur_page: 1,
-                multipleSelection: [],
-                select_cate: '',
-                select_word: '',
-                del_list: [],
-                is_search: false,
-
-                pager:{
-                  pageIndex:1,
-                  pageSize:20,
-                  total:0,
-                },
+                listType:'first',
+                dateRange:null,
                 keyword:null,
-                entryList:[],
-
-                fullscreenLoading: false, // 加载中
-                imFile: '', // 导入文件el
-                outFile: '',  // 导出文件el
-                errorDialog: false, // 错误信息弹窗
-                errorMsg: '', // 错误信息内容
-                excelData: [ ],
-
-                dialogFormVisible: false,
-                form:{},
-                formLabelWidth: '120px',
+                pager:{
+                    pageNumber:1,
+                    pageSize:20,
+                    total:100,//临时测试
+                },
+                entryList:[{test:'1'}],
             }
         },
         created(){
@@ -310,58 +270,21 @@
                 o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w)))
                 return o
             },
+            getList:function () {
 
-            percentFormatter(row, column) {
-                return row.revenue+'%';
             },
-            getList:function (pageIndex) {
-                this.pager.pageIndex=pageIndex?pageIndex:1;
-                let params={
-                    ...Vue.sessionInfo(),
-                    pageIndex:this.pager.pageIndex,
-                    pageSize:this.pager.pageSize,
-                    searchContent:this.keyword,
-                }
-                Vue.api.getUserList(params).then((resp)=>{
-                    if(resp.respCode=='00'){
-                        let data=JSON.parse(resp.respMsg);
-                        this.entryList=JSON.parse(data.userList);
-                        this.pager.total=data.userCount;
-                    }
-                });
+            handleSizeChange:function () {
+
             },
-            add:function () {
-                let params={
-                    ...Vue.sessionInfo(),
-                    ...this.form
-                }
-                let fb=Vue.operationFeedback({text:'保存中...'});
-                Vue.api.addUser(params).then((resp)=>{
-                    if(resp.respCode=='00'){
-                        this.getList();
-                        this.dialogFormVisible = false;
-                        fb.setOptions({type:'complete',text:'新建成功'});
-                    }else{
-                        fb.setOptions({type:'warn',text:'新建失败，'+resp.respMsg});
-                    }
-                });
-            },
-            addUserChangeArea:function (data) {
-                if(data.type=='province'){
-                    this.form.province=data.value;
-                }else if(data.type=='city'){
-                    this.form.city=data.value;
-                }else if(data.type=='area'){
-                    this.form.county=data.value;
-                }
-            },
+            handleCurrentChange:function () {
+
+            }
+
         },
         mounted () {
             this.imFile = document.getElementById('imFile');
             this.outFile = document.getElementById('downlink');
-
             /**/
-           /* this.getList();*/
 
         },
     }

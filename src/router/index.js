@@ -14,6 +14,11 @@ export default new Router({
                     name:'task',
                     component: resolve => require(['../page/task/Task.vue'], resolve)
                 },
+                {
+                    path: '/newTask',
+                    name:'newTask',
+                    component: resolve => require(['../page/task/NewTask.vue'], resolve)
+                },
             ]
         },
         {
