@@ -5,6 +5,7 @@
 import Distpicker from './Distpicker';
 import OperationFeedback from './OperationFeedback';
 import ViewPicModal from './ViewPicModal';
+import GenCode from './GenCode';
 
 
 /*全局组件注册配置*/
@@ -14,6 +15,7 @@ export default {
     Vue.component('v-distpicker',Distpicker);
     Vue.component('OperationFeedback',OperationFeedback);
     Vue.component('ViewPicModal',ViewPicModal);
+    Vue.component('GenCode',GenCode);
 
     /*方法调度方式*/
     let OperationFeedbackConstructor = Vue.extend(OperationFeedback);

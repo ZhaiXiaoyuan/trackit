@@ -23,6 +23,7 @@
                     <el-col :span="9">
                         <span>时间:</span>
                         <el-date-picker
+                            class="cm-date-picker"
                             v-model="dateRange"
                             type="daterange"
                             range-separator="至"
@@ -105,7 +106,8 @@
                 pager:{
                     pageNumber:1,
                     pageSize:20,
-                    total:100,//临时测试
+                    total:0,
+                    loading:false
                 },
                 entryList:[{test:'1'}],
             }
@@ -270,8 +272,21 @@
                 o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w)))
                 return o
             },
-            getList:function () {
-
+            getList:function (pageIndex) {
+                this.pager.pageIndex=pageIndex?pageIndex:1;
+                let params={
+                    ...Vue.sessionInfo(),
+                    pageIndex:this.pager.pageIndex,
+                    pageSize:this.pager.pageSize,
+                    searchContent:null,
+                }
+                this.pager.loading=true;
+                Vue.api.getTaskList(params).then((resp)=>{
+                    this.pager.loading=false;
+                    if(resp.respCode=='2000'){
+                        let data=JSON.parse(resp.respMsg);
+                    }
+                });
             },
             handleSizeChange:function () {
 
@@ -285,6 +300,7 @@
             this.imFile = document.getElementById('imFile');
             this.outFile = document.getElementById('downlink');
             /**/
+            this.getList();
 
         },
     }

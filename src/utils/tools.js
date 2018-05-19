@@ -78,10 +78,12 @@ export default {
         },
         sessionInfo:function () {
           let timestamp=this.genTimestamp();
-          let userId='07d2cbfa55cf4e6582d67e164405b36b';
+          let account=this.getAccountInfo();
           return{
+              req_from:' mj-backend',
               timeStamp:timestamp,
-              userId:userId,
+              number:account.number,
+              signature:md5.hex('timestamp='+timestamp+'&number='+account.number+'&token='+account.token+'')
           }
         },
         /*获取事件当前元素*/
@@ -127,12 +129,11 @@ export default {
               }
           },
         getAccountInfo:function () {
-            let loginPage=localStorage.getItem('loginPage');
             let account=Vue.cookie.get('account');
             if(account){
                 return JSON.parse(account);
             }else{
-                router.push({name:loginPage?loginPage:'login'});
+             /*   router.push({name:'login'});*/
                 return{};
             }
         }

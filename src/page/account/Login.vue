@@ -1,27 +1,18 @@
 <template>
     <div class="login-wrap">
-        <div class="ms-title">
-            <span v-if="pageName=='login'">夜彩平台超级管理员</span>
-            <span v-if="pageName=='adminLogin'">夜彩平台<span v-if="accountType=='marketManager'">市场</span><span v-if="accountType=='accountantManager'">财务</span>管理员</span>
-        </div>
-        <div class="ms-login">
-            <el-radio-group v-model="accountType" style="margin-bottom: 20px;" v-if="pageName=='adminLogin'">
-                <el-radio label="marketManager">市场管理员</el-radio>
-                <el-radio label="accountantManager">财务管理员</el-radio>
-            </el-radio-group>
-            <el-form :model="ruleForm"  ref="ruleForm" label-width="0px" class="demo-ruleForm">
+        <div class="ms-login form-block">
+            <div class="block-hd">
+                <i class="icon logo-icon"></i>
+            </div>
+            <el-form  ref="ruleForm" label-width="0px" class="demo-ruleForm">
                 <el-form-item prop="username">
-                    <el-input v-model="ruleForm.username" placeholder="账号"></el-input>
+                    <el-input v-model="account" placeholder="账号"></el-input>
                 </el-form-item>
                 <el-form-item prop="password">
-                    <el-input type="password" placeholder="密码" v-model="ruleForm.password" @keyup.enter.native="submitForm()"></el-input>
-                </el-form-item>
-                <el-form-item prop="identifyCode" id="identify-code" style="position:relative;">
-                    <el-input type="password" placeholder="验证码" v-model="ruleForm.identifyCode" @keyup.enter.native="submitForm()" style="padding-right: 100px;"></el-input>
-                    <identify style="position:absolute;top:0px;bottom: 0px;right: 0px;margin: auto;"></identify>
+                    <el-input type="password" placeholder="密码" v-model="pwd" @keyup.enter.native="login()"></el-input>
                 </el-form-item>
                 <div class="login-btn">
-                    <el-button type="primary" size="large" @click="submitForm()">登&nbsp;录</el-button>
+                    <el-button type="primary" size="large" @click="login()">登&nbsp;录</el-button>
                 </div>
 
             </el-form>
@@ -29,140 +20,114 @@
     </div>
 </template>
 
-<style>
+<style lang="less" rel="stylesheet/less" >
     .login-wrap{
+        display: flex;
+        align-items: center;
+        justify-content: center;
         position: relative;
         width:100%;
         height:100%;
-    }
-    .ms-title{
-        position: absolute;
-        top:50%;
-        width:100%;
-        margin-top: -230px;
-        text-align: center;
-        font-size:30px;
-        color: #fff;
-
-    }
-    .ms-login{
-        position: absolute;
-        left:50%;
-        top:50%;
-        width:300px;
-        height:230px;
-        margin:-150px 0 0 -190px;
-        padding:40px;
-        border-radius: 5px;
-        background: #fff;
-        font-size: 16px;
-    }
-    .ms-login .el-input--small .el-input__inner{
-        height:44px !important;
-    }
-    .login-btn{
-        text-align: center;
-    }
-    .login-btn button{
-        width:100%;
-        height:44px;
-    }
-    #identify-code input{
-        width: 180px;
+        background: url("../../images/login/login-bg.jpg") no-repeat center;
+        background-size: cover;
+        .ms-login{
+            width:500px;
+            height: 400px;
+            padding:40px;
+            border-radius: 5px;
+            background: #fff;
+            font-size: 16px;
+        }
+        .ms-login .el-input--small .el-input__inner{
+            height:44px !important;
+        }
+        .login-btn{
+            text-align: center;
+        }
+        .el-input{
+            width: 100%;
+        }
+        .login-btn button{
+            width:280px;
+            height:44px;
+        }
+        #identify-code input{
+            width: 180px;
+        }
+        .form-block{
+            .block-hd{
+                text-align: center;
+            }
+            .el-form{
+                margin-top: 20px;
+            }
+            .el-form-item{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .el-form-item__label{
+                    line-height: 44px;
+                }
+                .el-form-item__content{
+                    margin-left: 0px !important;
+                    width: 280px;
+                }
+            }
+            .code-form-item input{
+                width: 150px;
+            }
+        }
     }
 </style>
 <script>
     import Vue from 'vue'
-    import Identify from '../../components/Identify'
+    import md5 from 'js-md5'
 
     export default {
         components:{
-            Identify,
+
         },
         data: function(){
             return {
-                pageName:null,
-                accountType:'marketManager',//superManager:'超级管理员',marketManager:市场管理员账号,accountantManager:财务管理员账号
-                ruleForm: {
-                    username: '',
-                    password: '',
-                    identifyCode:''
-                },
+                account:null,
+                pwd:null,
             }
         },
         methods: {
-            submitForm() {
-                let code=document.getElementsByClassName('code-value')[0].value;
-                if(!this.ruleForm.username||this.ruleForm.username==''){
+            login:function () {
+                if(!this.account){
                     Vue.operationFeedback({type:'warn',text:'请输入账号'});
                     return;
                 }
-                if(!this.ruleForm.password||this.ruleForm.password==''){
+                if(!this.pwd){
                     Vue.operationFeedback({type:'warn',text:'请输入密码'});
                     return;
                 }
-                if(!this.ruleForm.identifyCode||this.ruleForm.identifyCode==''){
-                    Vue.operationFeedback({type:'warn',text:'请输入验证码'});
-                    return;
-                }
-                if(this.ruleForm.identifyCode!=code){
-                    Vue.operationFeedback({type:'warn',text:'验证码错误'});
-                    return;
+                let params={
+                    ...Vue.sessionInfo(),
+                    user_login_name:this.account,
+                    user_login_pwd:md5.hex(this.pwd)
                 }
                 let fb=Vue.operationFeedback({text:'登录中...'});
-                if(this.pageName=='login'){
-                    Vue.api.superManagerLogin({...Vue.sessionInfo(),account:this.ruleForm.username,password:this.ruleForm.password}).then((resp)=>{
-                        if(resp.respCode=='00'){
-                            localStorage.setItem('loginPage','login');
-                            this.$cookie.set('account',JSON.stringify({
-                                type:'superManager',
-                                account:this.ruleForm.username,
-                            }),7);
-                            this.$router.push({name:'shop',params:{}});
-                            fb.setOptions({type:'complete',text:'登录成功'});
-                        }else{
-                            fb.setOptions({type:'warn',text:'登录失败，'+resp.respMsg});
+                Vue.api.login(params).then((resp)=>{
+                    if(resp.status=='1'){
+                        let data=resp.resultInfos;
+                        let account={
+                            ...data,
+                            number:data.user_phone,
+                            token:data.sessionid
                         }
-                    });
-                }else if(this.pageName='adminLogin'){
-                    if(this.accountType=='marketManager'){
-                        Vue.api.marketManagerLogin({...Vue.sessionInfo(),account:this.ruleForm.username,password:this.ruleForm.password}).then((resp)=>{
-                            if(resp.respCode=='00'){
-                                localStorage.setItem('loginPage','adminLogin');
-                                this.$cookie.set('account',JSON.stringify({
-                                    type:this.accountType,
-                                    account:this.ruleForm.username,
-                                }),7);
-                                this.$router.push({name:'benefitRank',params:{}});
-                                fb.setOptions({type:'complete',text:'登录成功'});
-                            }else{
-                                fb.setOptions({type:'warn',text:'登录失败，'+resp.respMsg});
-                            }
-                        });
-                    }else if(this.accountType=='accountantManager'){
-                        Vue.api.accountantManagerLogin({...Vue.sessionInfo(),account:this.ruleForm.username,password:this.ruleForm.password}).then((resp)=>{
-                            if(resp.respCode=='00'){
-                                localStorage.setItem('loginPage','adminLogin');
-                                this.$cookie.set('account',JSON.stringify({
-                                    type:this.accountType,
-                                    account:this.ruleForm.username,
-                                }),7);
-                                this.$router.push({name:'rebatesRecord',params:{}});
-                                fb.setOptions({type:'complete',text:'登录成功'});
-                            }else{
-                                fb.setOptions({type:'warn',text:'登录失败，'+resp.respMsg});
-                            }
-                        });
-
+                        this.$cookie.set('account',JSON.stringify(account),7);
+                        fb.setOptions({type:"complete",text:'登录成功'});
+                        /*this.$router.push({name:'task'});*///临时测试
+                    }else{
+                        fb.setOptions({type:"complete",text:resp.desc});
                     }
-                }
-            },
-            getCode:function (data) {
-                console.log('data:',data);
+                });
             }
         },
         mounted () {
-            this.pageName=this.$route.name;
+
         },
     }
 </script>
