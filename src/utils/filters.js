@@ -27,3 +27,32 @@ Vue.filter('formatDate',function(date,fmt){
     if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
   return fmt;
 });
+//任务状态
+Vue.filter('taskStatus',function(str){
+    str+='';
+    let result='';
+    switch (str){
+        case '1':
+            result='任务生成，待分配';
+            break;
+        case '2':
+            result='任务已分配，等待完成';
+            break;
+        case '3':
+            result='任务完成，等待确认';
+            break;
+        case '4':
+            result='确认任务完成';
+            break;
+        case '5':
+            result='重做任务';
+            break;
+        case '6':
+            result='取消任务';
+            break;
+        case '7':
+            result='重做任务';
+            break;
+    }
+    return result;
+});

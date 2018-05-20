@@ -83,6 +83,15 @@ export default {
                 params: params
             });
         },
+        //上传文件
+        upload:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/base/svr/uppic',
+                params: params
+            });
+        },
+
     }
   },
 

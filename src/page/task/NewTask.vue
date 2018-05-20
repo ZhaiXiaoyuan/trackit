@@ -44,34 +44,27 @@
                     </div>
                     <div class="block-bd">
                         <el-form ref="form">
-                            <el-form-item label="活动区域">
-                                <el-select v-model="taskType" placeholder="任务种类">
-                                    <el-option label="区域一" value="shanghai"></el-option>
-                                    <el-option label="区域二" value="beijing"></el-option>
+                            <el-form-item label="任务种类">
+                                <el-select v-model="taskType" placeholder="请选择任务种类">
+                                    <el-option v-for="(item,index) in resourceTypeList" :label="item.label" :value="item.value" :key="item.value"></el-option>
                                 </el-select>
                             </el-form-item>
                             <el-form-item label="任务样品图片：">
-                                <el-upload class="uploader"
-                                           action="https://jsonplaceholder.typicode.com/posts/"
-                                           list-type="picture-card"
-                                           :on-preview="handlePictureCardPreview"
-                                           :on-remove="handleRemove">
-                                    <i class="el-icon-plus"></i>
-                                </el-upload>
-                                <el-upload class="uploader"
-                                           action="https://jsonplaceholder.typicode.com/posts/"
-                                           list-type="picture-card"
-                                           :on-preview="handlePictureCardPreview"
-                                           :on-remove="handleRemove">
-                                    <i class="el-icon-plus"></i>
-                                </el-upload>
-                                <el-upload class="uploader"
-                                           action="https://jsonplaceholder.typicode.com/posts/"
-                                           list-type="picture-card"
-                                           :on-preview="handlePictureCardPreview"
-                                           :on-remove="handleRemove">
-                                    <i class="el-icon-plus"></i>
-                                </el-upload>
+                               <ul class="cm-pic-list" style="float: left;">
+                                   <li v-for="(item,index) in picList">
+                                       <img :src="basicConfig.imgPrefix+'zfiles/'+item">
+                                       <i class="icon el-icon-delete del-btn"></i>
+                                       <div class="input-wrap">
+                                           <input type="text" maxlength="20" placeholder="请输入标签">
+                                       </div>
+                                   </li>
+                               </ul>
+                               <div class="cm-pic-uploader" v-loading="uploading" style="margin: 5px;">
+                                   <input  type="file" id="file-input" accept="image/*" @change="selectFile()">
+                                   <div class="wrapper">
+                                       <i class="icon add-icon el-icon-circle-plus"></i>
+                                   </div>
+                               </div>
                             </el-form-item>
                             <el-form-item class="row-input-item" label="客户要栏：">
                                 <el-input></el-input>
@@ -116,7 +109,7 @@
       max-width: 1200px;
   }
   .block{
-      padding: 20px 0px 10px 0px;
+      padding: 10px 0px 10px 0px;
       &+.block{
           border-top: 1px solid #e5e5e5;
       }
@@ -177,27 +170,6 @@
         data() {
             return {
                 dialogFormVisible: false,
-                areaSelect: { province: '', city: '', area: '' },
-                form: {
-                    name: '',
-                    region: '',
-                    date1: '',
-                    date2: '',
-                    delivery: false,
-                    type: [],
-                    resource: '',
-                    desc: '',
-                    id:null,
-                },
-                formLabelWidth: '120px',
-
-                shopDetail:{},
-                shopChannelsUser:{},
-                marketingChannelsUser:{},
-                otherUser:{},
-
-                uploadFb:null,
-                uploadedCount:0,
 
                 curDateStrArr:Vue.formatDate(new Date(),'yyyy.MM.dd').split('.'),
 
@@ -222,10 +194,13 @@
                 inputValue:null,
 
 
+                uploading:false,
+                picList:['Pic2018052012350045099.png'],
+                uploadParams:null,
                 customerNo:null,
                 customerNote:null,
                 completeDate:null,
-                taskType:null,
+                taskType:'Buliao',
                 isEmergency:false
             }
         },
@@ -236,136 +211,32 @@
 
         },
         methods: {
-            getShopDetail:function () {
-                Vue.api.getShopDetail({...Vue.sessionInfo(),shopId:this.id}).then((resp)=>{
-                    if(resp.respCode=='00'){
-                    this.shopDetail=JSON.parse(resp.respMsg);
-                    this.form=Object.assign({},this.shopDetail);
-                    this.shopChannelsUser=JSON.parse(this.shopDetail.shopChannelsUser);
-                    this.marketingChannelsUser=JSON.parse(this.shopDetail.marketingChannelsUser);
-                    this.otherUser=JSON.parse(this.shopDetail.otherUser);
-                    console.log('this.form:',this.form);
-                }
-            });
-            },
-            del:function () {
-                this.$confirm('确定删除该账号?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then((data) => {
-                    let fb=Vue.operationFeedback({text:'删除中...'});
-                    Vue.api.setShopState({timeStamp:Vue.sessionInfo().timeStamp,shopId:this.id,state:'del'}).then((resp)=>{
-                        if(resp.respCode=='00'){
-                            this.shopDetail.accountState='del';
-                            fb.setOptions({type:'complete',text:'删除成功'});
-                        }else{
-                            fb.setOptions({type:'warn',text:'删除失败，'+resp.respMsg});
-                        }
-                    });
-                }).catch((data) => {
-
-                });
-            },
-            disable:function () {
-                this.$confirm('确定禁用该账号?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then((data) => {
-                    let fb=Vue.operationFeedback({text:'操作中...'});
-                    Vue.api.setShopState({timeStamp:Vue.sessionInfo().timeStamp,shopId:this.id,state:'disable'}).then((resp)=>{
-                        if(resp.respCode=='00'){
-                            this.shopDetail.accountState='disable';
-                            fb.setOptions({type:'complete',text:'操作成功'});
-                        }else{
-                            fb.setOptions({type:'warn',text:'操作失败，'+resp.respMsg});
-                        }
-                    });
-                }).catch((data) => {
-
-                });
-            },
-            enable:function () {
-                this.$confirm('确定恢复该账号?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then((data) => {
-                    let fb=Vue.operationFeedback({text:'操作中...'});
-                    Vue.api.setShopState({timeStamp:Vue.sessionInfo().timeStamp,shopId:this.id,state:'enable'}).then((resp)=>{
-                        if(resp.respCode=='00'){
-                            this.shopDetail.accountState='enable';
-                            fb.setOptions({type:'complete',text:'操作成功'});
-                        }else{
-                            fb.setOptions({type:'warn',text:'操作失败，'+resp.respMsg});
-                        }
-                    });
-                }).catch((data) => {
-
-                });
-            },
-            update:function () {
-                let params={
-                    ...Vue.sessionInfo(),
-                    shopId:this.id,
-                    ...this.form
-                }
-                let fb=Vue.operationFeedback({text:'保存中...'});
-                Vue.api.updateShopInfo(params).then((resp)=>{
-                    if(resp.respCode=='00'){
-                        this.getShopDetail();
-                        this.dialogFormVisible = false;
-                        fb.setOptions({type:'complete',text:'保存成功'});
-                    }else{
-                        fb.setOptions({type:'warn',text:'保存失败，'+resp.respMsg});
-                    }
-                });
-            },
             selectFile:function () {
-                let that=this;
-                this.files=document.getElementById('file-input').files;
-                this.uploadFb=this.operationFeedback({text:'上传中，请耐心等待',mask:true});
-                this.uploadedCount=0;
-                let index=0;
-                let uploadInterval=setInterval(()=>{
-                    if(index==this.files.length){
-                        clearInterval(uploadInterval);
-                        return;
-                    }
-                    this.upload(this.files[index]);
-                    index++;
-                },1000);
-            },
-            upload:function (file) {
-                let that=this;
+                let file=document.getElementById('file-input').files[0];
+                let formData = new FormData();
                 let sessionInfo=Vue.sessionInfo();
-                var formData = new FormData();
-                formData.append('timeStamp',sessionInfo.timeStamp);
-                formData.append('shopId',this.id);
-                formData.append("file", file);
-                Vue.api.uploadShopPic(formData).then((resp)=>{
-                    if(resp.respCode=='00'){
-                        this.getShopDetail();
-                        that.uploadFb.setOptions({type:'complete',text:'上传成功'});
+                formData.append('req_from',sessionInfo.req_from);
+                formData.append('timestamp',sessionInfo.timestamp);
+                formData.append('number',sessionInfo.number);
+                formData.append('signature',sessionInfo.signature);
+                formData.append('biztype','Task');
+                formData.append('bizid',null);
+                formData.append('fieldname',file.name);
+                formData.append('file1',file);
+                this.uploading=true;
+                Vue.api.upload(formData).then((resp)=>{
+                    this.uploading=false;
+                    if(resp.status='success'){
+                        this.picList.push(resp.message)
                     }else{
-
+                        Vue.operationFeedback({type:'warn',text:'上传失败'});
                     }
                 });
-            },
-
-            handlePictureCardPreview:function () {
-
-            },
-            handleRemove:function () {
-
             },
         },
         mounted () {
             /**/
             this.id=this.$route.params.id;
-            /**/
-            this.getShopDetail();
             /**/
         },
     }

@@ -9,22 +9,27 @@
         <div class="container">
             <div class="condition-panel">
                 <el-row class="type-list">
-                    <el-button-group>
-                        <el-button type="primary">全部</el-button>
-                        <el-button type="">进行中</el-button>
-                        <el-button type="">已完成</el-button>
-                        <el-button type="">已取消</el-button>
+                    <el-radio-group v-model="range" @change="rangeChange" class="cm-radio-group">
+                        <el-radio label="All">全部</el-radio>
+                        <el-radio label="Mine">我的</el-radio>
+                    </el-radio-group>
+                    <el-button-group style="margin-left: 30px;">
+                        <!--<el-button type="primary">全部</el-button>-->
+                        <el-button type="" :class="{'el-button--primary':type=='do'}" @click="setType('do')">进行中</el-button>
+                        <el-button type="" :class="{'el-button--primary':type=='4'}" @click="setType('4')">已完成</el-button>
+                        <el-button type="" :class="{'el-button--primary':type=='7'}" @click="setType('7')">已取消</el-button>
                     </el-button-group>
                 </el-row>
                 <el-row class="condition-row" style="margin-top: 20px;">
                     <el-col :span="3">
-                        订单量：<span class="blue">3单</span>
+                        订单量：<span class="blue">{{pager.total}}单</span>
                     </el-col>
-                    <el-col :span="9">
+                    <el-col :span="8">
                         <span>时间:</span>
                         <el-date-picker
                             class="cm-date-picker"
-                            v-model="dateRange"
+                            v-model="dateRage"
+                            @change="dateRageChange"
                             type="daterange"
                             range-separator="至"
                             start-placeholder="开始日期"
@@ -32,12 +37,12 @@
                         </el-date-picker>
                     </el-col>
                     <span>关键字：</span>
-                    <el-col :span="5">
-                        <el-input placeholder="请输入内容" v-model="keyword">
+                    <el-col :span="6">
+                        <el-input placeholder="客户号/任务号/客户参考" v-model="keyword" @keyup.enter.native="getList()">
                             <el-button slot="append" icon="el-icon-search"></el-button>
                         </el-input>
                     </el-col>
-                    <el-col :span="5" style="text-align: right;">
+                    <el-col :span="4" style="text-align: right;margin-left: 20px;">
                         <el-button size="small" type="primary">新建任务</el-button>
                         <el-button size="small" type="">导出</el-button>
                     </el-col>
@@ -45,16 +50,20 @@
             </div>
             <div class="list-panel">
                 <el-table :data="entryList" border style="width: 100%;" ref="multipleTable">
-                    <el-table-column prop="phoneNums" label="任务单号" align="center"></el-table-column>
-                    <el-table-column prop="name" label="客户编号"  align="center"></el-table-column>
-                    <el-table-column prop="idCard" label="客户参考"  align="center"></el-table-column>
-                    <el-table-column prop="email" label="物料完成时间"  align="center"></el-table-column>
-                    <el-table-column prop="bankName" label="任务种类"  align="center"></el-table-column>
-                    <el-table-column prop="subbranch" label="下单时间" align="center"></el-table-column>
-                    <el-table-column prop="bankAccount" label="任务状态" width="200"  align="center"></el-table-column>
+                    <el-table-column prop="taskno" label="任务单号" align="center"></el-table-column>
+                    <el-table-column prop="custno" label="客户编号"  align="center"></el-table-column>
+                    <el-table-column prop="custbasis" label="客户参考"  align="center"></el-table-column>
+                    <el-table-column prop="plantime" label="物料完成时间"  align="center"></el-table-column>
+                    <el-table-column prop="resourceLabel" label="任务种类"  align="center"></el-table-column>
+                    <el-table-column prop="createtime" label="下单时间" align="center"></el-table-column>
+                    <el-table-column label="任务状态" width="200"  align="center">
+                        <template slot-scope="scope">
+                            {{scope.row.status|taskStatus}}
+                        </template>
+                    </el-table-column>
                     <el-table-column label="操作"  align="center">
                         <template slot-scope="scope">
-                            <router-link :to="'/userDetail/'+scope.row.id" size="small">查看详情</router-link>
+                            <router-link :to="'/taskDetail/'+scope.row.id" size="small">查看详情</router-link>
                             <i class="icon emergency-icon" v-if="false"></i>
                         </template>
                     </el-table-column>
@@ -62,12 +71,12 @@
                 <div class="pagination">
                     <el-pagination
                         @size-change="handleSizeChange"
-                        @current-change="handleCurrentChange"
-                        :current-page="1"
+                        @current-change="getList"
+                        :current-page="pager.pageNumber"
                         :page-sizes="[10, 20, 50, 100]"
-                        :page-size="100"
+                        :page-size="pager.pageSize"
                         layout="total, sizes, prev, pager, next, jumper"
-                        :total="400">
+                        :total="pager.total">
                     </el-pagination>
                 </div>
             </div>
@@ -101,8 +110,13 @@
         data() {
             return {
                 listType:'first',
+                type:'do',//进行中:do,4:已完成，7:已取消
+                range:'All',
                 dateRange:null,
+                startDate:null,
+                endDate:null,
                 keyword:null,
+                dateRage:null,
                 pager:{
                     pageNumber:1,
                     pageSize:20,
@@ -272,28 +286,50 @@
                 o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w)))
                 return o
             },
+
+            rangeChange:function (data) {
+                console.log('data:',data);
+                this.getList();
+            },
+            setType:function (value) {
+                this.type=value;
+                this.getList();
+            },
+            dateRageChange:function (data) {
+                this.startDate=Vue.formatDate(data[0],'yyyy-MM-dd');
+                this.endDate=Vue.formatDate(data[1],'yyyy-MM-dd');
+                this.getList();
+            },
             getList:function (pageIndex) {
                 this.pager.pageIndex=pageIndex?pageIndex:1;
                 let params={
                     ...Vue.sessionInfo(),
-                    pageIndex:this.pager.pageIndex,
-                    pageSize:this.pager.pageSize,
-                    searchContent:null,
+                    range:this.range,
+                    resource:'',
+                   /* status:this.type,*/
+                    beginDate:this.startDate,
+                    endDate:this.endDate,
+                    searchKey:this.keyword,
+                    'pager.pageNumber':this.pager.pageNumber,
+                    'pager.pageSize':this.pager.pageSize,
                 }
                 this.pager.loading=true;
                 Vue.api.getTaskList(params).then((resp)=>{
                     this.pager.loading=false;
-                    if(resp.respCode=='2000'){
-                        let data=JSON.parse(resp.respMsg);
+                    if(resp.status=='success'){
+                        let data=JSON.parse(resp.message);
+                        this.entryList=data.result;
+                        let pager=data.pager;
+                        this.pager.total=pager.totalRecordCount;
+                        console.log('this.entryLis:',this.entryList);
+
                     }
                 });
             },
-            handleSizeChange:function () {
-
+            handleSizeChange:function (data) {
+                this.pager.pageSize=data;
+                this.getList();
             },
-            handleCurrentChange:function () {
-
-            }
 
         },
         mounted () {

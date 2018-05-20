@@ -46,12 +46,27 @@ export default {
       Vue.tools = {
           basicConfig:{
               //临时测试
-              basicUrl:false&&process.env.NODE_ENV=='development'?'http://zyu-server.wicp.net:19356/':'http://api.yeahcai.com'
+              basicUrl:false&&process.env.NODE_ENV=='development'?'/api':'http://120.79.17.251:8000/trackitapps',
+              imgPrefix:'http://120.79.17.251:8000/'
           },
         /*生成请求时间戳*/
         genTimestamp:function () {
           return Math.ceil(new Date().getTime()/1000)
         },
+          resourceTypeList:[
+              {
+                  label:'布料 ',
+                  value:'Buliao'
+              },
+              {
+                  label:'辅料 ',
+                  value:'Fuliao'
+              },
+              {
+                  label:'加工厂',
+                  value:'Jiagong'
+              },
+          ],
         /**
          *
          * @param date
@@ -81,7 +96,7 @@ export default {
           let account=this.getAccountInfo();
           return{
               req_from:' mj-backend',
-              timeStamp:timestamp,
+              timestamp:timestamp,
               number:account.number,
               signature:md5.hex('timestamp='+timestamp+'&number='+account.number+'&token='+account.token+'')
           }
