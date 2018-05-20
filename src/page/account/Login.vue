@@ -119,9 +119,9 @@
                         }
                         this.$cookie.set('account',JSON.stringify(account),7);
                         fb.setOptions({type:"complete",text:'登录成功'});
-                        /*this.$router.push({name:'task'});*///临时测试
+                        this.$router.push({name:'task'});
                     }else{
-                        fb.setOptions({type:"complete",text:resp.desc});
+                        fb.setOptions({type:"warn",text:resp.desc});
                     }
                 });
             }

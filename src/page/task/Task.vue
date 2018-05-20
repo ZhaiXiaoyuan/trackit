@@ -43,7 +43,7 @@
                         </el-input>
                     </el-col>
                     <el-col :span="4" style="text-align: right;margin-left: 20px;">
-                        <el-button size="small" type="primary">新建任务</el-button>
+                        <el-button size="small" type="primary" @click="$router.push({name:'newTask'})">新建任务</el-button>
                         <el-button size="small" type="">导出</el-button>
                     </el-col>
                 </el-row>

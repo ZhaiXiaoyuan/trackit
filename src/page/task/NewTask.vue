@@ -52,7 +52,7 @@
                             <el-form-item label="任务样品图片：">
                                <ul class="cm-pic-list" style="float: left;">
                                    <li v-for="(item,index) in picList">
-                                       <img :src="basicConfig.imgPrefix+'zfiles/'+item">
+                                       <img :src="item.filepath">
                                        <i class="icon el-icon-delete del-btn" @click="delPic(index)"></i>
                                        <div class="input-wrap">
                                            <input type="text" maxlength="20" placeholder="请输入标签">
@@ -66,7 +66,7 @@
                                    </div>
                                </div>
                             </el-form-item>
-                            <el-form-item class="row-input-item" label="客户要栏：">
+                            <el-form-item class="row-input-item" label="客户要求栏：">
                                 <el-input v-model="custRequire" :maxlength="1024"></el-input>
                             </el-form-item>
                             <el-form-item label="任务是否紧急：">
@@ -98,8 +98,8 @@
                 </div>
             </div>
             <el-row style="text-align: center;margin-top: 40px;padding-bottom: 20px;">
-                <el-button type="primary">确认发布</el-button>
-                <el-button type="">取消发布</el-button>
+                <el-button type="primary" @click="save()">确认发布</el-button>
+                <el-button type="" @click="$router.go(-1)">取消发布</el-button>
             </el-row>
         </div>
         <el-dialog title="新建信息标签" class="add-label-dialog" :visible.sync="dialogFormVisible" v-if="dialogFormVisible" >
@@ -215,8 +215,7 @@
 
 
                 uploading:false,
-                picList:['Pic2018052012350045099.png'],//临时测试
-                uploadParams:null,
+                picList:[{"filepath":"http://120.79.17.251:8000/zfiles/Pic2018052101004353020.jpg","filename":"Pic2018052101004353020.jpg"}],//临时测试
                 customerNo:null,
                 customerNote:null,
                 completeDate:null,
@@ -248,7 +247,9 @@
                 Vue.api.upload(formData).then((resp)=>{
                     this.uploading=false;
                     if(resp.status='success'){
-                        this.picList.push(resp.message)
+                        let data=JSON.parse(resp.message)
+                        this.picList.push(data);
+                        console.log('this.picList:',this.picList);
                     }else{
                         Vue.operationFeedback({type:'warn',text:'上传失败'});
                     }
@@ -271,6 +272,82 @@
                 this.dialogFormVisible=false;
             },
             save:function () {
+                if(!this.customerNo){
+                    Vue.operationFeedback({type:'warn',text:'请输入客户编号'});
+                    return;
+                }
+                if(!this.customerNote){
+                    Vue.operationFeedback({type:'warn',text:'请输入客户参考'});
+                    return;
+                }
+                if(!this.completeDate){
+                    Vue.operationFeedback({type:'warn',text:'选择预计完成时间'});
+                    return;
+                }
+                if(!this.taskType){
+                    Vue.operationFeedback({type:'warn',text:'请选择任务种类'});
+                    return;
+                }
+                if(this.picList.length==0){
+                    Vue.operationFeedback({type:'warn',text:'请上传任务样品图片'});
+                    return;
+                }
+                if(!this.custRequire){
+                        Vue.operationFeedback({type:'warn',text:'请输入客户要求栏'});
+                    return;
+                }
+                let selectedLabelStr='';
+                this.labelList.forEach((item,i)=>{
+                    if(item.active){
+                        selectedLabelStr+=(i>0?',':'')+(i+1)+':'+item.label;
+                    }
+                })
+                if(!selectedLabelStr||selectedLabelStr==''){
+                    Vue.operationFeedback({type:'warn',text:'请勾选需要供应商提供的相关信息'});
+                    return;
+                }
+                let params={
+                    ...Vue.sessionInfo(),
+                    custno:this.customerNo,
+                    custbasis:this.customerNote,
+                    plantime:this.completeDate,
+                    resource:this.taskType,
+                    custrequire:this.custRequire,
+                    urgent:this.isEmergency,
+                    proattrs:selectedLabelStr,
+                }
+                this.picList.forEach((item,i)=>{
+                    if(i==0){
+                        params.custpropicone=item.filename;
+                    }else if(i==1){
+                        params.custpropictwo=item.filename;
+                    }if(i==2){
+                        params.custpropicthree=item.filename;
+                    }if(i==3){
+                        params.custpropicfour=item.filename;
+                    }if(i==4){
+                        params.custpropicfive=item.filename;
+                    }if(i==5){
+                        params.custpropicsix=item.filename;
+                    }if(i==6){
+                        params.custpropicseven=item.filename;
+                    }if(i==7){
+                        params.custpropiceight=item.filename;
+                    }if(i==8){
+                        params.custpropicnine=item.filename;
+                    }if(i==9){
+                        params.custpropicten=item.filename;
+                    }
+                })
+                let fb=Vue.operationFeedback({text:'保存中...'});
+                Vue.api.addTask(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        fb.setOptions({type:"complete",text:'保存成功'});
+                        this.$router.push({name:'task'});
+                    }else{
+                        fb.setOptions({type:"warn",text:resp.message});
+                    }
+                });
 
             }
         },

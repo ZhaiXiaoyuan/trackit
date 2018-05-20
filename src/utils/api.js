@@ -91,6 +91,14 @@ export default {
                 params: params
             });
         },
+        //【旧】新增任务【A+M】
+        addTask:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/task/biz/add',
+                params: params
+            });
+        },
 
     }
   },
