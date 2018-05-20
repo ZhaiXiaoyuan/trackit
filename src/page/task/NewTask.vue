@@ -24,13 +24,13 @@
                     <div class="block-bd">
                         <el-form :inline="true">
                             <el-form-item class="input-item" label="客户编号：">
-                                <el-input v-model="customerNo" placeholder=""></el-input>
+                                <el-input v-model="customerNo" :maxlength="32" placeholder=""></el-input>
                             </el-form-item>
                             <el-form-item class="input-item" label="客户参考：">
-                                <el-input v-model="customerNote" placeholder=""></el-input>
+                                <el-input v-model="customerNote" :maxlength="512" placeholder=""></el-input>
                             </el-form-item>
                             <el-form-item class="input-item" label="预计完成时间：">
-                                <el-input v-model="completeDate" placeholder=""></el-input>
+                                <el-date-picker type="date" placeholder="选择日期" v-model="completeDate"></el-date-picker>
                             </el-form-item>
                         </el-form>
                     </div>
@@ -53,7 +53,7 @@
                                <ul class="cm-pic-list" style="float: left;">
                                    <li v-for="(item,index) in picList">
                                        <img :src="basicConfig.imgPrefix+'zfiles/'+item">
-                                       <i class="icon el-icon-delete del-btn"></i>
+                                       <i class="icon el-icon-delete del-btn" @click="delPic(index)"></i>
                                        <div class="input-wrap">
                                            <input type="text" maxlength="20" placeholder="请输入标签">
                                        </div>
@@ -67,12 +67,12 @@
                                </div>
                             </el-form-item>
                             <el-form-item class="row-input-item" label="客户要栏：">
-                                <el-input></el-input>
+                                <el-input v-model="custRequire" :maxlength="1024"></el-input>
                             </el-form-item>
                             <el-form-item label="任务是否紧急：">
                                 <el-radio-group v-model="isEmergency" size="medium">
-                                    <el-radio label="是"></el-radio>
-                                    <el-radio label="否"></el-radio>
+                                    <el-radio :value="1" :label="1">是</el-radio>
+                                    <el-radio :value="0" :label="0">否</el-radio>
                                 </el-radio-group>
                             </el-form-item>
                         </el-form>
@@ -87,8 +87,8 @@
                     </div>
                     <div class="block-bd">
                         <ul class="label-list">
-                            <li v-for="item in labelList">{{item.label}}</li>
-                            <li class="add-btn">
+                            <li v-for="(item,index) in labelList" :class="{'active':item.active}" @click="selectLabel(index)">{{item.label}}</li>
+                            <li class="add-btn" @click="dialogFormVisible=true">
                                 <svg class="icon blue-icon" aria-hidden="true">
                                     <use xlink:href="#icon-tianjia"></use>
                                 </svg>
@@ -102,6 +102,15 @@
                 <el-button type="">取消发布</el-button>
             </el-row>
         </div>
+        <el-dialog title="新建信息标签" class="add-label-dialog" :visible.sync="dialogFormVisible" v-if="dialogFormVisible" >
+            <div style="text-align: center">
+                <el-input v-model="newLabel" placeholder="请输入信息描述" :maxlength="50" style="width: 100%;"></el-input>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="addLabel()">确定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <style lang="less" rel="stylesheet/less" scoped>
@@ -154,6 +163,11 @@
             margin: 5px 10px;
             border: 1px solid #e5e5e5;
             cursor: pointer;
+            &.active{
+                background: #48b4ff;
+                color: #fff;
+                border: 1px solid #48b4ff;
+            }
         }
         .add-btn{
             border: none;
@@ -176,32 +190,39 @@
                 labelList:[
                     {
                         label:'样品货号',
-                        value:''
+                        value:'',
+                        active:false,
                     },{
                         label:'样品名称',
-                        value:''
+                        value:'',
+                        active:false,
                     },{
                         label:'样品描述',
-                        value:''
+                        value:'',
+                        active:false,
                     },{
                         label:'单重',
-                        value:''
+                        value:'',
+                        active:false,
                     },{
                         label:'打样费用',
-                        value:''
+                        value:'',
+                        active:false,
                     }
                 ],
+                newLabel:null,
                 inputValue:null,
 
 
                 uploading:false,
-                picList:['Pic2018052012350045099.png'],
+                picList:['Pic2018052012350045099.png'],//临时测试
                 uploadParams:null,
                 customerNo:null,
                 customerNote:null,
                 completeDate:null,
                 taskType:'Buliao',
-                isEmergency:false
+                isEmergency:1,
+                custRequire:null,
             }
         },
         created(){
@@ -233,6 +254,25 @@
                     }
                 });
             },
+            delPic:function (index) {
+                this.picList.splice(index,1);
+            },
+            selectLabel:function (index) {
+                this.labelList[index].active=!this.labelList[index].active;
+            },
+            addLabel:function () {
+                let str=this.newLabel;
+                this.labelList.push({
+                    label:str,
+                    value:'',
+                    active:true,
+                });
+                this.newLabel=null;
+                this.dialogFormVisible=false;
+            },
+            save:function () {
+
+            }
         },
         mounted () {
             /**/
