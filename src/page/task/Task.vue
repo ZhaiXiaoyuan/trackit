@@ -9,12 +9,12 @@
         <div class="container">
             <div class="condition-panel">
                 <el-row class="type-list">
-                    <el-radio-group v-model="range" @change="rangeChange" class="cm-radio-group">
+                   <!-- <el-radio-group v-model="range" @change="rangeChange" class="cm-radio-group">
                         <el-radio label="All">全部</el-radio>
                         <el-radio label="Mine">我的</el-radio>
-                    </el-radio-group>
+                    </el-radio-group>-->
                     <el-button-group style="margin-left: 30px;">
-                        <!--<el-button type="primary">全部</el-button>-->
+                       <!-- <el-button type="primary">全部</el-button>-->
                         <el-button type="" :class="{'el-button--primary':type=='do'}" @click="setType('do')">进行中</el-button>
                         <el-button type="" :class="{'el-button--primary':type=='4'}" @click="setType('4')">已完成</el-button>
                         <el-button type="" :class="{'el-button--primary':type=='7'}" @click="setType('7')">已取消</el-button>
@@ -39,7 +39,7 @@
                     <span>关键字：</span>
                     <el-col :span="6">
                         <el-input placeholder="客户号/任务号/客户参考" v-model="keyword" @keyup.enter.native="getList()">
-                            <el-button slot="append" icon="el-icon-search"></el-button>
+                            <el-button slot="append" icon="el-icon-search" @click="getList()"></el-button>
                         </el-input>
                     </el-col>
                     <el-col :span="4" style="text-align: right;margin-left: 20px;">
@@ -64,7 +64,7 @@
                     <el-table-column label="操作"  align="center">
                         <template slot-scope="scope">
                             <router-link :to="'/taskDetail/'+scope.row.id" size="small">查看详情</router-link>
-                            <i class="icon emergency-icon" v-if="false"></i>
+                            <i class="icon emergency-icon" v-if="scope.row.urgent"></i>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -109,6 +109,7 @@
     export default {
         data() {
             return {
+                account:null,
                 listType:'first',
                 type:'do',//进行中:do,4:已完成，7:已取消
                 range:'All',
@@ -306,7 +307,7 @@
                     ...Vue.sessionInfo(),
                     range:this.range,
                     resource:'',
-                   /* status:this.type,*/
+                    status:this.type,
                     beginDate:this.startDate,
                     endDate:this.endDate,
                     searchKey:this.keyword,
@@ -333,6 +334,10 @@
 
         },
         mounted () {
+            //
+            this.account=Vue.getAccountInfo();
+            console.log('this.account:',this.account);
+            //
             this.imFile = document.getElementById('imFile');
             this.outFile = document.getElementById('downlink');
             /**/

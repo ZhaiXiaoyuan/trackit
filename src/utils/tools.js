@@ -148,7 +148,7 @@ export default {
             if(account){
                 return JSON.parse(account);
             }else{
-             /*   router.push({name:'login'});*/
+                router.push({name:'login'});
                 return{};
             }
         }

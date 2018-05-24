@@ -99,6 +99,14 @@ export default {
                 params: params
             });
         },
+        //【旧】任务详情 - 客户【A+M】
+        getCustomerTaskDetail:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/task/biz/get',
+                params: params
+            });
+        },
 
     }
   },

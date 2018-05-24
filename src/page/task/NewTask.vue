@@ -55,7 +55,7 @@
                                        <img :src="item.filepath">
                                        <i class="icon el-icon-delete del-btn" @click="delPic(index)"></i>
                                        <div class="input-wrap">
-                                           <input type="text" maxlength="20" placeholder="请输入标签">
+                                           <input type="text" v-model="item.label" maxlength="20" placeholder="请输入标签">
                                        </div>
                                    </li>
                                </ul>
@@ -139,7 +139,7 @@
     }
     .input-item{
         &+.input-item{
-            margin-left: 20px;
+            margin-left: 15px;
         }
     }
     .uploader{
@@ -215,7 +215,7 @@
 
 
                 uploading:false,
-                picList:[{"filepath":"http://120.79.17.251:8000/zfiles/Pic2018052101004353020.jpg","filename":"Pic2018052101004353020.jpg"}],//临时测试
+                picList:[{"filepath":"http://120.79.17.251:8000/zfiles/Pic2018052101004353020.jpg","filename":"Pic2018052101004353020.jpg",label:'标题'}],//临时测试
                 customerNo:null,
                 customerNote:null,
                 completeDate:null,
@@ -272,6 +272,7 @@
                 this.dialogFormVisible=false;
             },
             save:function () {
+                console.log('test:',this.completeDate);
                 if(!this.customerNo){
                     Vue.operationFeedback({type:'warn',text:'请输入客户编号'});
                     return;
@@ -310,7 +311,7 @@
                     ...Vue.sessionInfo(),
                     custno:this.customerNo,
                     custbasis:this.customerNote,
-                    plantime:this.completeDate,
+                    plantime:Vue.formatDate(this.completeDate,'yyyy-MM-dd'),
                     resource:this.taskType,
                     custrequire:this.custRequire,
                     urgent:this.isEmergency,
@@ -319,24 +320,34 @@
                 this.picList.forEach((item,i)=>{
                     if(i==0){
                         params.custpropicone=item.filename;
+                        params.custpropiconetag=item.label?item.label:null;
                     }else if(i==1){
                         params.custpropictwo=item.filename;
+                        params.custpropictwotag=item.label?item.label:null;
                     }if(i==2){
                         params.custpropicthree=item.filename;
+                        params.custpropicthreetag=item.label?item.label:null;
                     }if(i==3){
                         params.custpropicfour=item.filename;
+                        params.custpropicfourtag=item.label?item.label:null;
                     }if(i==4){
                         params.custpropicfive=item.filename;
+                        params.custpropicfivetag=item.label?item.label:null;
                     }if(i==5){
                         params.custpropicsix=item.filename;
+                        params.custpropicsixtag=item.label?item.label:null;
                     }if(i==6){
                         params.custpropicseven=item.filename;
+                        params.custpropicseventag=item.label?item.label:null;
                     }if(i==7){
                         params.custpropiceight=item.filename;
+                        params.custpropiceighttag=item.label?item.label:null;
                     }if(i==8){
                         params.custpropicnine=item.filename;
+                        params.custpropicninetag=item.label?item.label:null;
                     }if(i==9){
                         params.custpropicten=item.filename;
+                        params.custpropicninetag=item.label?item.label:null;
                     }
                 })
                 let fb=Vue.operationFeedback({text:'保存中...'});

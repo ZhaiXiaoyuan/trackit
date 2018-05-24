@@ -15,19 +15,26 @@
             </el-row>
             <div class="container-bd">
                 <div class="block">
+                    <el-row class="block-hd" type="flex" align="middle">
+                        <el-col :span="12">
+                            <span class="title">任务信息</span>
+                            <i class="icon emergency-icon" v-if="task.urgent"></i>
+                        </el-col>
+                        <el-col :span="12" style="text-align: right;">
+                            <el-button>导出</el-button>
+                        </el-col>
+                    </el-row>
                     <div class="block-bd">
                         <el-table :data="entryList" border style="width: 100%;" ref="multipleTable">
-                            <el-table-column prop="phoneNums" label="任务单号" align="center"></el-table-column>
-                            <el-table-column prop="name" label="客户编号"  align="center"></el-table-column>
-                            <el-table-column prop="idCard" label="客户参考"  align="center"></el-table-column>
-                            <el-table-column prop="email" label="预计完成时间"  align="center"></el-table-column>
-                            <el-table-column prop="bankName" label="任务种类"  align="center"></el-table-column>
-                            <el-table-column prop="subbranch" label="下单时间" align="center"></el-table-column>
-                            <el-table-column prop="bankAccount" label="任务状态" width="200"  align="center"></el-table-column>
-                            <el-table-column label="操作"  align="center">
+                            <el-table-column prop="taskno" label="任务单号" align="center"></el-table-column>
+                            <el-table-column prop="custno" label="客户编号"  align="center"></el-table-column>
+                            <el-table-column prop="custbasis" label="客户参考"  align="center"></el-table-column>
+                            <el-table-column prop="plantime" label="物料完成时间"  align="center"></el-table-column>
+                            <el-table-column prop="resourceLabel" label="任务种类"  align="center"></el-table-column>
+                            <el-table-column prop="createtime" label="下单时间" align="center"></el-table-column>
+                            <el-table-column label="任务状态" width="200"  align="center">
                                 <template slot-scope="scope">
-                                    <router-link :to="'/userDetail/'+scope.row.id" size="small">查看详情</router-link>
-                                    <i class="icon emergency-icon" v-if="false"></i>
+                                    {{scope.row.status|taskStatus}}
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -41,64 +48,32 @@
                         <span class="title">任务详情</span>
                     </div>
                     <div class="block-bd">
-                        <el-form ref="form">
-                            <el-form-item label="活动区域">
-                                <el-select v-model="taskType" placeholder="任务种类">
-                                    <el-option label="区域一" value="shanghai"></el-option>
-                                    <el-option label="区域二" value="beijing"></el-option>
-                                </el-select>
-                            </el-form-item>
-                            <el-form-item label="任务样品图片：">
-                                <el-upload class="uploader"
-                                           action="https://jsonplaceholder.typicode.com/posts/"
-                                           list-type="picture-card"
-                                           :on-preview="handlePictureCardPreview"
-                                           :on-remove="handleRemove">
-                                    <i class="el-icon-plus"></i>
-                                </el-upload>
-                                <el-upload class="uploader"
-                                           action="https://jsonplaceholder.typicode.com/posts/"
-                                           list-type="picture-card"
-                                           :on-preview="handlePictureCardPreview"
-                                           :on-remove="handleRemove">
-                                    <i class="el-icon-plus"></i>
-                                </el-upload>
-                                <el-upload class="uploader"
-                                           action="https://jsonplaceholder.typicode.com/posts/"
-                                           list-type="picture-card"
-                                           :on-preview="handlePictureCardPreview"
-                                           :on-remove="handleRemove">
-                                    <i class="el-icon-plus"></i>
-                                </el-upload>
+                        <el-form ref="form" :label-width="formLabelWidth" label-position="left">
+                            <el-form-item label="客户提供的图片：">
+                                <ul class="cm-pic-list" style="float: left;">
+                                    <li v-for="(item,index) in picList">
+                                        <img :src="item.filepath">
+                                        <div class="input-wrap">
+                                            <input type="text" v-model="item.label" maxlength="20" readonly placeholder="请输入标签">
+                                        </div>
+                                    </li>
+                                </ul>
                             </el-form-item>
                             <el-form-item class="row-input-item" label="客户要栏：">
-                                <el-input></el-input>
-                            </el-form-item>
-                            <el-form-item label="任务是否紧急：">
-                                <el-radio-group v-model="isEmergency" size="medium">
-                                    <el-radio label="是"></el-radio>
-                                    <el-radio label="否"></el-radio>
-                                </el-radio-group>
+                                <span>{{task.custrequire}}</span>
                             </el-form-item>
                         </el-form>
                     </div>
                 </div>
-                <div class="block">
+                <div class="block" v-if="account.user_type=='Customer'">
                     <div class="block-hd">
                         <svg class="icon blue-icon" aria-hidden="true">
-                            <use xlink:href="#icon-xuanzeyixuan"></use>
+                            <use xlink:href="#icon-biaoge"></use>
                         </svg>
-                        <span class="title">请勾选需要供应商提供的相关信息，完成新建任务</span>
+                        <span class="title">报价方案</span>
                     </div>
                     <div class="block-bd">
-                        <ul class="label-list">
-                            <li v-for="item in labelList">{{item.label}}</li>
-                            <li class="add-btn">
-                                <svg class="icon blue-icon" aria-hidden="true">
-                                    <use xlink:href="#icon-tianjia"></use>
-                                </svg>
-                            </li>
-                        </ul>
+                      
                     </div>
                 </div>
             </div>
@@ -114,7 +89,7 @@
       max-width: 1200px;
   }
   .block{
-      padding: 10px 0px 10px 0px;
+      padding: 20px 0px 20px 0px;
       &+.block{
           border-top: 1px solid #e5e5e5;
       }
@@ -131,7 +106,7 @@
       }
   }
     .block-bd{
-        margin-top: 20px;
+        margin-top: 15px;
     }
     .input-item{
         &+.input-item{
@@ -187,7 +162,7 @@
                     desc: '',
                     id:null,
                 },
-                formLabelWidth: '120px',
+
 
                 shopDetail:{},
                 shopChannelsUser:{},
@@ -219,12 +194,20 @@
                 ],
                 inputValue:null,
 
-
+                formLabelWidth: '125px',
                 customerNo:null,
                 customerNote:null,
                 completeDate:null,
                 taskType:null,
-                isEmergency:false
+                isEmergency:false,
+
+
+                id:null,
+                account:{},
+                task:{},
+                entryList:[],
+                picList:[],
+
             }
         },
         created(){
@@ -234,137 +217,93 @@
 
         },
         methods: {
-            getShopDetail:function () {
-                Vue.api.getShopDetail({...Vue.sessionInfo(),shopId:this.id}).then((resp)=>{
-                    if(resp.respCode=='00'){
-                    this.shopDetail=JSON.parse(resp.respMsg);
-                    this.form=Object.assign({},this.shopDetail);
-                    this.shopChannelsUser=JSON.parse(this.shopDetail.shopChannelsUser);
-                    this.marketingChannelsUser=JSON.parse(this.shopDetail.marketingChannelsUser);
-                    this.otherUser=JSON.parse(this.shopDetail.otherUser);
-                    console.log('this.form:',this.form);
-                }
-            });
-            },
-            del:function () {
-                this.$confirm('确定删除该账号?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then((data) => {
-                    let fb=Vue.operationFeedback({text:'删除中...'});
-                    Vue.api.setShopState({timeStamp:Vue.sessionInfo().timeStamp,shopId:this.id,state:'del'}).then((resp)=>{
-                        if(resp.respCode=='00'){
-                            this.shopDetail.accountState='del';
-                            fb.setOptions({type:'complete',text:'删除成功'});
-                        }else{
-                            fb.setOptions({type:'warn',text:'删除失败，'+resp.respMsg});
-                        }
-                    });
-                }).catch((data) => {
-
-                });
-            },
-            disable:function () {
-                this.$confirm('确定禁用该账号?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then((data) => {
-                    let fb=Vue.operationFeedback({text:'操作中...'});
-                    Vue.api.setShopState({timeStamp:Vue.sessionInfo().timeStamp,shopId:this.id,state:'disable'}).then((resp)=>{
-                        if(resp.respCode=='00'){
-                            this.shopDetail.accountState='disable';
-                            fb.setOptions({type:'complete',text:'操作成功'});
-                        }else{
-                            fb.setOptions({type:'warn',text:'操作失败，'+resp.respMsg});
-                        }
-                    });
-                }).catch((data) => {
-
-                });
-            },
-            enable:function () {
-                this.$confirm('确定恢复该账号?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then((data) => {
-                    let fb=Vue.operationFeedback({text:'操作中...'});
-                    Vue.api.setShopState({timeStamp:Vue.sessionInfo().timeStamp,shopId:this.id,state:'enable'}).then((resp)=>{
-                        if(resp.respCode=='00'){
-                            this.shopDetail.accountState='enable';
-                            fb.setOptions({type:'complete',text:'操作成功'});
-                        }else{
-                            fb.setOptions({type:'warn',text:'操作失败，'+resp.respMsg});
-                        }
-                    });
-                }).catch((data) => {
-
-                });
-            },
-            update:function () {
+            getCustomerTaskDetail:function () {
                 let params={
                     ...Vue.sessionInfo(),
-                    shopId:this.id,
-                    ...this.form
+                    id:this.id,
                 }
-                let fb=Vue.operationFeedback({text:'保存中...'});
-                Vue.api.updateShopInfo(params).then((resp)=>{
-                    if(resp.respCode=='00'){
-                        this.getShopDetail();
-                        this.dialogFormVisible = false;
-                        fb.setOptions({type:'complete',text:'保存成功'});
+                Vue.api.getCustomerTaskDetail(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        this.task=JSON.parse(resp.message);
+                        console.log('this.task:',this.task);
+                        this.entryList.push(this.task);
+                        if(this.task.custpropicone){
+                            this.picList.push({
+                                filepath:this.task.custpropiconeUrl,
+                                label:this.task.custpropiconetag
+                            })
+                        }
+                        if(this.task.custpropictwo){
+                            this.picList.push({
+                                filepath:this.task.custpropictwoUrl,
+                                label:this.task.custpropictwotag
+                            })
+                        }
+                        if(this.task.custpropicthree){
+                            this.picList.push({
+                                filepath:this.task.custpropicthreeUrl,
+                                label:this.task.custpropicthreetag
+                            })
+                        }
+                        if(this.task.custpropicfour){
+                            this.picList.push({
+                                filepath:this.task.custpropicfourUrl,
+                                label:this.task.custpropicfourtag
+                            })
+                        }
+                        if(this.task.custpropicfive){
+                            this.picList.push({
+                                filepath:this.task.custpropicfiveUrl,
+                                label:this.task.custpropicfivetag
+                            })
+                        }
+                        if(this.task.custpropicsix){
+                            this.picList.push({
+                                filepath:this.task.custpropicsixUrl,
+                                label:this.task.custpropicsixtag
+                            })
+                        }
+                        if(this.task.custpropicseven){
+                            this.picList.push({
+                                filepath:this.task.custpropicsevenUrl,
+                                label:this.task.custpropicseventag
+                            })
+                        }
+                        if(this.task.custpropiceight){
+                            this.picList.push({
+                                filepath:this.task.custpropiceightUrl,
+                                label:this.task.custpropiceighttag
+                            })
+                        }
+                        if(this.task.custpropicnine){
+                            this.picList.push({
+                                filepath:this.task.custpropicnineUrl,
+                                label:this.task.custpropicninetag
+                            })
+                        }
+                        if(this.task.custpropicten){
+                            this.picList.push({
+                                filepath:this.task.custpropictenUrl,
+                                label:this.task.custpropictentag
+                            })
+                        }
+                        console.log('this.picList:',this.picList);
                     }else{
-                        fb.setOptions({type:'warn',text:'保存失败，'+resp.respMsg});
+
                     }
                 });
-            },
-            selectFile:function () {
-                let that=this;
-                this.files=document.getElementById('file-input').files;
-                this.uploadFb=this.operationFeedback({text:'上传中，请耐心等待',mask:true});
-                this.uploadedCount=0;
-                let index=0;
-                let uploadInterval=setInterval(()=>{
-                    if(index==this.files.length){
-                        clearInterval(uploadInterval);
-                        return;
-                    }
-                    this.upload(this.files[index]);
-                    index++;
-                },1000);
-            },
-            upload:function (file) {
-                let that=this;
-                let sessionInfo=Vue.sessionInfo();
-                var formData = new FormData();
-                formData.append('timeStamp',sessionInfo.timeStamp);
-                formData.append('shopId',this.id);
-                formData.append("file", file);
-                Vue.api.uploadShopPic(formData).then((resp)=>{
-                    if(resp.respCode=='00'){
-                        this.getShopDetail();
-                        that.uploadFb.setOptions({type:'complete',text:'上传成功'});
-                    }else{
-
-                    }
-                });
-            },
-
-            handlePictureCardPreview:function () {
-
-            },
-            handleRemove:function () {
-
-            },
+            }
         },
         mounted () {
             /**/
             this.id=this.$route.params.id;
+            this.account=Vue.getAccountInfo();
             /**/
-            this.getShopDetail();
-            /**/
+            if(this.account.user_type=='Customer'){
+                this.getCustomerTaskDetail();
+            }else if(this.account.role_code=='Supplyer'){
+
+            }
         },
     }
 </script>
