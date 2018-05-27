@@ -22,7 +22,7 @@
                 </el-row>
                 <el-row class="condition-row" style="margin-top: 20px;">
                     <el-col :span="3">
-                        任务量：<span class="blue">{{pager.total}}单</span>
+                        订单量：<span class="blue">{{pager.total}}单</span>
                     </el-col>
                     <el-col :span="8">
                         <span>时间:</span>
@@ -38,24 +38,24 @@
                     </el-col>
                     <span>关键字：</span>
                     <el-col :span="6">
-                        <el-input placeholder="客户号/任务号/客户参考" v-model="keyword" @keyup.enter.native="getList()">
+                        <el-input placeholder="" v-model="keyword" @keyup.enter.native="getList()">
                             <el-button slot="append" icon="el-icon-search" @click="getList()"></el-button>
                         </el-input>
                     </el-col>
                     <el-col :span="4" style="text-align: right;margin-left: 20px;">
-                        <el-button size="small" type="primary" @click="$router.push({name:'newTask'})">新建任务</el-button>
+                        <el-button size="small" type="primary" @click="$router.push({name:'newOrder'})" v-if="account.user_type=='Customer'">新建订单</el-button>
                         <el-button size="small" type="">导出</el-button>
                     </el-col>
                 </el-row>
             </div>
             <div class="list-panel">
                 <el-table :data="entryList" border style="width: 100%;" ref="multipleTable">
-                    <el-table-column prop="taskno" label="任务单号" align="center"></el-table-column>
+                    <el-table-column prop="orderno" label="订单号" align="center"></el-table-column>
                     <el-table-column prop="custno" label="客户编号"  align="center"></el-table-column>
                     <el-table-column prop="custbasis" label="客户参考"  align="center"></el-table-column>
-                    <el-table-column prop="plantime" label="物料完成时间"  align="center"></el-table-column>
-                    <el-table-column prop="resourceLabel" label="任务种类"  align="center"></el-table-column>
-                    <el-table-column prop="createtime" label="下单时间" align="center"></el-table-column>
+                    <el-table-column prop="plantime" label="预计完成时间"  align="center"></el-table-column>
+                    <el-table-column prop="resourceLabel" label="订单种类"  align="center"></el-table-column>
+                    <el-table-column prop="" label="下单时间" align="center"></el-table-column>
                     <el-table-column label="任务状态" width="200"  align="center">
                         <template slot-scope="scope">
                             {{scope.row.status|taskStatus}}
@@ -109,7 +109,7 @@
     export default {
         data() {
             return {
-                account:null,
+                account:{},
                 listType:'first',
                 type:'do',//进行中:do,4:已完成，7:已取消
                 range:'All',
@@ -306,7 +306,6 @@
                 let params={
                     ...Vue.sessionInfo(),
                     range:this.range,
-                    resource:'',
                     status:this.type,
                     beginDate:this.startDate,
                     endDate:this.endDate,
@@ -315,7 +314,7 @@
                     'pager.pageSize':this.pager.pageSize,
                 }
                 this.pager.loading=true;
-                Vue.api.getTaskList(params).then((resp)=>{
+                Vue.api.getOrderList(params).then((resp)=>{
                     this.pager.loading=false;
                     if(resp.status=='success'){
                         let data=JSON.parse(resp.message);
@@ -342,6 +341,12 @@
             this.outFile = document.getElementById('downlink');
             /**/
             this.getList();
+            /**/
+            if(this.account.user_type=='Customer'){
+
+            }else if(this.account.user_type=='Supplier'){
+
+            }
 
         },
     }

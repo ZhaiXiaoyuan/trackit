@@ -107,6 +107,70 @@ export default {
                 params: params
             });
         },
+        //【旧】符合任务的供应商列表【A+M】
+        getSupplierList:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/task/biz/gettss',
+                params: params
+            });
+        },
+        //【新】供应商任务全部报价【A+M】
+        getPlanList:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/task/biz/getqs',
+                params: params
+            });
+        },
+        //【旧】任务详情 - 供应商【A+M】
+        getSupplierTaskDetail:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/task/biz/getsim',
+                params: params
+            });
+        },
+        //获取报价列表
+        getAllPlanList:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/task/biz/getqm',
+                params: params
+            });
+        },
+        //【新】供应商任务添加报价【A+M】
+        addPlan:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/task/biz/addq',
+                params: params
+            });
+        },
+        //【新】供应商任务单个报价【A+M】
+        getPlan:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/task/biz/getq',
+                params: params
+            });
+        },
+        //【旧】消息通知列表【A+M】
+        getMsgList:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/base/info/qnots',
+                params: params
+            });
+        },
+        //【旧】客户订单列表【A+M】
+        getOrderList:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/ordez/biz/query',
+                params: params
+            });
+        },
 
     }
   },

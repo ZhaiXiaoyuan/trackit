@@ -21,7 +21,7 @@
                     </el-submenu>
                 </template>
                 <template v-else>
-                    <el-menu-item :index="item.index" :class="{'active':index==0}" :key="item.index">
+                    <el-menu-item :index="item.index" :class="{'active':item.index.indexOf(pageName)>-1}" :key="item.index">
                         <svg class="icon blue-icon" aria-hidden="true">
                             <use :xlink:href="item.icon"></use>
                         </svg>
@@ -94,7 +94,7 @@
                     {
                         code:'01',
                         icon: '#icon-solid-time',
-                        index: '/task',
+                        index: '/',
                         title: '任务',
                     },
                     {
@@ -106,15 +106,15 @@
                     {
                         code:'03',
                         icon: '#icon-xitongtongzhi',
-                        index: '/notice',
+                        index: '/msg',
                         title: '通知',
                     },
-                    {
+                 /*   {
                         code:'04',
                         icon: '#icon-biaoge',
                         index: '/report',
                         title: '统计报表',
-                    },
+                    },*/
                     {
                         code:'05',
                         icon: '#icon-user',
@@ -122,11 +122,13 @@
                         title: '个人中心',
                     },
                 ],
-                items: []
+                items: [],
+                pageName:null,
             }
         },
         computed:{
             onRoutes(){
+                this.pageName=this.$route.name;
                 return this.$route.path.replace('/','');
             }
         },
@@ -135,6 +137,8 @@
             bus.$on('collapse', msg => {
                 this.collapse = msg;
             });
+            //
+            this.pageName=this.$route.name;
             //
             this.items=this.itemsConfig;
         }
