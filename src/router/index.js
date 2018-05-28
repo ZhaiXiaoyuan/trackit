@@ -30,9 +30,14 @@ export default new Router({
                     component: resolve => require(['../page/order/Order.vue'], resolve)
                 },
                 {
-                    path: '/newOrder',
+                    path: '/newOrder/:taskNo?',
                     name:'newOrder',
                     component: resolve => require(['../page/order/NewOrder.vue'], resolve)
+                },
+                {
+                    path: '/allocateOrder/:id',
+                    name:'allocateOrder',
+                    component: resolve => require(['../page/order/AllocateOrder.vue'], resolve)
                 },
                 {
                     path: '/msg',

@@ -46,61 +46,68 @@
                         </el-form>
                     </div>
                 </div>
-                <div class="block">
+                <div class="block" v-for="(form,index) in productFormList">
                     <div class="block-hd">
                         <svg class="icon blue-icon" aria-hidden="true">
                             <use xlink:href="#icon-biaoge"></use>
                         </svg>
-                        <span class="title">产品详情</span>
+                        <span class="title">产品详情{{index+1}}</span>
                     </div>
                     <div class="block-bd">
-                        <el-form ref="form" :label-width="formLabelWidth" label-position="left">
-                            <el-form-item class="row-input-item" label="产品名称：">
-                                <el-input v-model="customerNote" :maxlength="512" placeholder=""></el-input>
-                            </el-form-item>
-                            <el-form-item class="row-input-item" label="产品编号：">
-                                <el-input v-model="customerNote" :maxlength="512" placeholder=""></el-input>
-                            </el-form-item>
-                            <el-form-item class="row-input-item" label="产品单价：">
-                                <el-input v-model="customerNote" :maxlength="512" placeholder=""></el-input>
-                            </el-form-item>
-                            <el-form-item class="row-input-item" label="产品数量：">
-                                <el-input v-model="customerNote" :maxlength="512" placeholder=""></el-input>
-                            </el-form-item>
-                            <el-form-item class="row-input-item" label="客户参考：">
-                                <el-input v-model="customerNote" :maxlength="512" placeholder=""></el-input>
+                        <el-form :label-width="formLabelWidth" label-position="left">
+                            <el-row type="flex">
+                                <el-form-item class="input-item" label="产品名称：">
+                                    <el-input v-model="form.productname" :maxlength="512" placeholder=""></el-input>
+                                </el-form-item>
+                                <el-form-item class="input-item" label="产品编号：" style="margin-left: 50px;">
+                                    <el-input v-model="form.productcode" :maxlength="512" placeholder=""></el-input>
+                                </el-form-item>
+                            </el-row>
+                            <el-row type="flex">
+                                <el-form-item class="input-item" label="产品单价：">
+                                    <el-input v-model="form.price" :maxlength="512" placeholder=""></el-input>
+                                </el-form-item>
+                                <el-form-item class="input-item" label="产品数量：" style="margin-left: 50px;">
+                                    <el-input v-model="form.amount" :maxlength="512" placeholder=""></el-input>
+                                </el-form-item>
+                            </el-row>
+                            <el-form-item class="row-input-item" label="产品总价：">
+                                <span>{{form.price*form.amount?form.price*form.amount:0}}</span>
                             </el-form-item>
 
                             <el-form-item label="客户确认图片：">
                                <ul class="cm-pic-list" style="float: left;">
-                                   <li v-for="(item,index) in picList">
+                                   <li v-for="(item,picIndex) in form.picList">
                                        <img :src="item.filepath">
-                                       <i class="icon el-icon-delete del-btn" @click="delPic(index)"></i>
+                                       <i class="icon el-icon-delete del-btn" @click="delPic(index,picIndex)"></i>
                                        <div class="input-wrap">
                                            <input type="text" v-model="item.label" maxlength="20" placeholder="请输入标签">
                                        </div>
                                    </li>
                                </ul>
                                <div class="cm-pic-uploader" v-loading="uploading" style="margin: 5px;">
-                                   <input  type="file" id="file-input" accept="image/*" @change="selectFile()">
+                                   <input  type="file" :id="'file-input-'+index" accept="image/*" @change="selectFile(index)">
                                    <div class="wrapper">
                                        <i class="icon add-icon el-icon-circle-plus"></i>
                                    </div>
                                </div>
                             </el-form-item>
                             <el-form-item class="row-input-item" label="产品描述：">
-                                <el-input v-model="custRequire" :maxlength="1024"></el-input>
+                                <el-input v-model="form.productdesc" :maxlength="1024"></el-input>
                             </el-form-item>
                             <el-form-item class="row-input-item" label="客户要求栏：">
-                                <el-input v-model="custRequire" :maxlength="1024"></el-input>
+                                <el-input v-model="form.custrequire" :maxlength="1024"></el-input>
                             </el-form-item>
                         </el-form>
                     </div>
                 </div>
+                <div style="text-align: center;padding: 10px 0px;">
+                    <span class="add-product-btn cm-link-btn" style="text-decoration: underline;" @click="addProduct()">继续添加产品</span>
+                </div>
             </div>
             <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;">
-                <el-button type="primary" @click="save()">确认发布</el-button>
-                <el-button type="" @click="$router.go(-1)">取消发布</el-button>
+                <el-button type="primary" @click="save()">确认发布并分配</el-button>
+                <el-button type="danger" style="width: 116px;" @click="$router.go(-1)">取消发布</el-button>
             </el-row>
         </div>
     </div>
@@ -110,7 +117,7 @@
       max-width: 1200px;
   }
   .block{
-      padding: 10px 0px 10px 0px;
+      padding: 20px 0px 20px 0px;
       &+.block{
           border-top: 1px solid #e5e5e5;
       }
@@ -130,9 +137,9 @@
         margin-top: 20px;
     }
     .input-item{
+        margin-top: 5px;
+        margin-bottom: 5px;
         &+.input-item{
-            margin-top: 5px;
-            margin-bottom: 5px;
             margin-right: 15px;
         }
     }
@@ -183,15 +190,48 @@
                 curDateStrArr:Vue.formatDate(new Date(),'yyyy.MM.dd').split('.'),
 
 
-
+                taskNo:null,
                 uploading:false,
-                picList:[{"filepath":"http://120.79.17.251:8000/zfiles/Pic2018052101004353020.jpg","filename":"Pic2018052101004353020.jpg",label:'标题'}],//临时测试
                 customerNo:null,
                 customerNote:null,
                 completeDate:null,
                 taskType:'Buliao',
                 isEmergency:1,
-                custRequire:null,
+
+                formObject:{
+                    "productname": null,//"产品名称",
+                    "productcode":  null,//"产品编号",
+                    "amount":  null,//"产品数量",
+                    "price":  null,//"产品单价",
+                    "productdesc":  null,//"产品描述",
+                    "custrequire":  null,//"客户要求",
+
+                    "picList":[
+                        /*{"filepath":"http://120.79.17.251:8000/zfiles/Pic2018052101004353020.jpg","filename":"Pic2018052101004353020.jpg",label:'标题'}*/
+                    ],
+
+                   /* "custpicfour":  null,//"产品确认图片4",
+                    "custpicfourtag":  null,//"产品确认图片4tag",
+                    "custpicthree":  null,//"产品确认图片3",
+                    "custpicthreetag":  null,//"产品确认图片3tag",
+                    "custpicsix":  null,//"产品确认图片6",
+                    "custpicsixtag":  null,//"产品确认图片6tag",
+                    "custpiceight":  null,//"产品确认图片8",
+                    "custpiceighttag":  null,//"产品确认图片8tag",
+                    "custpicseven":  null,//"产品确认图片7",
+                    "custpicseventag":  null,//"产品确认图片7tag",
+                    "custpicnine":  null,//"产品确认图片9",
+                    "custpicninetag":  null,//"产品确认图片9tag",
+                    "custpictwo":  null,//"产品确认图片2",
+                    "custpictwotag":  null,//"产品确认图片2tag",
+                    "custpicten":  null,//"产品确认图片10",
+                    "custpictentag":  null,//"产品确认图片10tag",
+                    "custpicone":  null,//"产品确认图片1",
+                    "custpiconetag":  null,//"产品确认图片1tag",
+                    "custpicfivetag":  null,//"产品确认图片5tag",
+                    "custpicfive":  null,//"产品确认图片5",*/
+                },
+                productFormList:[],
             }
         },
         created(){
@@ -201,8 +241,8 @@
 
         },
         methods: {
-            selectFile:function () {
-                let file=document.getElementById('file-input').files[0];
+            selectFile:function (index) {
+                let file=document.getElementById('file-input-'+index).files[0];
                 let formData = new FormData();
                 let sessionInfo=Vue.sessionInfo();
                 formData.append('req_from',sessionInfo.req_from);
@@ -217,16 +257,15 @@
                 Vue.api.upload(formData).then((resp)=>{
                     this.uploading=false;
                     if(resp.status='success'){
-                        let data=JSON.parse(resp.message)
-                        this.picList.push(data);
-                        console.log('this.picList:',this.picList);
+                        let data=JSON.parse(resp.message);
+                        this.productFormList[index].picList.push(data);
                     }else{
                         Vue.operationFeedback({type:'warn',text:'上传失败'});
                     }
                 });
             },
-            delPic:function (index) {
-                this.picList.splice(index,1);
+            delPic:function (index,picIndex) {
+                this.productFormList[index].picList.splice(picIndex,1);
             },
             save:function () {
                 if(!this.customerNo){
@@ -245,83 +284,112 @@
                     Vue.operationFeedback({type:'warn',text:'请选择任务种类'});
                     return;
                 }
-                if(this.picList.length==0){
+
+                /*if(this.picList.length==0){
                     Vue.operationFeedback({type:'warn',text:'请上传任务样品图片'});
                     return;
                 }
                 if(!this.custRequire){
                         Vue.operationFeedback({type:'warn',text:'请输入客户要求栏'});
                     return;
-                }
-                let selectedLabelStr='';
-                this.labelList.forEach((item,i)=>{
-                    if(item.active){
-                        selectedLabelStr+=(i>0?',':'')+(i+1)+':'+item.label;
-                    }
-                })
-                if(!selectedLabelStr||selectedLabelStr==''){
-                    Vue.operationFeedback({type:'warn',text:'请勾选需要供应商提供的相关信息'});
-                    return;
-                }
+                }*/
                 let params={
                     ...Vue.sessionInfo(),
+                    taskno:this.taskNo,
                     custno:this.customerNo,
                     custbasis:this.customerNote,
                     plantime:Vue.formatDate(this.completeDate,'yyyy-MM-dd'),
                     resource:this.taskType,
-                    custrequire:this.custRequire,
                     urgent:this.isEmergency,
-                    proattrs:selectedLabelStr,
                 }
-                this.picList.forEach((item,i)=>{
-                    if(i==0){
-                        params.custpropicone=item.filename;
-                        params.custpropiconetag=item.label?item.label:null;
-                    }else if(i==1){
-                        params.custpropictwo=item.filename;
-                        params.custpropictwotag=item.label?item.label:null;
-                    }if(i==2){
-                        params.custpropicthree=item.filename;
-                        params.custpropicthreetag=item.label?item.label:null;
-                    }if(i==3){
-                        params.custpropicfour=item.filename;
-                        params.custpropicfourtag=item.label?item.label:null;
-                    }if(i==4){
-                        params.custpropicfive=item.filename;
-                        params.custpropicfivetag=item.label?item.label:null;
-                    }if(i==5){
-                        params.custpropicsix=item.filename;
-                        params.custpropicsixtag=item.label?item.label:null;
-                    }if(i==6){
-                        params.custpropicseven=item.filename;
-                        params.custpropicseventag=item.label?item.label:null;
-                    }if(i==7){
-                        params.custpropiceight=item.filename;
-                        params.custpropiceighttag=item.label?item.label:null;
-                    }if(i==8){
-                        params.custpropicnine=item.filename;
-                        params.custpropicninetag=item.label?item.label:null;
-                    }if(i==9){
-                        params.custpropicten=item.filename;
-                        params.custpropicninetag=item.label?item.label:null;
+                let proinfos=[];
+                for(let i=0;i<this.productFormList.length;i++){
+                    let form=this.productFormList[i];
+                    if(form.picList.length==0){
+                        Vue.operationFeedback({type:'warn',text:'请上传相关产品的客户确认图片'});
+                        return;
                     }
-                })
+                    if(!form.productname){
+                        Vue.operationFeedback({type:'warn',text:'请上传相关产品的产品名称'});
+                        return;
+                    }
+                    if(!form.productcode){
+                        Vue.operationFeedback({type:'warn',text:'请上传相关产品的产品编号'});
+                        return;
+                    }
+                    if(!form.price){
+                        Vue.operationFeedback({type:'warn',text:'请上传相关产品的产品单价'});
+                        return;
+                    }
+                    if(!regex.float.test(form.price)){
+                        Vue.operationFeedback({type:'warn',text:'相关产品的产品单价'+regex.floatAlert});
+                        return;
+                    }
+                    if(!form.amount){
+                        Vue.operationFeedback({type:'warn',text:'请上传相关产品的产品数量'});
+                        return;
+                    }
+                    if(!regex.pInt.test(form.amount)){
+                        Vue.operationFeedback({type:'warn',text:'相关产品的产品数量'+regex.pIntAlert});
+                        return;
+                    }
+                    for(let j=0;j<form.picList.length;j++){
+                        let item=form.picList[j];
+                        if(j==0){
+                            form.custpicone=item.filename;
+                            form.custpiconetag=item.label?item.label:null;
+                        }if(j==1){
+                            form.custpictwo=item.filename;
+                            form.custpictwotag=item.label?item.label:null;
+                        }if(j==2){
+                            form.custpicthree=item.filename;
+                            form.custpicthreetag=item.label?item.label:null;
+                        }if(j==3){
+                            form.custpicfour=item.filename;
+                            form.custpicfourtag=item.label?item.label:null;
+                        }if(j==4){
+                            form.custpicfive=item.filename;
+                            form.custpicfivetag=item.label?item.label:null;
+                        }if(j==5){
+                            form.custpicsix=item.filename;
+                            form.custpicsixtag=item.label?item.label:null;
+                        }if(j==6){
+                            form.custpicseven=item.filename;
+                            form.custpicseventag=item.label?item.label:null;
+                        }if(j==7){
+                            form.custpiceight=item.filename;
+                            form.custpiceighttag=item.label?item.label:null;
+                        }if(j==8){
+                            form.custpicnine=item.filename;
+                            form.custpicninetag=item.label?item.label:null;
+                        }if(j==9){
+                            form.custpicten=item.filename;
+                            form.custpicninetag=item.label?item.label:null;
+                        }
+                    }
+                    proinfos.push(form);
+                }
+                params.proinfos=JSON.stringify(proinfos);
                 let fb=Vue.operationFeedback({text:'保存中...'});
-                Vue.api.addTask(params).then((resp)=>{
+                Vue.api.addOrder(params).then((resp)=>{
                     if(resp.status=='success'){
                         fb.setOptions({type:"complete",text:'保存成功'});
-                        this.$router.push({name:'task'});
+                       /* this.$router.push({name:'order'});*/
                     }else{
                         fb.setOptions({type:"warn",text:resp.message});
                     }
                 });
 
-            }
+            },
+            addProduct:function () {
+                this.productFormList.push(JSON.parse(JSON.stringify(this.formObject)));
+            },
         },
         mounted () {
             /**/
-            this.id=this.$route.params.id;
+            this.taskNo=this.$route.params.taskNo;
             /**/
+            this.addProduct();
         },
     }
 </script>

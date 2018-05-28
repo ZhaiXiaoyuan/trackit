@@ -28,7 +28,8 @@
     "vue-router": "^3.0.1",
     "vue-schart": "^0.1.4",
     "vuedraggable": "^2.16.0",
-    "xlsx": "^0.12.10"
+    "xlsx": "^0.12.10",
+    "jquery":"^2.2.3"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

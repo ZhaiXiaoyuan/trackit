@@ -171,6 +171,39 @@ export default {
                 params: params
             });
         },
+        //【旧】客户新增订单【A+M】
+        addOrder:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/ordez/biz/add',
+                params: params
+            });
+        },
+        //【旧】客户订单详情【A+M】
+        getOrder:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/ordez/biz/get',
+                params: params
+            });
+        },
+        //【旧】符合订单的供应商列表【A+M】
+        getOrderCandidateSuppliers:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/ordez/biz/getoss',
+                params: params
+            });
+        },
+        //【旧】客户分配订单给供应商【A+M】
+        allocateOrder:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/ordez/biz/dissup',
+                params: params
+            });
+        },
+
 
     }
   },

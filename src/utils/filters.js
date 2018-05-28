@@ -56,3 +56,41 @@ Vue.filter('taskStatus',function(str){
     }
     return result;
 });
+//订单状态
+Vue.filter('orderStatus',function(str){
+    str+='';
+    let result='';
+    switch (str){
+        case '1':
+            result='订单生成，等待分配';
+            break;
+        case '2':
+            result='订单已分配，等待确认';
+            break;
+        case '3':
+            result='确认信息与风险';
+            break;
+        case '4':
+            result='确认交期';
+            break;
+        case '5':
+            result='确认材料';
+            break;
+        case '6':
+            result='确认大货样';
+            break;
+        case '7':
+            result='确认大货质量';
+            break;
+        case '8':
+            result='出货';
+            break;
+        case '9':
+            result='完成';
+            break;
+        case '10':
+            result='取消';
+            break;
+    }
+    return result;
+});

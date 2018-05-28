@@ -55,10 +55,10 @@
                     <el-table-column prop="custbasis" label="客户参考"  align="center"></el-table-column>
                     <el-table-column prop="plantime" label="预计完成时间"  align="center"></el-table-column>
                     <el-table-column prop="resourceLabel" label="订单种类"  align="center"></el-table-column>
-                    <el-table-column prop="" label="下单时间" align="center"></el-table-column>
+                    <el-table-column prop="createtime" label="下单时间" align="center"></el-table-column>
                     <el-table-column label="任务状态" width="200"  align="center">
                         <template slot-scope="scope">
-                            {{scope.row.status|taskStatus}}
+                            {{scope.row.status|orderStatus}}
                         </template>
                     </el-table-column>
                     <el-table-column label="操作"  align="center">
@@ -111,7 +111,8 @@
             return {
                 account:{},
                 listType:'first',
-                type:'do',//进行中:do,4:已完成，7:已取消
+                //临时测试
+                type:'1',//"1", "订单生成，等待分配"), // 等待分配 "2", "订单已分配，等待确认", // 已经分配 "3", "确认信息与风险", // 确认风险 "4", "确认交期", // 确认交期 "5", "确认材料", // 确认材料 "6", "确认大货样", // 确认大货样"7", "确认大货质量", // 确认大货质量"8", "出货", // 出货"9", "完成", // 完成"10", "取消", // 取消
                 range:'All',
                 dateRange:null,
                 startDate:null,

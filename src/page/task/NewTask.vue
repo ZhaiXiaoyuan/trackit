@@ -320,7 +320,7 @@
                     if(i==0){
                         params.custpropicone=item.filename;
                         params.custpropiconetag=item.label?item.label:null;
-                    }else if(i==1){
+                    }if(i==1){
                         params.custpropictwo=item.filename;
                         params.custpropictwotag=item.label?item.label:null;
                     }if(i==2){
