@@ -11,10 +11,10 @@
                 <el-form-item prop="password">
                     <el-input type="password" placeholder="密码" v-model="pwd" @keyup.enter.native="login()"></el-input>
                 </el-form-item>
-                <div class="login-btn">
+                <div class="login-btn" style="margin-top: 20px;">
                     <el-button type="primary" size="large" @click="login()">登&nbsp;录</el-button>
                 </div>
-
+                <div class="cm-link-btn" style="padding-top:20px;text-align: center;" @click="$router.push({ name: 'register', params: {}})">未有账号？马上注册</div>
             </el-form>
         </div>
     </div>

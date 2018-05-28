@@ -203,7 +203,54 @@ export default {
                 params: params
             });
         },
-
+        //【旧】客户订单详情【A+M】
+        getOrderDetail:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/ordez/biz/get',
+                params: params
+            });
+        },
+        //【旧】关于我们【A+M】
+        getAboutData:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/base/info/abus',
+                params: params
+            });
+        },
+        //【旧】添加反馈意见【A+M】
+        addAdvice:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/base/info/afb',
+                params: params
+            });
+        },
+        //【新】用户个人信息维护【A+M】
+        saveUserInfo:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/appuser/info/setinfo',
+                params: params
+            });
+        },
+        //【新】查看客户/供应商信息【A+M】
+        getUserInfo:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/appuser/info/vinfo',
+                params: params
+            });
+        },
+        //【新】客户添加供应商报价方案【A+M】
+        addPricePlan:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/task/biz/passq',
+                params: params
+            });
+        },
 
     }
   },

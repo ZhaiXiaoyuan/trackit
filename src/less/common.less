@@ -80,8 +80,9 @@ fieldset, img {
 button, input, select, textarea {
     font-size: 100%;
 }
-/**/
-/*input::-webkit-input-placeholder{
+/*
+!**!
+input::-webkit-input-placeholder{
     color:#999;
 }
 input::-moz-placeholder{   !* Mozilla Firefox 19+ *!
@@ -92,7 +93,8 @@ input:-moz-placeholder{    !* Mozilla Firefox 4 to 18 *!
 }
 input:-ms-input-placeholder{  !* Internet Explorer 10-11 *!
     color:#999;
-}*/
+}
+*/
 
 /* 使得表单元素在 ie 下能继承字体大小 */
 
@@ -134,6 +136,9 @@ table {
     height: 100px;
     resize: none;
     padding: 10px;
+}
+.cm-page-content-min{
+    width: 900px;
 }
 /**/
 .container-hd{
@@ -370,5 +375,14 @@ table {
 .add-label-dialog{
     .el-dialog{
         width: 300px;
+    }
+}
+
+.view-user-dialog{
+    .el-dialog{
+        width: 500px;
+        .el-dialog__header{
+            display: none;
+        }
     }
 }

@@ -5,9 +5,9 @@
         </div>-->
         <div class="logo"><i class="text-logo-icon"></i></div>
         <div class="user-info">
-            <img class="user-logo" src="../../../static/img/img.jpg">
+            <img class="user-logo" :src="account.user_avatar?account.user_avatar:defaultAvatar">
             <span class="greet">欢迎登陆Trac*it  中午好！</span>
-            <div class="cm-btn logout-btn">
+            <div class="cm-btn logout-btn" @click="logout()">
                 退出登录
                 <svg class="icon" aria-hidden="true">
                     <use xlink:href="#icon-tuichu"></use>
@@ -24,27 +24,25 @@
             return {
                 collapse: false,
                 name: 'linxin',
-                accountInfo:{},
+                account:{},
+                defaultAvatar:require('../../images/common/default-avatar.png'),
             }
         },
         computed:{
 
         },
         methods:{
-            handleCommand(command) {
-                if(command == 'loginout'){
-                    Vue.cookie.set('account','');
-                    let loginPage=localStorage.getItem('loginPage');
-                    this.$router.push({name:loginPage?loginPage:'login'});
-                }
-            },
             collapseChage(){
                 this.collapse = !this.collapse;
                 bus.$emit('collapse', this.collapse);
+            },
+            logout:function () {
+                Vue.cookie.set('account','');
+                this.$router.push({name:'login'});
             }
         },
         created(){
-            this.accountInfo=this.getAccountInfo();
+            this.account=this.getAccountInfo();
         }
     }
 </script>

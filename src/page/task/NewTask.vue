@@ -2,7 +2,7 @@
     <div class="page-content new-task">
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item>首页</el-breadcrumb-item>
+                <el-breadcrumb-item>Trackit</el-breadcrumb-item>
                 <el-breadcrumb-item>任务</el-breadcrumb-item>
                 <el-breadcrumb-item>新建任务</el-breadcrumb-item>
             </el-breadcrumb>
@@ -138,6 +138,7 @@
         margin-top: 20px;
     }
     .input-item{
+        margin: 5px 0px;
         &+.input-item{
             margin-left: 15px;
         }
@@ -215,7 +216,9 @@
 
 
                 uploading:false,
-                picList:[{"filepath":"http://120.79.17.251:8000/zfiles/Pic2018052101004353020.jpg","filename":"Pic2018052101004353020.jpg",label:'标题'}],//临时测试
+                picList:[
+                  /*  {"filepath":"http://120.79.17.251:8000/zfiles/Pic2018052101004353020.jpg","filename":"Pic2018052101004353020.jpg",label:'标题'}*/
+                    ],
                 customerNo:null,
                 customerNote:null,
                 completeDate:null,

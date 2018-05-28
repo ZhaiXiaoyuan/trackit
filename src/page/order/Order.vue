@@ -2,7 +2,7 @@
     <div class="table">
         <div class="crumbs">
             <el-breadcrumb separator="-">
-                <el-breadcrumb-item>首页</el-breadcrumb-item>
+                <el-breadcrumb-item>Trackit</el-breadcrumb-item>
                 <el-breadcrumb-item class="active">任务</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -14,10 +14,10 @@
                         <el-radio label="Mine">我的</el-radio>
                     </el-radio-group>-->
                     <el-button-group style="margin-left: 30px;">
-                       <!-- <el-button type="primary">全部</el-button>-->
+                        <el-button type="" :class="{'el-button--primary':!type}" @click="setType(null)">全部</el-button>
                         <el-button type="" :class="{'el-button--primary':type=='do'}" @click="setType('do')">进行中</el-button>
-                        <el-button type="" :class="{'el-button--primary':type=='4'}" @click="setType('4')">已完成</el-button>
-                        <el-button type="" :class="{'el-button--primary':type=='7'}" @click="setType('7')">已取消</el-button>
+                        <el-button type="" :class="{'el-button--primary':type=='9'}" @click="setType('9')">已完成</el-button>
+                        <el-button type="" :class="{'el-button--primary':type=='10'}" @click="setType('10')">已取消</el-button>
                     </el-button-group>
                 </el-row>
                 <el-row class="condition-row" style="margin-top: 20px;">
@@ -44,7 +44,8 @@
                     </el-col>
                     <el-col :span="4" style="text-align: right;margin-left: 20px;">
                         <el-button size="small" type="primary" @click="$router.push({name:'newOrder'})" v-if="account.user_type=='Customer'">新建订单</el-button>
-                        <el-button size="small" type="">导出</el-button>
+                        <el-button size="small" type="" @click="getAllList()">导出</el-button>
+                        <a id="downlink"></a>
                     </el-col>
                 </el-row>
             </div>
@@ -54,16 +55,15 @@
                     <el-table-column prop="custno" label="客户编号"  align="center"></el-table-column>
                     <el-table-column prop="custbasis" label="客户参考"  align="center"></el-table-column>
                     <el-table-column prop="plantime" label="预计完成时间"  align="center"></el-table-column>
-                    <el-table-column prop="resourceLabel" label="订单种类"  align="center"></el-table-column>
                     <el-table-column prop="createtime" label="下单时间" align="center"></el-table-column>
-                    <el-table-column label="任务状态" width="200"  align="center">
+                    <el-table-column label="订单状态" width="200"  align="center">
                         <template slot-scope="scope">
                             {{scope.row.status|orderStatus}}
                         </template>
                     </el-table-column>
                     <el-table-column label="操作"  align="center">
                         <template slot-scope="scope">
-                            <router-link :to="'/taskDetail/'+scope.row.id" size="small">查看详情</router-link>
+                            <router-link :to="'/orderDetail/'+scope.row.id" size="small">查看详情</router-link>
                             <i class="icon emergency-icon" v-if="scope.row.urgent"></i>
                         </template>
                     </el-table-column>
@@ -111,8 +111,7 @@
             return {
                 account:{},
                 listType:'first',
-                //临时测试
-                type:'1',//"1", "订单生成，等待分配"), // 等待分配 "2", "订单已分配，等待确认", // 已经分配 "3", "确认信息与风险", // 确认风险 "4", "确认交期", // 确认交期 "5", "确认材料", // 确认材料 "6", "确认大货样", // 确认大货样"7", "确认大货质量", // 确认大货质量"8", "出货", // 出货"9", "完成", // 完成"10", "取消", // 取消
+                type:null,//"1", "订单生成，等待分配"), // 等待分配 "2", "订单已分配，等待确认", // 已经分配 "3", "确认信息与风险", // 确认风险 "4", "确认交期", // 确认交期 "5", "确认材料", // 确认材料 "6", "确认大货样", // 确认大货样"7", "确认大货质量", // 确认大货质量"8", "出货", // 出货"9", "完成", // 完成"10", "取消", // 取消
                 range:'All',
                 dateRange:null,
                 startDate:null,
@@ -126,6 +125,8 @@
                     loading:false
                 },
                 entryList:[{test:'1'}],
+
+                downLoadFb:null,
             }
         },
         created(){
@@ -213,6 +214,7 @@
                 this.outFile.download = downName + '.xlsx'  // 下载名称
                 this.outFile.href = href  // 绑定a标签
                 this.outFile.click()  // 模拟点击实现下载
+                this.downLoadFb.setOptions({type:'complete',text:'导出成功，请留意浏览器的下载文件'});
                 setTimeout(function () {  // 延时释放
                     URL.revokeObjectURL(tmpDown) // 用URL.revokeObjectURL()来释放这个object URL
                 }, 100)
@@ -306,7 +308,7 @@
                 this.pager.pageIndex=pageIndex?pageIndex:1;
                 let params={
                     ...Vue.sessionInfo(),
-                    range:this.range,
+                 /*   range:this.range,*/
                     status:this.type,
                     beginDate:this.startDate,
                     endDate:this.endDate,
@@ -330,6 +332,51 @@
             handleSizeChange:function (data) {
                 this.pager.pageSize=data;
                 this.getList();
+            },
+
+            getAllList:function (pageIndex) {
+                let params={
+                    ...Vue.sessionInfo(),
+                    /*   range:this.range,*/
+                    status:this.type,
+                    beginDate:this.startDate,
+                    endDate:this.endDate,
+                    searchKey:this.keyword,
+                    'pager.pageNumber':1,
+                    'pager.pageSize':this.pager.total,
+                }
+                this.downLoadFb=Vue.operationFeedback({text:'导出中...'});
+                Vue.api.getOrderList(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        let data=JSON.parse(resp.message);
+                        let allList=data.result;
+                        let jsonData=[
+                            {
+                                1:'序号',
+                                2:'订单号',
+                                3:'客户编号',
+                                4:'客户参考',
+                                5:'预计完成时间',
+                                6:'下单时间',
+                                7:'订单状态',
+                            }
+                        ];
+                        allList.forEach((item,i)=>{
+                            jsonData.push({
+                                1:i+1,
+                                2:item.orderno,
+                                3:item.custno,
+                                4:item.custbasis,
+                                5:item.plantime,
+                                6:item.createtime,
+                                7:Vue.orderStatus(item.status),
+                            });
+                        });
+                        this.downloadExl(jsonData,'任务导出表');
+                    }else{
+                        this.downLoadFb.setOptions({type:'warn',text:'导出失败，'+resp.respMsg});
+                    }
+                });
             },
 
         },

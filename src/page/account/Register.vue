@@ -1,6 +1,6 @@
 <template>
     <div class="login-wrap register-wrap">
-        <div class="ms-login form-block">
+        <div class="ms-register form-block">
             <el-form  ref="ruleForm" label-width="85px" class="demo-ruleForm">
                 <el-form-item label="用户名">
                     <el-input v-model="name" placeholder="请输入用户名"></el-input>
@@ -35,6 +35,7 @@
                 <div class="login-btn">
                     <el-button type="primary" size="large" @click="register()">注&nbsp;册</el-button>
                 </div>
+                <div class="cm-link-btn" style="padding-top:20px;text-align: center;" @click="$router.push({ name: 'login', params: {}})">已有账号？马上登录</div>
             </el-form>
         </div>
     </div>
@@ -60,15 +61,15 @@
             color: #fff;
 
         }
-        .ms-login{
+        .ms-register{
             width:500px;
-            min-height:230px;
+            height: auto;
             padding:40px;
             border-radius: 5px;
             background: #fff;
             font-size: 16px;
         }
-        .ms-login .el-input--small .el-input__inner{
+        .ms-register .el-input--small .el-input__inner{
             height:44px !important;
         }
         .login-btn{
@@ -132,7 +133,11 @@
         },
         methods: {
             getRegisterInfo:function () {
-              Vue.api.getRegisterInfo({...Vue.sessionInfo()}).then((resp)=>{
+                let params={
+                    req_from:'mj-backend',
+                    timestamp:Vue.genTimestamp()
+                }
+              Vue.api.getRegisterInfo(params).then((resp)=>{
                   if(resp.status=='success'){
                       let data=JSON.parse(resp.message);
                       this.userTypeList=data.usertypes;
@@ -185,7 +190,8 @@
                     return;
                 }
                 let params={
-                    ...Vue.sessionInfo(),
+                    req_from:'mj-backend',
+                    timestamp:Vue.genTimestamp(),
                     user_name:this.name,
                     user_phone:this.phone,
                     icode:this.verifyCode,
@@ -199,7 +205,6 @@
                     platform:'backend',
 
                 }
-                console.log('params:',params);
                 let fb=Vue.operationFeedback({text:'注册中...'});
                 Vue.api.register(params).then((resp)=>{
                     if(resp.status=='success'){

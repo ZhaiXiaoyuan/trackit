@@ -2,7 +2,7 @@
     <div class="page-content new-task">
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item>首页</el-breadcrumb-item>
+                <el-breadcrumb-item>Trackit</el-breadcrumb-item>
                 <el-breadcrumb-item>订单</el-breadcrumb-item>
                 <el-breadcrumb-item>新建订单</el-breadcrumb-item>
             </el-breadcrumb>
@@ -32,11 +32,11 @@
                             <el-form-item class="input-item" label="预计完成时间：">
                                 <el-date-picker type="date" placeholder="选择日期" v-model="completeDate"></el-date-picker>
                             </el-form-item>
-                            <el-form-item class="input-item" label="任务种类：">
+                            <!--<el-form-item class="input-item" label="任务种类：">
                                 <el-select v-model="taskType" placeholder="请选择任务种类" style="width: 200px;">
                                     <el-option v-for="(item,index) in resourceTypeList" :label="item.label" :value="item.value" :key="item.value"></el-option>
                                 </el-select>
-                            </el-form-item>
+                            </el-form-item>-->
                             <el-form-item class="input-item" label="任务是否紧急：">
                                 <el-radio-group v-model="isEmergency" size="medium">
                                     <el-radio :value="1" :label="1">是</el-radio>
@@ -103,6 +103,17 @@
                 </div>
                 <div style="text-align: center;padding: 10px 0px;">
                     <span class="add-product-btn cm-link-btn" style="text-decoration: underline;" @click="addProduct()">继续添加产品</span>
+                </div>
+                <div class="block" style="padding: 0px;">
+                    <div class="block-bd">
+                        <el-form :label-width="formLabelWidth" label-position="left">
+                            <el-row type="flex">
+                                <el-form-item class="input-item" label="关联的任务号：">
+                                    <span class="cm-link-btn">{{taskNo}}</span>
+                                </el-form-item>
+                            </el-row>
+                        </el-form>
+                    </div>
                 </div>
             </div>
             <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;">
@@ -373,8 +384,9 @@
                 let fb=Vue.operationFeedback({text:'保存中...'});
                 Vue.api.addOrder(params).then((resp)=>{
                     if(resp.status=='success'){
+                        let data=JSON.parse(resp.message);
                         fb.setOptions({type:"complete",text:'保存成功'});
-                       /* this.$router.push({name:'order'});*/
+                        this.$router.push({name:'allocateOrder',params:{id:data.id}});
                     }else{
                         fb.setOptions({type:"warn",text:resp.message});
                     }

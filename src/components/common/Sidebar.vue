@@ -1,8 +1,8 @@
 <template>
     <div class="sidebar">
         <div class="user-info">
-            <img src="https://gss3.bdstatic.com/-Po3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign=b280b1cdcc5c1038247ec9c48a2af42e/0eb30f2442a7d933934555a4a74bd11372f00173.jpg">
-            <p class="name">Naby chen123</p>
+            <img :src="account.user_avatar?account.user_avatar:defaultAvatar">
+            <p class="name">{{account.user_name}}</p>
         </div>
         <el-menu class="sidebar-el-menu" :default-active="onRoutes" :collapse="collapse" background-color="#fff"
             text-color="#888" active-text-color="#48b4ff" unique-opened router>
@@ -85,6 +85,7 @@
 </style>
 
 <script>
+    import Vue from 'vue'
     import bus from '../common/bus';
     export default {
         data() {
@@ -118,12 +119,14 @@
                     {
                         code:'05',
                         icon: '#icon-user',
-                        index: '/userCenter',
+                        index: '/center',
                         title: '个人中心',
                     },
                 ],
                 items: [],
                 pageName:null,
+                account:{},
+                defaultAvatar:require('../../images/common/default-avatar.png'),
             }
         },
         computed:{
@@ -137,6 +140,8 @@
             bus.$on('collapse', msg => {
                 this.collapse = msg;
             });
+            this.account=Vue.getAccountInfo();
+            console.log('this.account:',this.account);
             //
             this.pageName=this.$route.name;
             //

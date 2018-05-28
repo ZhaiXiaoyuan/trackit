@@ -40,9 +40,29 @@ export default new Router({
                     component: resolve => require(['../page/order/AllocateOrder.vue'], resolve)
                 },
                 {
+                    path: '/orderDetail/:id',
+                    name:'orderDetail',
+                    component: resolve => require(['../page/order/OrderDetail.vue'], resolve)
+                },
+                {
                     path: '/msg',
                     name:'msg',
                     component: resolve => require(['../page/message/Msg.vue'], resolve)
+                },
+                {
+                    path: '/center',
+                    name:'center',
+                    component: resolve => require(['../page/account/Center.vue'], resolve)
+                },
+                {
+                    path: '/advice',
+                    name:'advice',
+                    component: resolve => require(['../page/account/Advice.vue'], resolve)
+                },
+                {
+                    path: '/userInfo',
+                    name:'userInfo',
+                    component: resolve => require(['../page/account/UserInfo.vue'], resolve)
                 },
             ]
         },

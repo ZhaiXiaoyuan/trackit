@@ -2,7 +2,7 @@
     <div class="table">
         <div class="crumbs">
             <el-breadcrumb separator="-">
-                <el-breadcrumb-item>首页</el-breadcrumb-item>
+                <el-breadcrumb-item>Trackit</el-breadcrumb-item>
                 <el-breadcrumb-item class="active">通知</el-breadcrumb-item>
             </el-breadcrumb>
         </div>

@@ -2,7 +2,7 @@
     <div class="page-content new-task">
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item>首页</el-breadcrumb-item>
+                <el-breadcrumb-item>Trackit</el-breadcrumb-item>
                 <el-breadcrumb-item>任务</el-breadcrumb-item>
                 <el-breadcrumb-item>任务详情</el-breadcrumb-item>
             </el-breadcrumb>
@@ -92,8 +92,8 @@
                                         :value="item.name">
                                     </el-option>
                                 </el-select>
-                                <span class="cm-link-btn" style="margin-left: 10px;">查看供应商信息</span>
-                                <el-button type="primary" style="margin-left: 20px;">添加该方案</el-button>
+                                <span class="cm-link-btn" style="margin-left: 10px;" @click="getUserInfo()">查看供应商信息</span>
+                                <el-button type="primary" style="margin-left: 20px;" @click="addPricePlan()">添加该方案</el-button>
                             </el-form-item>
                             <el-form-item label="样品图片：">
                                 <ul class="cm-simple-list" style="float: left;">
@@ -115,7 +115,7 @@
                             </el-form-item>
                         </el-form>
                         <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;" v-if="account.user_type=='Customer'">
-                            <el-button type="primary">发起关联订单</el-button>
+                            <el-button type="primary"  @click="$router.push({ name: 'newOrder', params: {taskNo:task.taskno}})">发起关联订单</el-button>
                             <el-button type="primary">确认完成任务</el-button>
                             <el-button type="primary">编辑任务</el-button>
                             <el-button type="primary">取消任务</el-button>
@@ -205,12 +205,32 @@
 
 
             <!--查看供应商信息-->
-            <el-dialog class="add-label-dialog" :visible.sync="dialogFormVisible" v-if="dialogFormVisible" >
-
-                <div slot="footer" class="dialog-footer">
+            <el-dialog class="view-user-dialog" :visible.sync="dialogFormVisible" v-if="dialogFormVisible" >
+                <div class="dialog-content">
+                    <p class="title">供应商信息</p>
+                    <div style="text-align: center;margin-top: 20px;margin-bottom: 10px;">
+                        <img class="avatar" :src="curSupplier.user_avatar?urSupplier.user_avatar:defaultAvatar" alt="">
+                    </div>
+                    <div class="info-row">
+                        <span class="field">名称：</span>
+                        <div class="value">{{curSupplier.user_name}}</div>
+                    </div>
+                    <div class="info-row">
+                        <span class="field">联系方式：</span>
+                        <div class="value">{{curSupplier.user_phone}}</div>
+                    </div>
+                    <div class="info-row">
+                        <span class="field">供应商简介：</span>
+                        <div class="value">缺字段</div>
+                    </div>
+                    <div style="margin-top: 40px;">
+                        <el-button type="primary" @click="dialogFormVisible=false">关闭</el-button>
+                    </div>
+                </div>
+                <!--<div slot="footer" class="dialog-footer">
                     <el-button @click="dialogFormVisible = false">取 消</el-button>
                     <el-button type="primary" @click="addLabel()">确定</el-button>
-                </div>
+                </div>-->
             </el-dialog>
         </div>
     </div>
@@ -274,6 +294,36 @@
             }
         }
     }
+    .view-user-dialog{
+        .dialog-content{
+            padding: 10px 20px;
+            text-align: center;
+            .title{
+                font-size: 20px;
+                color: #666;
+            }
+            .avatar{
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+            }
+            .info-row{
+                padding: 5px 0px;
+                display: flex;
+                .field{
+                    flex: 1;
+                    text-align: right;
+                }
+                .value{
+                    padding-left: 10px;
+                    flex: 3.5;
+                    text-align: left;
+                    word-break: break-all;
+                }
+
+            }
+        }
+    }
 </style>
 <script>
     import Vue from 'vue'
@@ -281,6 +331,7 @@
         data() {
             return {
                 dialogFormVisible: false,
+                defaultAvatar:require('../../images/common/default-avatar.png'),
 
 
                 formLabelWidth: '125px',
@@ -289,7 +340,6 @@
                 completeDate:null,
                 taskType:null,
                 isEmergency:false,
-                dialogFormVisible:false,
 
 
                 id:null,
@@ -415,6 +465,7 @@
                 this.curSupplier.planList.forEach((item,i)=>{
                     if(name==item.name){
                         this.selectedPlan=item;
+                        console.log('this.selectedPlan:',this.selectedPlan);
                         this.getPlan(this.selectedPlan.id);
                     }
                 })
@@ -444,6 +495,7 @@
                         }
                         if(this.allPlanList.length>0){
                             this.curSupplier=this.allPlanList[0];
+                            console.log('this.curSupplier:',this.curSupplier);
                             this.curSupplierName=this.curSupplier.name;
                             this.selectedPlan=this.curSupplier.planList[0];
                             this.selectedPlanName=this.selectedPlan.name;
@@ -479,7 +531,6 @@
                         let data=JSON.parse(resp.message);
                         if(this.account.user_type=='Customer'){
                            Object.assign(this.selectedPlan,data);
-                            console.log('this.selectedPlan:',this.selectedPlan);
                         }
                         let proattrs=JSON.parse(data.proattrs);
                         this.sampleList=[];
@@ -759,7 +810,50 @@
                         }
                     }
                 });
-            }
+            },
+            addPricePlan:function () {
+                if(!this.selectedPlan){
+                    Vue.operationFeedback({type:'warn',text:'请先选择方案'});
+                    return;
+                }
+                let params={
+                    ...Vue.sessionInfo(),
+                    quotaid:this.selectedPlan.id,
+                }
+                let fb=Vue.operationFeedback({text:'添加中...'});
+                Vue.api.addPricePlan(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        fb.setOptions({type:"complete",text:'添加成功'});
+                    }else{
+                        fb.setOptions({type:"complete",text:resp.message});
+                    }
+                });
+            },
+            getUserInfo:function () {
+                if(!this.curSupplier){
+                    Vue.operationFeedback({type:'warn',text:'请先选择供应商'});
+                    return;
+                }
+                let params={
+                    ...Vue.sessionInfo(),
+                    unumber:this.curSupplier.id,
+                    /*  uid:this.account.user_uuid*/
+                }
+                Vue.api.getUserInfo(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        let data=JSON.parse(resp.message);
+                        Object.assign(this.curSupplier,data);
+                        this.phone=data.user_phone;
+                        this.userName=data.user_name;
+                        this.email=data.email;
+                        this.avatar=data.user_avatar;
+                        this.dialogFormVisible=true;
+                        console.log('this.curSupplier:',this.curSupplier);
+                    }else{
+
+                    }
+                });
+            },
         },
         mounted () {
             /**/

@@ -2,7 +2,7 @@
     <div class="table">
         <div class="crumbs">
             <el-breadcrumb separator="-">
-                <el-breadcrumb-item>首页</el-breadcrumb-item>
+                <el-breadcrumb-item>Trackit</el-breadcrumb-item>
                 <el-breadcrumb-item class="active">任务</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -44,7 +44,8 @@
                     </el-col>
                     <el-col :span="4" style="text-align: right;margin-left: 20px;">
                         <el-button size="small" type="primary" @click="$router.push({name:'newTask'})">新建任务</el-button>
-                        <el-button size="small" type="">导出</el-button>
+                        <el-button size="small" type="" @click="getAllList()">导出</el-button>
+                        <a id="downlink"></a>
                     </el-col>
                 </el-row>
             </div>
@@ -125,6 +126,8 @@
                     loading:false
                 },
                 entryList:[{test:'1'}],
+
+                downLoadFb:null,
             }
         },
         created(){
@@ -182,7 +185,7 @@
                 for (let k in json[0]) {
                     keyMap.push(k)
                 }
-                console.info('keyMap', keyMap, json)
+               /* console.info('keyMap', keyMap, json)*/
                 let tmpdata = [] // 用来保存转换好的json
                 json.map((v, i) => keyMap.map((k, j) => Object.assign({}, {
                     v: v[k],
@@ -212,6 +215,7 @@
                 this.outFile.download = downName + '.xlsx'  // 下载名称
                 this.outFile.href = href  // 绑定a标签
                 this.outFile.click()  // 模拟点击实现下载
+                this.downLoadFb.setOptions({type:'complete',text:'导出成功，请留意浏览器的下载文件'});
                 setTimeout(function () {  // 延时释放
                     URL.revokeObjectURL(tmpDown) // 用URL.revokeObjectURL()来释放这个object URL
                 }, 100)
@@ -330,6 +334,53 @@
             handleSizeChange:function (data) {
                 this.pager.pageSize=data;
                 this.getList();
+            },
+            getAllList:function (pageIndex) {
+                let params={
+                    ...Vue.sessionInfo(),
+                    range:this.range,
+                    resource:'',
+                    status:this.type,
+                    beginDate:this.startDate,
+                    endDate:this.endDate,
+                    searchKey:this.keyword,
+                    'pager.pageNumber':1,
+                    'pager.pageSize':this.pager.total,
+                }
+                this.downLoadFb=Vue.operationFeedback({text:'导出中...'});
+                Vue.api.getTaskList(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        let data=JSON.parse(resp.message);
+                        let allList=data.result;
+                        let jsonData=[
+                            {
+                                1:'序号',
+                                2:'任务单号',
+                                3:'客户编号',
+                                4:'客户参考',
+                                5:'物料完成时间',
+                                6:'任务种类',
+                                7:'下单时间',
+                                8:'任务状态',
+                            }
+                        ];
+                        allList.forEach((item,i)=>{
+                            jsonData.push({
+                                1:i+1,
+                                2:item.taskno,
+                                3:item.custno,
+                                4:item.custbasis,
+                                5:item.plantime,
+                                6:item.resourceLabel,
+                                7:item.createtime,
+                                8:Vue.taskStatus(item.status),
+                            });
+                        });
+                        this.downloadExl(jsonData,'任务导出表');
+                    }else{
+                        this.downLoadFb.setOptions({type:'warn',text:'导出失败，'+resp.respMsg});
+                    }
+                });
             },
 
         },

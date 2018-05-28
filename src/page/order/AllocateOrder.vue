@@ -3,7 +3,7 @@
     <div class="page-content new-task">
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item>首页</el-breadcrumb-item>
+                <el-breadcrumb-item>Trackit</el-breadcrumb-item>
                 <el-breadcrumb-item>订单</el-breadcrumb-item>
                 <el-breadcrumb-item>新建订单</el-breadcrumb-item>
                 <el-breadcrumb-item>分配订单</el-breadcrumb-item>
@@ -23,7 +23,6 @@
                             <el-table-column prop="custno" label="客户编号"  align="center"></el-table-column>
                             <el-table-column prop="custbasis" label="客户参考"  align="center"></el-table-column>
                             <el-table-column prop="plantime" label="物料完成时间"  align="center"></el-table-column>
-                            <el-table-column prop="resourceLabel" label="订单种类"  align="center"></el-table-column>
                             <el-table-column prop="createtime" label="下单时间" align="center"></el-table-column>
                         </el-table>
                     </div>
@@ -42,7 +41,7 @@
                                 </div>
                                 <ul class="list-bd" style="padding-left: 20px;">
                                     <li v-for="(supplier,subIndex) in item.data">
-                                        <el-radio v-model="selectedId" :label="supplier.label">{{supplier.label}}</el-radio>
+                                        <el-radio v-model="selectedId" :label="supplier.value">{{supplier.label}}</el-radio>
                                     </li>
                                 </ul>
                             </div>
