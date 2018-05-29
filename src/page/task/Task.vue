@@ -56,7 +56,13 @@
                     <el-table-column prop="custbasis" label="客户参考"  align="center"></el-table-column>
                     <el-table-column prop="plantime" width="100" label="物料完成时间"  align="center"></el-table-column>
                     <el-table-column prop="resourceLabel" label="任务种类"  align="center"></el-table-column>
-                    <el-table-column prop="createtime" label="下单时间" align="center"></el-table-column>
+                    <el-table-column label="下单时间" align="center">
+                        <template slot-scope="scope">
+                            <span v-if="scope.row.createtime">
+                                {{scope.row.createtime|formatDate('yyyy-MM-dd hh:mm')}}
+                            </span>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="任务状态"  align="center">
                         <template slot-scope="scope">
                             {{scope.row.status|taskStatus}}
