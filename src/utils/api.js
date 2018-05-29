@@ -41,7 +41,7 @@ export default {
 
     /**/
     //临时测试
-    let basicUrl=false&&process.env.NODE_ENV=='development'?'/api':'http://120.79.17.251:8000/trackitapps';
+    let basicUrl=false&&process.env.NODE_ENV=='development'?'/api':'http://trackit.elecplus.tech/trackitapps';
     Vue.api={
         //登录
         login:function (params) {
@@ -251,7 +251,70 @@ export default {
                 params: params
             });
         },
-
+        //【旧】客户取消任务【A+M】
+        cancelTask:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/task/biz/cancel',
+                params: params
+            });
+        },
+        //【新】系统基础配置数据查询【A+M】
+        basicConfig:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/base/info/cfgs',
+                params: params
+            });
+        },
+        //【旧】客户完成任务【A+M】
+        complete:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/task/biz/finish',
+                params: params
+            });
+        },
+        //【旧】修改任务信息【A+M】
+        updateTask:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/task/biz/update',
+                params: params
+            });
+        },
+        //【旧】客户/供应商订单状态修改【A+M】
+        setOrderStatus:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/ordez/biz/updsts',
+                params: params
+            });
+        },
+        //【新】客户确认完成订单【A+M】
+        completeOrder:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/ordez/biz/finish',
+                params: params
+            });
+        },
+        //【新】客户取消订单【A+M】
+        cancelOrder:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/ordez/biz/cancel',
+                params: params
+            });
+        },
+        //【新】客户/供应商头像修改【A+M】
+        updateAvatar:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/appuser/info/uphpic',
+                params: params
+            });
+        },
     }
   },
 

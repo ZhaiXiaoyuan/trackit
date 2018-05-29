@@ -31,7 +31,7 @@
                             <el-table-column prop="custbasis" label="客户参考"  align="center"></el-table-column>
                             <el-table-column prop="plantime" label="物料完成时间"  align="center"></el-table-column>
                             <el-table-column prop="createtime" label="下单时间" align="center"></el-table-column>
-                            <el-table-column label="任务状态" width="200"  align="center">
+                            <el-table-column label="任务状态"  align="center">
                                 <template slot-scope="scope">
                                     {{scope.row.status|orderStatus}}
                                 </template>
@@ -87,7 +87,7 @@
                         </el-form>
                     </div>
                 </div>
-                <div class="block" v-for="(form,index) in productList">
+                <div class="block">
                     <div class="block-hd">
                         <svg class="icon blue-icon" aria-hidden="true">
                             <use xlink:href="#icon-biaoge"></use>
@@ -109,9 +109,9 @@
                     </div>
                 </div>
             </div>
-            <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;" v-if="account.user_type=='Customer'">
+            <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;" v-if="account.user_type=='Customer'&&order.status!=10">
                 <el-button type="primary" style="width: 116px;" v-if="order.status==1" @click="$router.push({ name: 'allocateOrder', params: {id:id}})">分配订单</el-button>
-                <el-button type="primary" v-if="order.status==8" @click="setStatus(9)">确认订单完成</el-button>
+                <el-button type="primary" v-if="order.status==8" @click="completeDialogFlag=true">确认订单完成</el-button>
                 <el-button type="danger" style="width: 116px;" v-if="order.status<9" @click="setStatus(10)">取消订单</el-button>
             </el-row>
             <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;" v-if="account.user_type=='Supplier'">
@@ -121,6 +121,38 @@
                 <el-button type="primary" v-if="order.status==6" @click="setStatus(8)">出货</el-button>
             </el-row>
         </div>
+        <!--完成订单弹窗-->
+        <el-dialog class="cm-dialog complete-dialog" title="完成订单" :visible.sync="completeDialogFlag" v-if="completeDialogFlag" >
+            <div class="dialog-content">
+                <div class="panel">
+                    <div class="panel-bd">
+                        <!--<el-form-item label="质量：" >
+                            <el-radio-group v-model="hasQualityProblem">
+                                <el-radio value="0" label="0">没问题</el-radio>
+                                <el-radio value="1" label="1">有问题</el-radio>
+                            </el-radio-group>
+                        </el-form-item>-->
+                        <span>质量：</span>
+                        <el-radio-group v-model="hasQualityProblem" size="medium">
+                            <el-radio :value="0" :label="0">没问题</el-radio>
+                            <el-radio :value="1" :label="1">有问题</el-radio>
+                        </el-radio-group>
+                    </div>
+                </div>
+                <div class="panel other-reason-panel active" >
+                    <div class="panel-hd">
+                        <p>备注：</p>
+                    </div>
+                    <div class="panel-bd">
+                        <textarea v-model="orderFeedback" maxlength="1024"  cols="30" rows="10"></textarea>
+                    </div>
+                </div>
+            </div>
+            <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;">
+                <el-button type="" style="width: 80px;" @click="completeDialogFlag=false">取消</el-button>
+                <el-button type="primary" style="margin-left: 40px;" @click="complete()">确认完成</el-button>
+            </el-row>
+        </el-dialog>
     </div>
 </template>
 <style lang="less" rel="stylesheet/less" scoped>
@@ -229,6 +261,33 @@
             }
         }
     }
+
+  .complete-dialog{
+      .panel{
+          padding: 0px 40px;
+          .panel-hd{
+              padding-bottom: 10px;
+          }
+          &+.panel{
+              margin-top: 20px;
+          }
+      }
+      textarea{
+          padding: 10px;
+          width: 100%;
+          height: 100px;
+          border: 1px solid #e5e5e5;
+          resize: none;
+      }
+      .other-reason-panel{
+          height: 0px;
+          overflow: hidden;
+          transition: height 0.3s;
+          &.active{
+              height: 141px;
+          }
+      }
+  }
 </style>
 <script>
     import Vue from 'vue'
@@ -288,6 +347,10 @@
                     },
                 ],
                 statusLogs:[],
+
+                completeDialogFlag:false,
+                orderFeedback:null,
+                hasQualityProblem:0,
             }
         },
         created(){
@@ -537,6 +600,24 @@
                     if(resp.status=='success'){
                         fb.setOptions({type:"complete",text:'设置成功'});
                         this.order.status=value;
+                    }else{
+                        fb.setOptions({type:"warn",text:resp.message});
+                    }
+                });
+            },
+            complete:function () {
+                let params={
+                    ...Vue.sessionInfo(),
+                    ordezid:this.id,
+                    quality:this.hasQualityProblem,
+                    finishRemark:this.orderFeedback
+                }
+                let fb=Vue.operationFeedback({text:'设置中...'});
+                Vue.api.completeOrder(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        fb.setOptions({type:"complete",text:'设置成功'});
+                        this.completeDialogFlag=false;
+                        this.order.status=9;
                     }else{
                         fb.setOptions({type:"warn",text:resp.message});
                     }

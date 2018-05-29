@@ -9,6 +9,7 @@
 </template>
 <style>
     .content{
+        padding: 30px;
         left: 230px;
     }
 </style>

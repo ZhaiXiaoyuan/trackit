@@ -32,7 +32,7 @@
                             <el-table-column prop="plantime" label="物料完成时间"  align="center"></el-table-column>
                             <el-table-column prop="resourceLabel" label="任务种类"  align="center"></el-table-column>
                             <el-table-column prop="createtime" label="下单时间" align="center"></el-table-column>
-                            <el-table-column label="任务状态" width="200"  align="center">
+                            <el-table-column label="任务状态"  align="center">
                                 <template slot-scope="scope">
                                     {{scope.row.status|taskStatus}}
                                 </template>
@@ -114,12 +114,14 @@
                                 <span v-if="selectedPlan">{{selectedPlan.feedback}}</span>
                             </el-form-item>
                         </el-form>
-                        <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;" v-if="account.user_type=='Customer'">
+                        <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;" v-if="account.user_type=='Customer'&&task.status!=4&&task.status!=6">
                             <el-button type="primary"  @click="$router.push({ name: 'newOrder', params: {taskNo:task.taskno}})">发起关联订单</el-button>
-                            <el-button type="primary">确认完成任务</el-button>
-                            <el-button type="primary">编辑任务</el-button>
-                            <el-button type="primary">取消任务</el-button>
+                            <el-button type="primary" @click="complete()">确认完成任务</el-button>
+                            <el-button type="primary" @click="$router.push({ name: 'newTask', params: {id:task.id}})">编辑任务</el-button>
+                            <el-button type="danger" @click="cancelTaskDialogFlag=true">取消任务</el-button>
                         </el-row>
+                        <p style="text-align: center;font-size: 20px;color: #409EFF;" v-if="task.status==4">任务已完成</p>
+                        <p style="text-align: center;font-size: 20px;color: #F56C6C;" v-if="task.status==6">任务已取消</p>
                     </div>
                 </div>
                 <!--供应商-->
@@ -221,7 +223,7 @@
                     </div>
                     <div class="info-row">
                         <span class="field">供应商简介：</span>
-                        <div class="value">缺字段</div>
+                        <div class="value">{{curSupplier.remark}}</div>
                     </div>
                     <div style="margin-top: 40px;">
                         <el-button type="primary" @click="dialogFormVisible=false">关闭</el-button>
@@ -231,6 +233,35 @@
                     <el-button @click="dialogFormVisible = false">取 消</el-button>
                     <el-button type="primary" @click="addLabel()">确定</el-button>
                 </div>-->
+            </el-dialog>
+
+            <!--取消任务弹窗-->
+            <el-dialog class="cm-dialog cancel-task-dialog" title="取消任务" :visible.sync="cancelTaskDialogFlag" v-if="cancelTaskDialogFlag" >
+                <div class="dialog-content">
+                   <div class="panel">
+                       <div class="panel-hd">
+                           <p>请您勾选取消任务的原因：</p>
+                       </div>
+                       <div class="panel-bd">
+                          <ul class="label-list">
+                              <li v-for="(item,index) in labelList" :class="{'active':item.selected}" @click="selectLabel(item)">{{item.label}}</li>
+                              <li :class="{'active':otherReasonFlag}" @click="otherReasonFlag=true;">其他</li>
+                          </ul>
+                       </div>
+                   </div>
+                    <div class="panel other-reason-panel" :class="{'active':otherReasonFlag}">
+                        <div class="panel-hd">
+                            <p>其他原因：</p>
+                        </div>
+                        <div class="panel-bd">
+                            <textarea v-model="otherReason" maxlength="1024"  cols="30" rows="10"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;">
+                    <el-button type="" @click="cancelTaskDialogFlag=false">取消</el-button>
+                    <el-button type="primary" style="margin-left: 40px;" @click="cancel()">确认</el-button>
+                </el-row>
             </el-dialog>
         </div>
     </div>
@@ -275,6 +306,8 @@
     }
     .label-list{
         overflow: hidden;
+        padding: 15px;
+        border: 1px solid #e5e5e5;
         li{
             float: left;
             height: 34px;
@@ -284,13 +317,12 @@
             padding: 0px 20px;
             margin: 5px 10px;
             border: 1px solid #e5e5e5;
+            min-width: 140px;
             cursor: pointer;
-        }
-        .add-btn{
-            border: none;
-            padding: 0px;
-            .icon{
-                font-size: 34px;
+            text-align: center;
+            &.active{
+                border: 1px solid #409EFF;
+                color: #409EFF;
             }
         }
     }
@@ -324,6 +356,32 @@
             }
         }
     }
+  .cancel-task-dialog{
+      .panel{
+          padding: 0px 40px;
+          .panel-hd{
+              padding-bottom: 10px;
+          }
+          &+.panel{
+              margin-top: 20px;
+          }
+      }
+      textarea{
+          padding: 10px;
+          width: 100%;
+          height: 100px;
+          border: 1px solid #e5e5e5;
+          resize: none;
+      }
+      .other-reason-panel{
+          height: 0px;
+          overflow: hidden;
+          transition: height 0.3s;
+          &.active{
+              height: 141px;
+          }
+      }
+  }
 </style>
 <script>
     import Vue from 'vue'
@@ -362,7 +420,41 @@
                 uploading:false,
                 proattrs:[],
                 newSampleList:[],
-                feedbackText:''
+                feedbackText:'',
+
+                cancelTaskDialogFlag:false,
+                labelList:[
+                    {
+                        label:'不接近客人要的',
+                        selected:false,
+                    },
+                    {
+                        label:'价格太高',
+                        selected:false,
+                    },
+                    {
+                        label:'打版时间太长',
+                        selected:false,
+                    },
+                    {
+                        label:'打版费用太高',
+                        selected:false,
+                    },
+                    {
+                        label:'大货起订量太大',
+                        selected:false,
+                    },
+                    {
+                        label:'大货货期太长',
+                        selected:false,
+                    },
+                    {
+                        label:'客人要其他选择',
+                        selected:false,
+                    },
+                ],
+                otherReasonFlag:false,
+                otherReason:null,
             }
         },
         created(){
@@ -380,6 +472,7 @@
                 Vue.api.getCustomerTaskDetail(params).then((resp)=>{
                     if(resp.status=='success'){
                         this.task=JSON.parse(resp.message);
+                        this.task.status=parseInt(this.task.status);
                         console.log('this.task:',this.task);
                         this.entryList.push(this.task);
                         if(this.task.custpropicone){
@@ -616,13 +709,13 @@
                 Vue.api.getSupplierTaskDetail(params).then((resp)=>{
                     if(resp.status=='success'){
                         this.task=JSON.parse(resp.message);
+                        this.task.status=parseInt(this.task.status);
                         this.proattrs=this.task.proattrs;
                         this.newSampleList=[{
                             filepath:'',
                             filename:'',
                             attrList:JSON.parse(this.proattrs),
                         }];
-                        console.log('this.task:',  this.task);
                         this.entryList.push(this.task);
                         if(this.task.custpropicone){
                             this.picList.push({
@@ -803,8 +896,8 @@
                     if(resp.status=='success'){
                         if(resp.status=='success'){
                             fb.setOptions({type:"complete",text:'保存成功'});
-                            toAddPlan=false;
-                           /* this.$router.go(0);*/
+                            this.toAddPlan=false;
+                            this.getSupplierPlanList();
                         }else{
                             fb.setOptions({type:"warn",text:resp.message});
                         }
@@ -830,14 +923,14 @@
                 });
             },
             getUserInfo:function () {
-                if(!this.curSupplier){
+                if(!this.curSupplier||!this.curSupplier.id){
                     Vue.operationFeedback({type:'warn',text:'请先选择供应商'});
                     return;
                 }
                 let params={
                     ...Vue.sessionInfo(),
-                    unumber:this.curSupplier.id,
-                    /*  uid:this.account.user_uuid*/
+                   /* unumber:this.curSupplier.id,*/
+                      uid:this.curSupplier.id
                 }
                 Vue.api.getUserInfo(params).then((resp)=>{
                     if(resp.status=='success'){
@@ -854,12 +947,58 @@
                     }
                 });
             },
+            selectLabel:function (item) {
+                item.selected=!item.selected;
+            },
+            cancel:function () {
+                let reason='';
+                this.labelList.forEach((item,i)=>{
+                    if(item.selected){
+                        reason+=(i>0?',':'')+item.label;
+                    }
+                });
+                if(!reason&&!this.otherReason){
+                    Vue.operationFeedback({type:'warn',text:'请勾选取消任务的原因'});
+                    return;
+                }
+                let params={
+                    ...Vue.sessionInfo(),
+                    taskid:this.id,
+                    cannelreason:reason,
+                    elseReason:this.otherReason
+                }
+                let fb=Vue.operationFeedback({text:'取消中...'});
+                Vue.api.cancelTask(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        fb.setOptions({type:"complete",text:'取消成功'});
+                        this.task.status=6;
+                        this.cancelTaskDialogFlag=false;
+                    }else{
+                        fb.setOptions({type:"warn",text:resp.message});
+                    }
+                });
+            },
+            complete:function () {
+                let params={
+                    ...Vue.sessionInfo(),
+                    taskid:this.id
+                }
+                let fb=Vue.operationFeedback({text:'设置中...'});
+                Vue.api.complete(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        fb.setOptions({type:"complete",text:'设置成功'});
+                        this.task.status=4;
+                    }else{
+                        fb.setOptions({type:"warn",text:resp.message});
+                    }
+                });
+            }
+
         },
         mounted () {
             /**/
             this.id=this.$route.params.id;
             this.account=Vue.getAccountInfo();
-            console.log('this.account:',this.account);
             /**/
             if(this.account.user_type=='Customer'){
                 this.getCustomerTaskDetail();

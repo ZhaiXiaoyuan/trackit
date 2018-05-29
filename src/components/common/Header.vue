@@ -16,6 +16,9 @@
         </div>
     </div>
 </template>
+<style lang="less" rel="stylesheet/less" >
+    .header{}
+</style>
 <script>
     import Vue from 'vue'
     import bus from '../common/bus';

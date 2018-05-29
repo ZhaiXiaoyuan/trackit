@@ -25,7 +25,7 @@
                 <el-row class="block-bd" type="flex" align="middle">
                     <el-col :span="3">关于我们：</el-col>
                     <el-col :span="21">
-                        <a :href="about" class="cm-link-btn">{{about}}</a>
+                        <span class="cm-link-btn" @click="aboutDialogFlag=true">点击查看</span>
                     </el-col>
                 </el-row>
             </div>
@@ -38,6 +38,14 @@
                 </el-row>
             </div>
         </div>
+        <el-dialog class="cm-dialog about-dialog" title="关于我们" :visible.sync="aboutDialogFlag" v-if="aboutDialogFlag" >
+            <div class="dialog-content">
+                <iframe id="google_ads_frame2" name="google_ads_frame2" width="100%" height="620" frameborder="0" :src="about" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" allowfullscreen="true"></iframe>
+            </div>
+            <el-row style="text-align: center;margin-top: 20px;">
+                <el-button type="primary" @click="aboutDialogFlag=false">关闭</el-button>
+            </el-row>
+        </el-dialog>
     </div>
 </template>
 <style lang="less" rel="stylesheet/less" scoped>
@@ -56,6 +64,7 @@
             return {
                 account:{},
                 about:null,
+                aboutDialogFlag:false
             }
         },
         created(){

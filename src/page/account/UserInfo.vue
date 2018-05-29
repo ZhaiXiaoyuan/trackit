@@ -136,6 +136,9 @@
                     if(resp.status='success'){
                         let data=JSON.parse(resp.message)
                         this.avatar=data.filepath;
+                   /*     Vue.api.updateAvatar({...Vue.sessionInfo(),hpic:data.filename}).then(()=>{
+
+                        })*/
                     }else{
                         Vue.operationFeedback({type:'warn',text:'上传失败'});
                     }
@@ -179,7 +182,8 @@
                     email:this.email,
                     password:this.curPwd,
                     newpassword1:this.newPwd,
-                    newpassword2:this.rePwd
+                    newpassword2:this.rePwd,
+                    remark:this.remark,
                 }
                 let fb=Vue.operationFeedback({text:'保存中...'});
                 Vue.api.saveUserInfo(params).then((resp)=>{

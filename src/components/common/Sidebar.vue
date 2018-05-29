@@ -68,8 +68,8 @@
         border-top:1px solid #f0f0f8;
         height:100%;
         li{
-            height: 80px;
-            line-height: 80px;
+            height: 70px;
+            line-height: 70px;
             border-bottom: 1px solid #f0f0f8;
             &:hover{
                 background: #f8f8f9 !important;
@@ -95,7 +95,7 @@
                     {
                         code:'01',
                         icon: '#icon-solid-time',
-                        index: '/',
+                        index: '/task',
                         title: '任务',
                     },
                     {
@@ -144,6 +144,7 @@
             console.log('this.account:',this.account);
             //
             this.pageName=this.$route.name;
+            console.log('this.pageName:',this.pageName);
             //
             this.items=this.itemsConfig;
         }

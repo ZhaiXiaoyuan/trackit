@@ -4,7 +4,8 @@
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>Trackit</el-breadcrumb-item>
                 <el-breadcrumb-item>任务</el-breadcrumb-item>
-                <el-breadcrumb-item>新建任务</el-breadcrumb-item>
+                <el-breadcrumb-item v-if="!id">新建任务</el-breadcrumb-item>
+                <el-breadcrumb-item v-if="id">编辑任务</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
@@ -98,7 +99,8 @@
                 </div>
             </div>
             <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;">
-                <el-button type="primary" @click="save()">确认发布</el-button>
+                <el-button type="primary" @click="save()" v-if="!id">确认发布</el-button>
+                <el-button type="primary" @click="update()" v-if="id">确认发布</el-button>
                 <el-button type="" @click="$router.go(-1)">取消发布</el-button>
             </el-row>
         </div>
@@ -184,6 +186,7 @@
     export default {
         data() {
             return {
+                id:null,
                 dialogFormVisible: false,
 
                 curDateStrArr:Vue.formatDate(new Date(),'yyyy.MM.dd').split('.'),
@@ -225,6 +228,8 @@
                 taskType:'Buliao',
                 isEmergency:1,
                 custRequire:null,
+
+                task:null,
             }
         },
         created(){
@@ -362,12 +367,219 @@
                     }
                 });
 
-            }
+            },
+
+            getCustomerTaskDetail:function () {
+                let params={
+                    ...Vue.sessionInfo(),
+                    id:this.id,
+                }
+                Vue.api.getCustomerTaskDetail(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        this.task=JSON.parse(resp.message);
+                        console.log('this.task:',this.task);
+                        this.task.status=parseInt(this.task.status);
+
+                        //
+                        this.customerNo=this.task.custno;
+                        this.customerNote=this.task.custbasis;
+                        this.completeDate=Vue.formatDate(this.task.plantime,'yyyy-MM-dd');
+                        this.taskType=this.task.resource;
+                        this.isEmergency=this.task.urgent;
+                        this.custRequire=this.task.custrequire;
+                        let proattrs=JSON.parse(this.task.proattrs);
+                        for(let i=0;i<proattrs.length;i++){
+                            let attr=proattrs[i];
+                            for(let j=0;j<this.labelList.length;j++){
+                                let label=this.labelList[j];
+                                if(attr.attrName==label.label){
+                                    label.active=true;
+                                    break;
+                                }else if(j==this.labelList.length-1){
+                                    this.labelList.push({
+                                        label:attr.attrName,
+                                        value:'',
+                                        active:true,
+                                    })
+                                }
+                            }
+                        }
+
+                        if(this.task.custpropicone){
+                            this.picList.push({
+                                filepath:this.task.custpropiconeUrl,
+                                label:this.task.custpropiconetag,
+                                filename:this.task.custpropicone
+                            })
+                        }
+                        if(this.task.custpropictwo){
+                            this.picList.push({
+                                filepath:this.task.custpropictwoUrl,
+                                label:this.task.custpropictwotag,
+                                filename:this.task.custpropictwo
+                            })
+                        }
+                        if(this.task.custpropicthree){
+                            this.picList.push({
+                                filepath:this.task.custpropicthreeUrl,
+                                label:this.task.custpropicthreetag,
+                                filename:this.task.custpropicthree
+                            })
+                        }
+                        if(this.task.custpropicfour){
+                            this.picList.push({
+                                filepath:this.task.custpropicfourUrl,
+                                label:this.task.custpropicfourtag,
+                                filename:this.task.custpropicfour
+                            })
+                        }
+                        if(this.task.custpropicfive){
+                            this.picList.push({
+                                filepath:this.task.custpropicfiveUrl,
+                                label:this.task.custpropicfivetag,
+                                filename:this.task.custpropicfive
+                            })
+                        }
+                        if(this.task.custpropicsix){
+                            this.picList.push({
+                                filepath:this.task.custpropicsixUrl,
+                                label:this.task.custpropicsixtag,
+                                filename:this.task.custpropicsix
+                            })
+                        }
+                        if(this.task.custpropicseven){
+                            this.picList.push({
+                                filepath:this.task.custpropicsevenUrl,
+                                label:this.task.custpropicseventag,
+                                filename:this.task.custpropicseven
+                            })
+                        }
+                        if(this.task.custpropiceight){
+                            this.picList.push({
+                                filepath:this.task.custpropiceightUrl,
+                                label:this.task.custpropiceighttag,
+                                filename:this.task.custpropiceight
+                            })
+                        }
+                        if(this.task.custpropicnine){
+                            this.picList.push({
+                                filepath:this.task.custpropicnineUrl,
+                                label:this.task.custpropicninetag,
+                                filename:this.task.custpropicnine
+                            })
+                        }
+                        if(this.task.custpropicten){
+                            this.picList.push({
+                                filepath:this.task.custpropictenUrl,
+                                label:this.task.custpropictentag,
+                                filename:this.task.custpropicten
+                            })
+                        }
+                    }else{
+
+                    }
+                });
+            },
+
+            update:function () {
+                if(!this.customerNo){
+                    Vue.operationFeedback({type:'warn',text:'请输入客户编号'});
+                    return;
+                }
+                if(!this.customerNote){
+                    Vue.operationFeedback({type:'warn',text:'请输入客户参考'});
+                    return;
+                }
+                if(!this.completeDate){
+                    Vue.operationFeedback({type:'warn',text:'选择预计完成时间'});
+                    return;
+                }
+                if(!this.taskType){
+                    Vue.operationFeedback({type:'warn',text:'请选择任务种类'});
+                    return;
+                }
+                if(this.picList.length==0){
+                    Vue.operationFeedback({type:'warn',text:'请上传任务样品图片'});
+                    return;
+                }
+                if(!this.custRequire){
+                    Vue.operationFeedback({type:'warn',text:'请输入客户要求栏'});
+                    return;
+                }
+                let selectedLabelStr='';
+                this.labelList.forEach((item,i)=>{
+                    if(item.active){
+                        selectedLabelStr+=(i>0?',':'')+(i+1)+':'+item.label;
+                    }
+                })
+                if(!selectedLabelStr||selectedLabelStr==''){
+                    Vue.operationFeedback({type:'warn',text:'请勾选需要供应商提供的相关信息'});
+                    return;
+                }
+                let params={
+                    ...Vue.sessionInfo(),
+                    id:this.id,
+                    custno:this.customerNo,
+                    custbasis:this.customerNote,
+                    plantime:Vue.formatDate(this.completeDate,'yyyy-MM-dd'),
+                    resource:this.taskType,
+                    custrequire:this.custRequire,
+                    urgent:this.isEmergency,
+                    proattrs:selectedLabelStr,
+                }
+                this.picList.forEach((item,i)=>{
+                    if(i==0){
+                        params.custpropicone=item.filename;
+                        params.custpropiconetag=item.label?item.label:null;
+                    }if(i==1){
+                        params.custpropictwo=item.filename;
+                        params.custpropictwotag=item.label?item.label:null;
+                    }if(i==2){
+                        params.custpropicthree=item.filename;
+                        params.custpropicthreetag=item.label?item.label:null;
+                    }if(i==3){
+                        params.custpropicfour=item.filename;
+                        params.custpropicfourtag=item.label?item.label:null;
+                    }if(i==4){
+                        params.custpropicfive=item.filename;
+                        params.custpropicfivetag=item.label?item.label:null;
+                    }if(i==5){
+                        params.custpropicsix=item.filename;
+                        params.custpropicsixtag=item.label?item.label:null;
+                    }if(i==6){
+                        params.custpropicseven=item.filename;
+                        params.custpropicseventag=item.label?item.label:null;
+                    }if(i==7){
+                        params.custpropiceight=item.filename;
+                        params.custpropiceighttag=item.label?item.label:null;
+                    }if(i==8){
+                        params.custpropicnine=item.filename;
+                        params.custpropicninetag=item.label?item.label:null;
+                    }if(i==9){
+                        params.custpropicten=item.filename;
+                        params.custpropicninetag=item.label?item.label:null;
+                    }
+                })
+                let fb=Vue.operationFeedback({text:'保存中...'});
+                Vue.api.updateTask(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        fb.setOptions({type:"complete",text:'保存成功'});
+                        this.$router.push({name:'taskDetail',params:{id:this.id}});
+                    }else{
+                        fb.setOptions({type:"warn",text:resp.message});
+                    }
+                });
+
+            },
         },
         mounted () {
             /**/
             this.id=this.$route.params.id;
+            this.account=Vue.getAccountInfo();
             /**/
+            if(this.id){
+                this.getCustomerTaskDetail();
+            }
         },
     }
 </script>

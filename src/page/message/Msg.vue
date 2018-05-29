@@ -11,7 +11,14 @@
                 <el-row class="condition-row" style="margin-top: 20px;">
                     <span>消息通知类型：</span>
                     <el-col :span="6">
-
+                        <el-select v-model="curTypeIndex" @change="selectTypeChange" placeholder="请选择类型">
+                            <el-option
+                                v-for="(item,index) in typeList"
+                                :key="item.id"
+                                :label="item.label"
+                                :value="index">
+                            </el-option>
+                        </el-select>
                     </el-col>
                 </el-row>
             </div>
@@ -21,7 +28,8 @@
                     <el-table-column prop="createtime" label="通知时间"  align="center"></el-table-column>
                     <el-table-column label="通知详情"  align="center">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.biztype=='Order'">您的订单号为<span class="cm-link-btn" style="padding: 0px 5px;">{{scope.row.bizid}}</span></span>
+                            <span v-if="scope.row.biztype=='Order'">您的订单号为<span class="cm-link-btn" @click="$router.push({ name: 'orderDetail', params: {id:scope.row.bizid}})" style="padding: 0px 5px;">{{scope.row.bizid}}</span></span>
+                            <span v-if="scope.row.biztype=='Task'">您的任务号为<span class="cm-link-btn" @click="$router.push({ name: 'taskDetail', params: {id:scope.row.bizid}})" style="padding: 0px 5px;">{{scope.row.bizid}}</span></span>
                             <span v-html="scope.row.content"></span>
                         </template>
                     </el-table-column>
@@ -68,14 +76,17 @@
         data() {
             return {
                 account:null,
-                listType:'first',
-                type:'do',//进行中:do,4:已完成，7:已取消
-                range:'All',
-                dateRange:null,
-                startDate:null,
-                endDate:null,
-                keyword:null,
-                dateRage:null,
+                typeList:[
+                    {
+                        label:'任务',
+                        value:'Task ',
+                    },
+                    {
+                        label:'订单',
+                        value:'Order ',
+                    }
+                ],
+                curTypeIndex:0,
                 pager:{
                     pageNumber:1,
                     pageSize:20,
@@ -96,6 +107,7 @@
                     ...Vue.sessionInfo(),
                     'pager.pageNumber':this.pager.pageNumber,
                     'pager.pageSize':this.pager.pageSize,
+                    biztype:this.typeList[this.curTypeIndex].value
                 }
                 this.pager.loading=true;
                 Vue.api.getMsgList(params).then((resp)=>{
@@ -114,6 +126,9 @@
                 this.pager.pageSize=data;
                 this.getList();
             },
+            selectTypeChange:function (data) {
+                this.getList();
+            }
 
         },
         mounted () {

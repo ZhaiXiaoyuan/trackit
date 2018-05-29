@@ -48,7 +48,7 @@ Vue.filter('taskStatus',function(str){
             result='重做任务';
             break;
         case '6':
-            result='取消任务';
+            result='已取消';
             break;
         case '7':
             result='重做任务';

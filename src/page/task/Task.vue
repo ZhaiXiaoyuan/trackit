@@ -17,15 +17,15 @@
                        <!-- <el-button type="primary">全部</el-button>-->
                         <el-button type="" :class="{'el-button--primary':type=='do'}" @click="setType('do')">进行中</el-button>
                         <el-button type="" :class="{'el-button--primary':type=='4'}" @click="setType('4')">已完成</el-button>
-                        <el-button type="" :class="{'el-button--primary':type=='7'}" @click="setType('7')">已取消</el-button>
+                        <el-button type="" :class="{'el-button--primary':type=='7'}" @click="setType('6')">已取消</el-button>
                     </el-button-group>
                 </el-row>
-                <el-row class="condition-row" style="margin-top: 20px;">
-                    <el-col :span="3">
+                <el-row class="condition-row" style="margin-top: 20px;" type="flex">
+                    <div>
                         任务量：<span class="blue">{{pager.total}}单</span>
-                    </el-col>
-                    <el-col :span="8">
-                        <span>时间:</span>
+                    </div>
+                    <span style="margin-left: 20px;">时间：</span>
+                    <div>
                         <el-date-picker
                             class="cm-date-picker"
                             v-model="dateRage"
@@ -35,34 +35,34 @@
                             start-placeholder="开始日期"
                             end-placeholder="结束日期">
                         </el-date-picker>
-                    </el-col>
-                    <span>关键字：</span>
-                    <el-col :span="6">
-                        <el-input placeholder="客户号/任务号/客户参考" v-model="keyword" @keyup.enter.native="getList()">
+                    </div>
+                    <span style="margin-left: 20px;">关键字：</span>
+                    <div>
+                        <el-input placeholder="客户号/任务号/客户参考" style="width: 220px;" v-model="keyword" @keyup.enter.native="getList()">
                             <el-button slot="append" icon="el-icon-search" @click="getList()"></el-button>
                         </el-input>
-                    </el-col>
-                    <el-col :span="4" style="text-align: right;margin-left: 20px;">
+                    </div>
+                    <div style="text-align: right;margin-left: auto">
                         <el-button size="small" type="primary" @click="$router.push({name:'newTask'})">新建任务</el-button>
                         <el-button size="small" type="" @click="getAllList()">导出</el-button>
                         <a id="downlink"></a>
-                    </el-col>
+                    </div>
                 </el-row>
             </div>
             <div class="list-panel">
                 <el-table :data="entryList" border style="width: 100%;" ref="multipleTable">
                     <el-table-column prop="taskno" label="任务单号" align="center"></el-table-column>
-                    <el-table-column prop="custno" label="客户编号"  align="center"></el-table-column>
+                    <el-table-column prop="custno"  width="100"  label="客户编号"  align="center"></el-table-column>
                     <el-table-column prop="custbasis" label="客户参考"  align="center"></el-table-column>
-                    <el-table-column prop="plantime" label="物料完成时间"  align="center"></el-table-column>
+                    <el-table-column prop="plantime" width="100" label="物料完成时间"  align="center"></el-table-column>
                     <el-table-column prop="resourceLabel" label="任务种类"  align="center"></el-table-column>
                     <el-table-column prop="createtime" label="下单时间" align="center"></el-table-column>
-                    <el-table-column label="任务状态" width="200"  align="center">
+                    <el-table-column label="任务状态"  align="center">
                         <template slot-scope="scope">
                             {{scope.row.status|taskStatus}}
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作"  align="center">
+                    <el-table-column label="操作" width="100"  align="center">
                         <template slot-scope="scope">
                             <router-link :to="'/taskDetail/'+scope.row.id" size="small">查看详情</router-link>
                             <i class="icon emergency-icon" v-if="scope.row.urgent"></i>
@@ -112,7 +112,7 @@
             return {
                 account:null,
                 listType:'first',
-                type:'do',//进行中:do,4:已完成，7:已取消
+                type:'do',//进行中:do,4:已完成，6:已取消
                 range:'All',
                 dateRange:null,
                 startDate:null,

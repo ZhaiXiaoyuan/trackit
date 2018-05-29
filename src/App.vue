@@ -10,3 +10,30 @@
     @import "less/main";
     [v-cloak] { display: none }
 </style>
+<script>
+    import Vue from 'vue'
+
+    export default {
+        components:{
+        },
+        data: function(){
+            return {
+
+            }
+        },
+        methods: {
+
+        },
+        mounted () {
+            /*请求基本配置*/
+            let params={
+                req_from:'mj-backend',
+                timestamp:Vue.genTimestamp(),
+                types:'Resource,TaskCancelReason,TaskRedoReason '
+            }
+            Vue.api.basicConfig(params).then(()=>{
+
+            });
+        },
+    }
+</script>

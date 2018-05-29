@@ -179,6 +179,7 @@ table {
 
 /*框架样式覆盖*/
 .crumbs{
+    margin-bottom: 10px;
     .active{
         .el-breadcrumb__inner{
             color: #48b4ff;
@@ -186,6 +187,8 @@ table {
     }
 }
 .container{
+   /* padding: 20px;*/
+    max-width: 1400px;
     &.container{
         margin-top: 10px;
     }
@@ -384,5 +387,38 @@ table {
         .el-dialog__header{
             display: none;
         }
+    }
+}
+.cm-dialog{
+    .el-dialog__header{
+        padding: 20px;
+        text-align: center;
+        border-bottom: 1px solid #e5e5e5;
+    }
+}
+
+.about-dialog{
+    .el-dialog{
+        margin-top:4vh !important;
+        width: 1200px;
+    }
+}
+
+@media screen and (max-width: 1500px) {
+    .sidebar{
+        top:60px !important;
+        .sidebar-el-menu:not(.el-menu--collapse){
+            width: 210px;
+        }
+    }
+    .header{
+        height: 60px !important;
+        line-height: 60px !important;
+        font-size: 18px !important;
+    }
+    .content{
+        padding: 20px 15px !important;
+        top:60px !important;
+        left: 210px !important;
     }
 }

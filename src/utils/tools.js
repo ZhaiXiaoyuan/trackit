@@ -46,8 +46,8 @@ export default {
       Vue.tools = {
           basicConfig:{
               //临时测试
-              basicUrl:false&&process.env.NODE_ENV=='development'?'/api':'http://120.79.17.251:8000/trackitapps',
-              imgPrefix:'http://120.79.17.251:8000/zfiles/'
+              basicUrl:false&&process.env.NODE_ENV=='development'?'/api':'http://trackit.elecplus.tech/trackitapps',
+              imgPrefix:'http://trackit.elecplus.tech/zfiles/'
           },
         /*生成请求时间戳*/
         genTimestamp:function () {
@@ -210,7 +210,7 @@ export default {
                     result='重做任务';
                     break;
                 case '6':
-                    result='取消任务';
+                    result='已取消';
                     break;
                 case '7':
                     result='重做任务';

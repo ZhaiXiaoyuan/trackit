@@ -220,7 +220,7 @@
                 Vue.api.allocateOrder(params).then((resp)=>{
                     if(resp.status=='success'){
                         fb.setOptions({type:"complete",text:'操作成功'});
-                        /* this.$router.push({name:'order'});*/
+                         this.$router.push({name:'orderDetail',params:{id:this.id}});
                     }else{
                         fb.setOptions({type:"warn",text:resp.message});
                     }

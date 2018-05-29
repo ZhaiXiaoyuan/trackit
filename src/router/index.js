@@ -10,12 +10,12 @@ export default new Router({
             component: resolve => require(['../components/common/Home.vue'], resolve),
             children:[
                 {
-                    path: '/',
+                    path: '/task',
                     name:'task',
                     component: resolve => require(['../page/task/Task.vue'], resolve)
                 },
                 {
-                    path: '/newTask',
+                    path: '/newTask/:id?',
                     name:'newTask',
                     component: resolve => require(['../page/task/NewTask.vue'], resolve)
                 },

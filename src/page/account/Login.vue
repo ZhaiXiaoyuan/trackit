@@ -6,7 +6,7 @@
             </div>
             <el-form  ref="ruleForm" label-width="0px" class="demo-ruleForm">
                 <el-form-item prop="username">
-                    <el-input v-model="account" placeholder="账号"></el-input>
+                    <el-input v-model="account" placeholder="手机号"></el-input>
                 </el-form-item>
                 <el-form-item prop="password">
                     <el-input type="password" placeholder="密码" v-model="pwd" @keyup.enter.native="login()"></el-input>

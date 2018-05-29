@@ -20,11 +20,11 @@
                         <el-button type="" :class="{'el-button--primary':type=='10'}" @click="setType('10')">已取消</el-button>
                     </el-button-group>
                 </el-row>
-                <el-row class="condition-row" style="margin-top: 20px;">
-                    <el-col :span="3">
+                <el-row class="condition-row" style="margin-top: 20px;" type="flex">
+                    <div>
                         订单量：<span class="blue">{{pager.total}}单</span>
-                    </el-col>
-                    <el-col :span="8">
+                    </div>
+                    <div style="margin-left: 20px;">
                         <span>时间:</span>
                         <el-date-picker
                             class="cm-date-picker"
@@ -35,18 +35,18 @@
                             start-placeholder="开始日期"
                             end-placeholder="结束日期">
                         </el-date-picker>
-                    </el-col>
-                    <span>关键字：</span>
-                    <el-col :span="6">
-                        <el-input placeholder="" v-model="keyword" @keyup.enter.native="getList()">
+                    </div>
+                    <span style="margin-left: 20px;">关键字：</span>
+                    <div>
+                        <el-input placeholder="" style="width: 220px;" v-model="keyword" @keyup.enter.native="getList()">
                             <el-button slot="append" icon="el-icon-search" @click="getList()"></el-button>
                         </el-input>
-                    </el-col>
-                    <el-col :span="4" style="text-align: right;margin-left: 20px;">
+                    </div>
+                    <div style="text-align: right;margin-left: auto">
                         <el-button size="small" type="primary" @click="$router.push({name:'newOrder'})" v-if="account.user_type=='Customer'">新建订单</el-button>
                         <el-button size="small" type="" @click="getAllList()">导出</el-button>
                         <a id="downlink"></a>
-                    </el-col>
+                    </div>
                 </el-row>
             </div>
             <div class="list-panel">
@@ -56,7 +56,7 @@
                     <el-table-column prop="custbasis" label="客户参考"  align="center"></el-table-column>
                     <el-table-column prop="plantime" label="预计完成时间"  align="center"></el-table-column>
                     <el-table-column prop="createtime" label="下单时间" align="center"></el-table-column>
-                    <el-table-column label="订单状态" width="200"  align="center">
+                    <el-table-column label="订单状态"  align="center">
                         <template slot-scope="scope">
                             {{scope.row.status|orderStatus}}
                         </template>
