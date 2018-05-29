@@ -77,7 +77,8 @@
         }
         this.isRequesting=true;
         let params={
-          ...Vue.tools.sessionInfo(),
+            req_from:'mj-backend',
+            timestamp:Vue.genTimestamp(),
             telephoneNums:this.phone,
             user_phone:this.phone
         }

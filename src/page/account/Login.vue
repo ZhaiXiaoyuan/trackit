@@ -104,7 +104,8 @@
                     return;
                 }
                 let params={
-                    ...Vue.sessionInfo(),
+                    req_from:'mj-backend',
+                    timestamp:Vue.genTimestamp(),
                     user_login_name:this.account,
                     user_login_pwd:md5.hex(this.pwd)
                 }
