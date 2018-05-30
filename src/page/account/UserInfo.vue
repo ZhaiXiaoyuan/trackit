@@ -79,6 +79,8 @@
 </style>
 <script>
     import Vue from 'vue'
+    import md5 from 'js-md5'
+
     export default {
         data() {
             return {
@@ -102,7 +104,7 @@
             getUserInfo:function () {
                 let params={
                     ...Vue.sessionInfo(),
-                    unumber:this.account.user_uuid,
+                    unumber:this.account.user_phone,
                   /*  uid:this.account.user_uuid*/
                 }
                 Vue.api.getUserInfo(params).then((resp)=>{
@@ -112,6 +114,7 @@
                         this.userName=data.user_name;
                         this.email=data.email;
                         this.avatar=data.user_avatar;
+                        this.remark=data.remark;
                         console.log('data:',data);
                     }else{
 
@@ -126,12 +129,12 @@
                 formData.append('timestamp',sessionInfo.timestamp);
                 formData.append('number',sessionInfo.number);
                 formData.append('signature',sessionInfo.signature);
-                formData.append('biztype','Task');
+              /*  formData.append('biztype','Task');
                 formData.append('bizid',null);
-                formData.append('fieldname',file.name);
-                formData.append('file1',file);
+                formData.append('fieldname',file.name);*/
+                formData.append('hpic',file);
                 this.uploading=true;
-                Vue.api.upload(formData).then((resp)=>{
+                Vue.api.updateAvatar(formData).then((resp)=>{
                     this.uploading=false;
                     if(resp.status='success'){
                         let data=JSON.parse(resp.message)
@@ -180,9 +183,9 @@
                     ...Vue.sessionInfo(),
                     user_name:this.userName,
                     email:this.email,
-                    password:this.curPwd,
-                    newpassword1:this.newPwd,
-                    newpassword2:this.rePwd,
+                    password:md5.hex(this.curPwd),
+                    newpassword1:md5.hex(this.newPwd),
+                    newpassword2:md5.hex(this.rePwd),
                     remark:this.remark,
                 }
                 let fb=Vue.operationFeedback({text:'保存中...'});

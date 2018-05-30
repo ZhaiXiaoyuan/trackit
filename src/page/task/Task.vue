@@ -43,13 +43,13 @@
                         </el-input>
                     </div>
                     <div style="text-align: right;margin-left: auto">
-                        <el-button size="small" type="primary" @click="$router.push({name:'newTask'})">新建任务</el-button>
+                        <el-button size="small" type="primary" v-if="account.user_type=='Customer'" @click="$router.push({name:'newTask'})">新建任务</el-button>
                         <el-button size="small" type="" @click="getAllList()">导出</el-button>
                         <a id="downlink"></a>
                     </div>
                 </el-row>
             </div>
-            <div class="list-panel">
+            <div class="list-panel" v-loading="pager.loading">
                 <el-table :data="entryList" border style="width: 100%;" ref="multipleTable">
                     <el-table-column prop="taskno" label="任务单号" align="center"></el-table-column>
                     <el-table-column prop="custno"  width="100"  label="客户编号"  align="center"></el-table-column>
@@ -116,7 +116,7 @@
     export default {
         data() {
             return {
-                account:null,
+                account:{},
                 listType:'first',
                 type:'do',//进行中:do,4:已完成，6:已取消
                 range:'All',

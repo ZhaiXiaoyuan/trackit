@@ -40,8 +40,7 @@ export default {
     }
 
     /**/
-    //临时测试
-    let basicUrl=false&&process.env.NODE_ENV=='development'?'/api':'http://trackit.elecplus.tech/trackitapps';
+    let basicUrl=process.env.NODE_ENV=='development'?'/api':'http://trackit.51plus.net/trackitapps';
     Vue.api={
         //登录
         login:function (params) {

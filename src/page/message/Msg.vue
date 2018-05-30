@@ -22,7 +22,7 @@
                     </el-col>
                 </el-row>
             </div>
-            <div class="list-panel">
+            <div class="list-panel" v-loading="pager.loading">
                 <el-table :data="entryList" border style="width: 100%;" ref="multipleTable">
                     <el-table-column prop="title" label="通知标题" align="center"></el-table-column>
                     <el-table-column prop="createtime" label="通知时间"  align="center"></el-table-column>

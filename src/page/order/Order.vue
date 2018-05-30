@@ -49,7 +49,7 @@
                     </div>
                 </el-row>
             </div>
-            <div class="list-panel">
+            <div class="list-panel" v-loading="pager.loading">
                 <el-table :data="entryList" border style="width: 100%;" ref="multipleTable">
                     <el-table-column prop="orderno" label="订单号" align="center"></el-table-column>
                     <el-table-column prop="custno" label="客户编号"  align="center"></el-table-column>

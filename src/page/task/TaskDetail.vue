@@ -76,12 +76,12 @@
                     <div class="block-bd">
                         <el-form ref="form" :label-width="formLabelWidth" label-position="left">
                             <el-form-item class="row-input-item">
-                                <el-select v-model="curSupplierName" @change="whenSupplierChange" placeholder="请选择供应商">
+                                <el-select v-model="curSupplierIndex" @change="whenSupplierChange" placeholder="请选择供应商">
                                     <el-option
                                         v-for="(item,index) in allPlanList"
                                         :key="item.id"
                                         :label="item.name"
-                                        :value="item.name">
+                                        :value="index">
                                     </el-option>
                                 </el-select>
                                 <el-select v-model="selectedPlanName" @change="whenPlanChange" placeholder="请选择方案">
@@ -95,24 +95,26 @@
                                 <span class="cm-link-btn" style="margin-left: 10px;" @click="getUserInfo()">查看供应商信息</span>
                                 <el-button type="primary" style="margin-left: 20px;" @click="addPricePlan()">添加该方案</el-button>
                             </el-form-item>
-                            <el-form-item label="样品图片：">
-                                <ul class="cm-simple-list" style="float: left;">
-                                    <li v-for="(item,index) in sampleList">
-                                        <div class="img-wrap" v-if="item.filepath">
-                                            <img :src="item.filepath">
-                                        </div>
-                                        <div class="info-list">
-                                            <div v-for="(attr) in item.attrList" style="text-align: center;">
-                                                <span class="label" v-if="index==0">{{attr.attrName}}：</span>
-                                                <span>{{attr.attrValue}}</span>
+                            <div v-loading="loadingPlan">
+                                <el-form-item label="样品图片：">
+                                    <ul class="cm-simple-list" style="float: left;">
+                                        <li v-for="(item,index) in sampleList">
+                                            <div class="img-wrap" v-if="item.filepath">
+                                                <img :src="item.filepath">
                                             </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </el-form-item>
-                            <el-form-item class="row-input-item" label="跟单反馈栏：">
-                                <span v-if="selectedPlan">{{selectedPlan.feedback}}</span>
-                            </el-form-item>
+                                            <div class="info-list">
+                                                <div v-for="(attr) in item.attrList" style="text-align: center;">
+                                                    <span class="label" v-if="index==0">{{attr.attrName}}：</span>
+                                                    <span>{{attr.attrValue}}</span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </el-form-item>
+                                <el-form-item class="row-input-item" label="跟单反馈栏：">
+                                    <span v-if="selectedPlan">{{selectedPlan.feedback}}</span>
+                                </el-form-item>
+                            </div>
                         </el-form>
                         <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;" v-if="account.user_type=='Customer'&&task.status!=4&&task.status!=6">
                             <el-button type="primary"  @click="$router.push({ name: 'newOrder', params: {taskNo:task.taskno}})">发起关联订单</el-button>
@@ -407,9 +409,10 @@
                 picList:[],
                 allPlanList:[],
                 curSupplier:{},
-                curSupplierName:null,
+                curSupplierIndex:0,
                 selectedPlan:null,
                 selectedPlanName:null,
+                loadingPlan:true,
 
                 supplierList:[],
                 curPlan:{},
@@ -551,8 +554,12 @@
                     }
                 });
             },
-            whenSupplierChange:function (data) {
-                console.log('data:',data);
+            whenSupplierChange:function (index) {
+                console.log('index:',index);
+                this.curSupplier=this.allPlanList[index];
+                this.selectedPlan=this.curSupplier.planList[0];
+                this.selectedPlanName=this.selectedPlan.name;
+                this.getPlan(this.selectedPlan.id);
             },
             whenPlanChange:function (name) {
                 this.curSupplier.planList.forEach((item,i)=>{
@@ -587,9 +594,9 @@
                             }
                         }
                         if(this.allPlanList.length>0){
-                            this.curSupplier=this.allPlanList[0];
+                            this.curSupplierIndex=0;
+                            this.curSupplier=this.allPlanList[this.curSupplierIndex];
                             console.log('this.curSupplier:',this.curSupplier);
-                            this.curSupplierName=this.curSupplier.name;
                             this.selectedPlan=this.curSupplier.planList[0];
                             this.selectedPlanName=this.selectedPlan.name;
                             this.getPlan(this.selectedPlan.id);
@@ -619,7 +626,9 @@
                     ...Vue.sessionInfo(),
                     quotaid:id
                 }
+                this.loadingPlan=true;
                 Vue.api.getPlan(params).then((resp)=>{
+                    this.loadingPlan=false;
                     if(resp.status=='success'){
                         let data=JSON.parse(resp.message);
                         if(this.account.user_type=='Customer'){
@@ -789,9 +798,14 @@
                 }
                 Vue.api.getPlanList(params).then((resp)=>{
                     if(resp.status=='success'){
-                        this.planList=JSON.parse(resp.message);
-                        this.planList.forEach((item,i)=>{
-                            item.label='方案'+(i+1);
+                        let list=resp.message?JSON.parse(resp.message):[];
+                        this.planList=[];
+                        list.forEach((item,i)=>{
+                            if(item.createrid==this.account.user_id+''){
+                                let plan=JSON.parse(JSON.stringify(item));
+                                plan.label='方案'+(this.planList.length+1);
+                                this.planList.push(plan);
+                            }
                             //
                         });
                         if(this.planList.length>0){
