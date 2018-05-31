@@ -314,6 +314,14 @@ export default {
                 params: params
             });
         },
+        //工作量统计
+        workStatistics:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/rp/com/cus',
+                params: params
+            });
+        },
     }
   },
 

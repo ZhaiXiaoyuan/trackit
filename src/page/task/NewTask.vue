@@ -53,7 +53,7 @@
                             <el-form-item label="任务样品图片：">
                                <ul class="cm-pic-list" style="float: left;">
                                    <li v-for="(item,index) in picList">
-                                       <img :src="item.filepath">
+                                       <img :src="item.filepath" @click="viewPicModal({imgUrl:item.filepath})">
                                        <i class="icon el-icon-delete del-btn" @click="delPic(index)"></i>
                                        <div class="input-wrap">
                                            <input type="text" v-model="item.label" maxlength="20" placeholder="请输入标签">
@@ -326,10 +326,10 @@
                 }
                 for(let i=0;i<this.picList.length;i++){
                     let item=this.picList[i];
-                    if(!item.label){
+                  /*  if(!item.label){
                         Vue.operationFeedback({type:'warn',text:'请填写所有样品图片的标签'});
                         return;
-                    }
+                    }*/
                     if(i==0){
                         params.custpropicone=item.filename;
                         params.custpropiconetag=item.label?item.label:null;

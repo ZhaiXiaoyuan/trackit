@@ -15,15 +15,15 @@
                     <p class="name">点击更换头像</p>
                 </div>
             </div>
-            <el-form label-width="100px" style="width: 500px;margin: 0px auto;padding: 50px 0px;">
+            <el-form class="edit-user-form" label-width="100px" style="width: 500px;margin: 0px auto;padding: 50px 0px;">
                 <el-form-item label="手机号码：">
-                    <el-input maxlength="100" v-model="phone" placeholder="请输入手机号码"></el-input>
+                    <el-input maxlength="100" v-model="phone" class="cm-disabled" placeholder="请输入手机号码"></el-input>
                 </el-form-item>
-                <el-form-item label="用户名：">
+                <el-form-item label="用户名：" required>
                     <el-input maxlength="100" v-model="userName" placeholder="请输入用户名"></el-input>
                 </el-form-item>
-                <el-form-item label="通讯邮箱：">
-                    <el-input maxlength="100" v-model="email" placeholder="请输入通信邮箱"></el-input>
+                <el-form-item label="通讯邮箱：" required>
+                    <el-input maxlength="100" v-model="email" placeholder="请输入通讯邮箱"></el-input>
                 </el-form-item>
                 <el-form-item label="当前密码：">
                     <el-input type="password" maxlength="100" v-model="curPwd" placeholder="如需修改密码请在此输入当前密码"></el-input>
@@ -80,6 +80,7 @@
 <script>
     import Vue from 'vue'
     import md5 from 'js-md5'
+    import bus from '../../components/common/bus';
 
     export default {
         data() {
@@ -115,7 +116,7 @@
                         this.email=data.email;
                         this.avatar=data.httpUser_avatar;
                         this.remark=data.remark;
-                        console.log('data:',data);
+                        //
                     }else{
 
                     }
@@ -129,33 +130,28 @@
                 formData.append('timestamp',sessionInfo.timestamp);
                 formData.append('number',sessionInfo.number);
                 formData.append('signature',sessionInfo.signature);
-              /*  formData.append('biztype','Task');
-                formData.append('bizid',null);
-                formData.append('fieldname',file.name);*/
                 formData.append('hpic',file);
                 this.uploading=true;
+                let fb=Vue.operationFeedback({text:'上传中...'});
                 Vue.api.updateAvatar(formData).then((resp)=>{
                     this.uploading=false;
                     if(resp.status=='success'){
-                        let data=JSON.parse(resp.message)
+                        let data=JSON.parse(resp.message);
                         this.avatar=data.filepath;
-                   /*     Vue.api.updateAvatar({...Vue.sessionInfo(),hpic:data.filename}).then(()=>{
 
-                        })*/
+                        Object.assign(this.account,{
+                            httpUser_avatar:data.filepath,
+                            user_avatar:data.filename,
+                        });
+                        this.$cookie.set('account',JSON.stringify(this.account),7);
+                        bus.$emit('refreshAccount');
+                        fb.setOptions({type:"complete",text:'上传成功'});
                     }else{
-                        Vue.operationFeedback({type:'warn',text:'上传失败'});
+                        fb.setOptions({type:"warn",text:'上传失败'});
                     }
                 });
             },
             save:function () {
-                if(!this.phone){
-                    Vue.operationFeedback({type:'warn',text:'请输入手机号码'});
-                    return;
-                }
-                if(!regex.phone.test(this.phone)){
-                    Vue.operationFeedback({type:'warn',text:regex.phoneAlert});
-                    return;
-                }
                 if(!this.email){
                     Vue.operationFeedback({type:'warn',text:'请输入通讯邮箱'});
                     return;
@@ -183,14 +179,24 @@
                     ...Vue.sessionInfo(),
                     user_name:this.userName,
                     email:this.email,
-                    password:md5.hex(this.curPwd),
-                    newpassword1:md5.hex(this.newPwd),
-                    newpassword2:md5.hex(this.rePwd),
                     remark:this.remark,
+                }
+                if(this.curPwd){
+                    params.password=md5.hex(this.curPwd);
+                    params.newpassword1=md5.hex(this.newPwd);
+                    params.newpassword2=md5.hex(this.rePwd);
                 }
                 let fb=Vue.operationFeedback({text:'保存中...'});
                 Vue.api.saveUserInfo(params).then((resp)=>{
                     if(resp.status=='success'){
+                        Object.assign(this.account,{
+                            user_name:this.userName,
+                            email:this.email,
+                            remark:this.remark,
+                        });
+                        this.$cookie.set('account',JSON.stringify(this.account),7);
+                        bus.$emit('refreshAccount');
+
                         fb.setOptions({type:"complete",text:'保存成功'});
                     }else{
                         fb.setOptions({type:"warn",text:resp.message});

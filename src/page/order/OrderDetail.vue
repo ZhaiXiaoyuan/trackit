@@ -72,8 +72,8 @@
                             <el-form-item label="客户确认图片：">
                                <ul class="cm-pic-list" style="float: left;">
                                    <li v-for="(item,picIndex) in form.picList">
-                                       <img :src="item.filepath">
-                                       <div class="input-wrap">
+                                       <img :src="item.filepath" @click="viewPicModal({imgUrl:item.filepath})">
+                                       <div class="input-wrap" v-if="item.label">
                                            <input type="text" v-model="item.label" readonly maxlength="20">
                                        </div>
                                    </li>
@@ -534,54 +534,63 @@
                           }
                           if(product.custpictwo){
                               product.picList.push({
+                                  filepath:Vue.basicConfig.imgPrefix+product.custpictwo,
                                   filename:product.custpictwo,
                                   label:product.custpictwotag
                               });
                           }
                           if(product.custpicthree){
                               product.picList.push({
+                                  filepath:Vue.basicConfig.imgPrefix+product.custpicthree,
                                   filename:product.custpicthree,
                                   label:product.custpicthreetag
                               });
                           }
                           if(product.custpicfour){
                               product.picList.push({
+                                  filepath:Vue.basicConfig.imgPrefix+product.custpicfour,
                                   filename:product.custpicfour,
                                   label:product.custpicfourtag
                               });
                           }
                           if(product.custpicfive){
                               product.picList.push({
+                                  filepath:Vue.basicConfig.imgPrefix+product.custpicfive,
                                   filename:product.custpicfive,
                                   label:product.custpicfivetag
                               });
                           }
                           if(product.custpicsix){
                               product.picList.push({
+                                  filepath:Vue.basicConfig.imgPrefix+product.custpicsix,
                                   filename:product.custpicsix,
                                   label:product.custpicsixtag
                               });
                           }
                           if(product.custpicseven){
                               product.picList.push({
+                                  filepath:Vue.basicConfig.imgPrefix+product.custpicseven,
                                   filename:product.custpicseven,
                                   label:product.custpicseventag
                               });
                           }
                           if(product.custpiceight){
                               product.picList.push({
+                                  filepath:Vue.basicConfig.imgPrefix+product.custpiceight,
                                   filename:product.custpiceight,
                                   label:product.custpiceighttag
                               });
                           }
                           if(product.custpicnine){
                               product.picList.push({
+                                  filepath:Vue.basicConfig.imgPrefix+product.custpicnine,
                                   filename:product.custpicnine,
                                   label:product.custpicninetag
                               });
                           }
                           if(product.custpicten){
                               product.picList.push({
+                                  filepath:Vue.basicConfig.imgPrefix+product.custpicten,
                                   filename:product.custpicten,
                                   label:product.custpicninetag
                               });

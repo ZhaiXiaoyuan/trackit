@@ -64,6 +64,11 @@ export default new Router({
                     name:'userInfo',
                     component: resolve => require(['../page/account/UserInfo.vue'], resolve)
                 },
+                {
+                    path: '/statistics',
+                    name:'statistics',
+                    component: resolve => require(['../page/statistics/Statistics.vue'], resolve)
+                },
             ]
         },
         {

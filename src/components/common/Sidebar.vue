@@ -110,10 +110,10 @@
                         index: '/msg',
                         title: '通知',
                     },
-                 /*   {
+                  /*  {
                         code:'04',
                         icon: '#icon-biaoge',
-                        index: '/report',
+                        index: '/statistics',
                         title: '统计报表',
                     },*/
                     {
@@ -140,6 +140,11 @@
             bus.$on('collapse', msg => {
                 this.collapse = msg;
             });
+            /*刷新用户信息*/
+            bus.$on('refreshAccount', () => {
+                this.account=Vue.getAccountInfo();
+            });
+            //
             this.account=Vue.getAccountInfo();
             console.log('this.account:',this.account);
             //

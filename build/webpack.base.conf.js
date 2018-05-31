@@ -30,7 +30,7 @@ module.exports = {
                  jQuery:"jquery", 
                 "windows.jQuery":"jquery"
         }),
-        new BundleAnalyzerPlugin() 
+        /*new BundleAnalyzerPlugin() */
       ], 
   resolve: {
     extensions: ['.js', '.vue', '.json'],

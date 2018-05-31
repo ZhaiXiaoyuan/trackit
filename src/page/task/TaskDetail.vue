@@ -53,8 +53,8 @@
                             <el-form-item label="客户提供的图片：">
                                 <ul class="cm-pic-list" style="float: left;">
                                     <li v-for="(item,index) in picList">
-                                        <img :src="item.filepath">
-                                        <div class="input-wrap">
+                                        <img :src="item.filepath" @click="viewPicModal({imgUrl:item.filepath})">
+                                        <div class="input-wrap" v-if="item.label">
                                             <input type="text" v-model="item.label" maxlength="20" readonly>
                                         </div>
                                     </li>
@@ -101,8 +101,12 @@
                                     <ul class="cm-simple-list" style="float: left;">
                                         <li v-for="(item,index) in sampleList">
                                             <div class="img-wrap" v-if="item.filepath">
-                                                <img :src="item.filepath">
+                                                <img :src="item.filepath" @click="viewPicModal({imgUrl:item.filepath})">
+                                                <div class="input-wrap" v-if="item.label">
+                                                    <input type="text" v-model="item.label" maxlength="20">
+                                                </div>
                                             </div>
+
                                             <div class="info-list">
                                                 <div v-for="(attr) in item.attrList" style="text-align: center;">
                                                     <span class="label" v-if="index==0">{{attr.attrName}}：</span>
@@ -152,7 +156,10 @@
                                 <ul class="cm-simple-list" style="float: left;">
                                     <li v-for="(item,index) in sampleList">
                                         <div class="img-wrap" v-if="item.filepath">
-                                            <img :src="item.filepath">
+                                            <img :src="item.filepath" @click="viewPicModal({imgUrl:item.filepath})">
+                                            <div class="input-wrap" v-if="item.label">
+                                                <input type="text" v-model="item.label" maxlength="20">
+                                            </div>
                                         </div>
                                         <div class="info-list">
                                             <div v-for="(attr) in item.attrList" style="text-align: center;">
@@ -178,7 +185,7 @@
                                 <ul class="cm-simple-list" style="float: left;">
                                     <li v-for="(item,index) in newSampleList">
                                         <div class="img-wrap" v-if="item.filepath">
-                                            <img :src="item.filepath">
+                                            <img :src="item.filepath" @click="viewPicModal({imgUrl:item.filepath})">
                                             <i class="icon el-icon-delete del-btn" @click="delSample(index)"></i>
                                             <div class="input-wrap">
                                                 <input type="text" v-model="item.label" maxlength="20">
@@ -648,6 +655,7 @@
                                 filepath:Vue.basicConfig.imgPrefix+data.samplepicone,
                                 filename:data.samplepicone,
                                 attrList:this.attrFormat(data.samplepicone,proattrs),
+                                label:data.samplepiconetag&&data.samplepiconetag!='undefined'?data.samplepiconetag:'',
                             });
                         }
                         if(data.samplepictwo){
@@ -655,6 +663,7 @@
                                 filepath:Vue.basicConfig.imgPrefix+data.samplepictwo,
                                 filename:data.samplepictwo,
                                 attrList:this.attrFormat(data.samplepictwo,proattrs),
+                                label:data.samplepictwotag&&data.samplepictwotag!='undefined'?data.samplepictwotag:'',
                             });
                         }
                         if(data.samplepicthree){
@@ -662,6 +671,7 @@
                                 filepath:Vue.basicConfig.imgPrefix+data.samplepicthree,
                                 filename:data.samplepicthree,
                                 attrList:this.attrFormat(data.samplepicthree,proattrs),
+                                label:data.samplepicthreetag&&data.samplepicthreetag!='undefined'?data.samplepicthreetag:'',
                             });
                         }
                         if(data.samplepicfour){
@@ -669,6 +679,7 @@
                                 filepath:Vue.basicConfig.imgPrefix+data.samplepicfour,
                                 filename:data.samplepicfour,
                                 attrList:this.attrFormat(data.samplepicfour,proattrs),
+                                label:data.samplepicfourtag&&data.samplepicfourtag!='undefined'?data.samplepicfourtag:'',
                             });
                         }
                         if(data.samplepicfive){
@@ -676,6 +687,7 @@
                                 filepath:Vue.basicConfig.imgPrefix+data.samplepicfive,
                                 filename:data.samplepicfive,
                                 attrList:this.attrFormat(data.samplepicfive,proattrs),
+                                label:data.samplepicfivetag&&data.samplepicfivetag!='undefined'?data.samplepicfivetag:'',
                             });
                         }
                         if(data.samplepicsix){
@@ -683,6 +695,7 @@
                                 filepath:Vue.basicConfig.imgPrefix+data.samplepicsix,
                                 filename:data.samplepicsix,
                                 attrList:this.attrFormat(data.samplepicsix,proattrs),
+                                label:data.samplepicsixtag&&data.samplepicsixtag!='undefined'?data.samplepicsixtag:'',
                             });
                         }
                         if(data.samplepicseven){
@@ -690,6 +703,7 @@
                                 filepath:Vue.basicConfig.imgPrefix+data.samplepicseven,
                                 filename:data.samplepicseven,
                                 attrList:this.attrFormat(data.samplepicseven,proattrs),
+                                label:data.samplepicseventag&&data.samplepicseventag!='undefined'?data.samplepicseventag:'',
                             });
                         }
                         if(data.samplepiceight){
@@ -697,6 +711,7 @@
                                 filepath:Vue.basicConfig.imgPrefix+data.samplepiceight,
                                 filename:data.samplepiceight,
                                 attrList:this.attrFormat(data.samplepiceight,proattrs),
+                                label:data.samplepiceighttag&&data.samplepiceighttag!='undefined'?data.samplepiceighttag:'',
                             });
                         }
                         if(data.samplepicnine){
@@ -704,6 +719,7 @@
                                 filepath:Vue.basicConfig.imgPrefix+data.samplepicnine,
                                 filename:data.samplepicnine,
                                 attrList:this.attrFormat(data.samplepicnine,proattrs),
+                                label:data.samplepicninetag&&data.samplepicninetag!='undefined'?data.samplepicninetag:'',
                             });
                         }
                         if(data.samplepicten){
@@ -711,6 +727,7 @@
                                 filepath:Vue.basicConfig.imgPrefix+data.samplepicten,
                                 filename:data.samplepicten,
                                 attrList:this.attrFormat(data.samplepicten,proattrs),
+                                label:data.samplepictentag&&data.samplepictentag!='undefined'?data.samplepictentag:'',
                             });
                         }
                     }
@@ -733,7 +750,7 @@
                             attrList:JSON.parse(this.proattrs),
                         }];
                         this.entryList.push(this.task);
-                        console.log('this.task:',this.task);
+                     /*   console.log('this.task:',this.task);*/
                         if(this.task.custpropicone){
                             this.picList.push({
                                 filepath:this.task.custpropiconeUrl,

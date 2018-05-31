@@ -6,7 +6,7 @@
         <div class="logo"><i class="text-logo-icon"></i></div>
         <div class="user-info">
             <img class="user-logo" :src="account.httpUser_avatar?account.httpUser_avatar:defaultAvatar">
-            <span class="greet">欢迎登陆Trac*it  中午好！</span>
+            <span class="greet">欢迎登陆Trac*it  {{greeting}}</span>
             <div class="cm-btn logout-btn" @click="logout()">
                 退出登录
                 <svg class="icon" aria-hidden="true">
@@ -29,6 +29,7 @@
                 name: 'linxin',
                 account:{},
                 defaultAvatar:require('../../images/common/default-avatar.png'),
+                greeting:'',
             }
         },
         computed:{
@@ -45,7 +46,22 @@
             }
         },
         created(){
+            /*刷新用户信息*/
+            bus.$on('refreshAccount', () => {
+                this.account=Vue.getAccountInfo();
+            });
+            /**/
             this.account=this.getAccountInfo();
+            /**/
+            let now = new Date(),hour = now.getHours();
+            if(hour < 6){this.greeting='凌晨好！';}
+            else if (hour < 9){this.greeting='早上好！';}
+            else if (hour < 12){this.greeting='上午好！';d}
+            else if (hour < 14){this.greeting='中午好！';}
+            else if (hour < 17){this.greeting='下午好！';}
+            else if (hour < 19){this.greeting='傍晚好！';}
+            else if (hour < 22){this.greeting='晚上好！';}
+            else {this.greeting='夜里好！'}
         }
     }
 </script>
