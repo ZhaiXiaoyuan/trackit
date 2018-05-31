@@ -5,7 +5,7 @@
         </div>-->
         <div class="logo"><i class="text-logo-icon"></i></div>
         <div class="user-info">
-            <img class="user-logo" :src="account.user_avatar?account.user_avatar:defaultAvatar">
+            <img class="user-logo" :src="account.httpUser_avatar?account.httpUser_avatar:defaultAvatar">
             <span class="greet">欢迎登陆Trac*it  中午好！</span>
             <div class="cm-btn logout-btn" @click="logout()">
                 退出登录

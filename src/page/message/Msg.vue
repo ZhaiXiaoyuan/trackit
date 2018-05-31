@@ -23,13 +23,17 @@
                 </el-row>
             </div>
             <div class="list-panel" v-loading="pager.loading">
-                <el-table :data="entryList" border style="width: 100%;" ref="multipleTable">
+                <el-table :data="entryList" border style="width: 100%;" ref="multipleTable" @row-click="clickRow">
                     <el-table-column prop="title" label="通知标题" align="center"></el-table-column>
                     <el-table-column prop="createtime" label="通知时间"  align="center"></el-table-column>
                     <el-table-column label="通知详情"  align="center">
                         <template slot-scope="scope">
+<!--
                             <span v-if="scope.row.biztype=='Order'">您的订单号为<span class="cm-link-btn" @click="$router.push({ name: 'orderDetail', params: {id:scope.row.bizid}})" style="padding: 0px 5px;">{{scope.row.bizid}}</span></span>
+-->
+<!--
                             <span v-if="scope.row.biztype=='Task'">您的任务号为<span class="cm-link-btn" @click="$router.push({ name: 'taskDetail', params: {id:scope.row.bizid}})" style="padding: 0px 5px;">{{scope.row.bizid}}</span></span>
+-->
                             <span v-html="scope.row.content"></span>
                         </template>
                     </el-table-column>
@@ -128,6 +132,14 @@
             },
             selectTypeChange:function (data) {
                 this.getList();
+            },
+            clickRow:function (row) {
+                if(row.biztype=='Order'){
+                    this.$router.push({ name: 'orderDetail', params: {id:row.bizid}})
+                }else if(row.biztype=='Task'){
+                    this.$router.push({ name: 'taskDetail', params: {id:row.bizid}})
+                }
+                console.log('row:',row);
             }
 
         },

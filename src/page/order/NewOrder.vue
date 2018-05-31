@@ -72,7 +72,7 @@
                                 </el-form-item>
                             </el-row>
                             <el-form-item class="row-input-item" label="产品总价：">
-                                <span>{{form.price*form.amount?form.price*form.amount:0}}</span>
+                                <span>{{form.price*form.amount?(form.price*form.amount).toFixed(2):0}}</span>
                             </el-form-item>
 
                             <el-form-item label="客户确认图片：">

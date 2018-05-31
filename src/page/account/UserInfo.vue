@@ -17,13 +17,13 @@
             </div>
             <el-form label-width="100px" style="width: 500px;margin: 0px auto;padding: 50px 0px;">
                 <el-form-item label="手机号码：">
-                    <el-input maxlength="100" v-model="phone"></el-input>
+                    <el-input maxlength="100" v-model="phone" placeholder="请输入手机号码"></el-input>
                 </el-form-item>
                 <el-form-item label="用户名：">
-                    <el-input maxlength="100" v-model="userName"></el-input>
+                    <el-input maxlength="100" v-model="userName" placeholder="请输入用户名"></el-input>
                 </el-form-item>
                 <el-form-item label="通讯邮箱：">
-                    <el-input maxlength="100" v-model="email"></el-input>
+                    <el-input maxlength="100" v-model="email" placeholder="请输入通信邮箱"></el-input>
                 </el-form-item>
                 <el-form-item label="当前密码：">
                     <el-input type="password" maxlength="100" v-model="curPwd" placeholder="如需修改密码请在此输入当前密码"></el-input>
@@ -113,7 +113,7 @@
                         this.phone=data.user_phone;
                         this.userName=data.user_name;
                         this.email=data.email;
-                        this.avatar=data.user_avatar;
+                        this.avatar=data.httpUser_avatar;
                         this.remark=data.remark;
                         console.log('data:',data);
                     }else{
@@ -136,7 +136,7 @@
                 this.uploading=true;
                 Vue.api.updateAvatar(formData).then((resp)=>{
                     this.uploading=false;
-                    if(resp.status='success'){
+                    if(resp.status=='success'){
                         let data=JSON.parse(resp.message)
                         this.avatar=data.filepath;
                    /*     Vue.api.updateAvatar({...Vue.sessionInfo(),hpic:data.filename}).then(()=>{

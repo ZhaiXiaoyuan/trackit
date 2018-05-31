@@ -17,7 +17,7 @@
                        <!-- <el-button type="primary">全部</el-button>-->
                         <el-button type="" :class="{'el-button--primary':type=='do'}" @click="setType('do')">进行中</el-button>
                         <el-button type="" :class="{'el-button--primary':type=='4'}" @click="setType('4')">已完成</el-button>
-                        <el-button type="" :class="{'el-button--primary':type=='7'}" @click="setType('6')">已取消</el-button>
+                        <el-button type="" :class="{'el-button--primary':type=='6'}" @click="setType('6')">已取消</el-button>
                     </el-button-group>
                 </el-row>
                 <el-row class="condition-row" style="margin-top: 20px;" type="flex">
@@ -395,7 +395,6 @@
             this.account=Vue.getAccountInfo();
             console.log('this.account:',this.account);
             //
-            this.imFile = document.getElementById('imFile');
             this.outFile = document.getElementById('downlink');
             /**/
             this.getList();

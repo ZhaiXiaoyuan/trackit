@@ -35,13 +35,23 @@
                     </div>
                     <div class="block-bd">
                         <el-radio-group v-model="selectedId">
+                            <div class="item-list">
+                                <div class="list-hd" style="padding: 10px 0px;color: #666;font-size: 20px;">
+                                   关联供应商列表
+                                </div>
+                                <ul class="list-bd" style="padding-left: 20px;">
+                                    <li v-for="(supplier,index) in tqsList">
+                                        <el-radio :label="supplier.value">{{supplier.label}}</el-radio>
+                                    </li>
+                                </ul>
+                            </div>
                             <div class="item-list" v-for="(item,index) in filterList">
                                 <div class="list-hd" style="padding: 10px 0px;color: #409EFF;font-size: 20px;">
                                     {{item.letter}}
                                 </div>
                                 <ul class="list-bd" style="padding-left: 20px;">
                                     <li v-for="(supplier,subIndex) in item.data">
-                                        <el-radio v-model="selectedId" :label="supplier.value">{{supplier.label}}</el-radio>
+                                        <el-radio :label="supplier.value">{{supplier.label}}</el-radio>
                                     </li>
                                 </ul>
                             </div>
@@ -115,6 +125,13 @@
             }
         }
     }
+    .item-list{
+        li{
+            &+li{
+                margin-top: 10px;
+            }
+        }
+    }
 </style>
 <script>
     import Vue from 'vue'
@@ -137,6 +154,7 @@
                 sortList:[],
                 filterList:[],
                 selectedId:null,
+                tqsList:[],
             }
         },
         created(){
@@ -168,6 +186,7 @@
                     if(resp.status=='success'){
                         let data=JSON.parse(resp.message);
                         this.supplierList=data.alls;
+                        this.tqsList=data.tqs;
                         let nameList=[];
                         this.supplierList.forEach((item,i)=>{
                             nameList.push(item.label);
@@ -200,7 +219,7 @@
                     if(empty || curr.data.length) {
                         segs.push(curr);
                         curr.data.sort(function(a,b){
-                            return a.localeCompare(b,"zh");
+                            return a['label'].localeCompare(b['label'],"zh");
                         });
                     }
                 });

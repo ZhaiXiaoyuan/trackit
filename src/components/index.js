@@ -26,6 +26,10 @@ export default {
          * @param options object
          */
         operationFeedback:function (options) {
+            let oldEle=document.getElementById('operation-feedback');
+            if(oldEle){
+                return;
+            }
             options={...{
                 parent:'app',//添加提示框的容器,该容器的position属性值须是'relative'
                 parentPosition:'relative',//父元素属性值须是'relative'或者fixed

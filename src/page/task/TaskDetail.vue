@@ -21,7 +21,8 @@
                             <i class="icon emergency-icon" v-if="task.urgent"></i>
                         </el-col>
                         <el-col :span="12" style="text-align: right;">
-                            <el-button>导出</el-button>
+                            <el-button @click="exportTask">导出</el-button>
+                            <a id="downlink"></a>
                         </el-col>
                     </el-row>
                     <div class="block-bd">
@@ -178,7 +179,10 @@
                                     <li v-for="(item,index) in newSampleList">
                                         <div class="img-wrap" v-if="item.filepath">
                                             <img :src="item.filepath">
-                                          <!--  <i class="icon el-icon-delete del-btn" @click="delPic(index)"></i>-->
+                                            <i class="icon el-icon-delete del-btn" @click="delSample(index)"></i>
+                                            <div class="input-wrap">
+                                                <input type="text" v-model="item.label" maxlength="20">
+                                            </div>
                                         </div>
                                         <div class="cm-pic-uploader" v-loading="uploading" v-if="!item.filepath">
                                             <input  type="file" id="file-input" accept="image/*" @change="selectFile(index)">
@@ -186,7 +190,7 @@
                                                 <i class="icon add-icon el-icon-circle-plus"></i>
                                             </div>
                                         </div>
-                                        <div class="info-list">
+                                        <div class="info-list" v-if="item.filepath">
                                             <div v-for="(attr) in item.attrList">
                                                 <span class="label" v-if="index==0">{{attr.attrName}}：</span>
                                                 <input v-model="attr.attrValue" maxlength="50" type="text">
@@ -213,7 +217,7 @@
                 <div class="dialog-content">
                     <p class="title">供应商信息</p>
                     <div style="text-align: center;margin-top: 20px;margin-bottom: 10px;">
-                        <img class="avatar" :src="curSupplier.user_avatar?urSupplier.user_avatar:defaultAvatar" alt="">
+                        <img class="avatar" :src="curSupplier.httpUser_avatar?curSupplier.httpUser_avatar:defaultAvatar" alt="">
                     </div>
                     <div class="info-row">
                         <span class="field">名称：</span>
@@ -387,6 +391,8 @@
 </style>
 <script>
     import Vue from 'vue'
+    let XLSX = require('xlsx');
+
     export default {
         data() {
             return {
@@ -409,10 +415,10 @@
                 picList:[],
                 allPlanList:[],
                 curSupplier:{},
-                curSupplierIndex:0,
+                curSupplierIndex:null,
                 selectedPlan:null,
                 selectedPlanName:null,
-                loadingPlan:true,
+                loadingPlan:false,
 
                 supplierList:[],
                 curPlan:{},
@@ -458,6 +464,7 @@
                 ],
                 otherReasonFlag:false,
                 otherReason:null,
+                downLoadFb:null,
             }
         },
         created(){
@@ -726,6 +733,7 @@
                             attrList:JSON.parse(this.proattrs),
                         }];
                         this.entryList.push(this.task);
+                        console.log('this.task:',this.task);
                         if(this.task.custpropicone){
                             this.picList.push({
                                 filepath:this.task.custpropiconeUrl,
@@ -861,7 +869,19 @@
                     }
                 });
             },
+            delSample:function (index) {
+                if(index==0){
+                    this.newSampleList=[{
+                        filepath:'',
+                        filename:'',
+                        attrList:JSON.parse(this.proattrs),
+                    }];
+                }else{
+                    this.newSampleList.splice(index,1);
+                }
+            },
             addPlan:function () {
+                console.log(233);
                 if(!this.feedbackText){
                     Vue.operationFeedback({type:'warn',text:'请输入跟单反馈栏'});
                     return;
@@ -873,33 +893,51 @@
                 };
                 let proattrs=[];
                 let count=0;
-                this.newSampleList.forEach((item,i)=>{
+                for(let i=0;i<this.newSampleList.length;i++){
+                    let item=this.newSampleList[i];
                     if(item.filename){
+                        for(let j=0;j<item.attrList.length;j++){
+                            if(!item.attrList[j].attrValue){
+                                Vue.operationFeedback({type:'warn',text:'请填写完整样品的相关信息'});
+                                return;
+                            }
+                        }
                         count++;
                         proattrs.push(...item.attrList);
                         if(i==0){
                             params.samplepicone=item.filename;
+                            params.samplepiconetag=item.label;
                         }else if(i==1){
                             params.samplepictwo=item.filename;
+                            params.samplepictwotag=item.label;
                         }if(i==2){
                             params.samplepicthree=item.filename;
+                            params.samplepicthreetag=item.label;
                         }if(i==3){
                             params.samplepicfour=item.filename;
+                            params.samplepicfourtag=item.label;
                         }if(i==4){
                             params.samplepicfive=item.filename;
+                            params.samplepicfivetag=item.label;
                         }if(i==5){
                             params.samplepicsix=item.filename;
+                            params.samplepicsixtag=item.label;
                         }if(i==6){
                             params.samplepicseven=item.filename;
+                            params.samplepicseventag=item.label;
                         }if(i==7){
                             params.samplepiceight=item.filename;
+                            params.samplepiceighttag=item.label;
                         }if(i==8){
                             params.samplepicnine=item.filename;
+                            params.samplepicninetag=item.label;
                         }if(i==9){
                             params.samplepicten=item.filename;
+                            params.samplepictentag=item.label;
                         }
                     }
-                });
+                }
+
                 if(count==0){
                     Vue.operationFeedback({type:'warn',text:'请至少上传一张样品图片，并填写完整相关信息'});
                     return;
@@ -910,6 +948,12 @@
                     if(resp.status=='success'){
                         if(resp.status=='success'){
                             fb.setOptions({type:"complete",text:'保存成功'});
+                            this.newSampleList=[{
+                                filepath:'',
+                                filename:'',
+                                attrList:JSON.parse(this.proattrs),
+                            }];
+                            this.feedbackText=null;
                             this.toAddPlan=false;
                             this.getSupplierPlanList();
                         }else{
@@ -1006,13 +1050,120 @@
                         fb.setOptions({type:"warn",text:resp.message});
                     }
                 });
-            }
+            },
 
+            downloadFile: function (rs) { // 按钮导出
+                let data = [{}]
+                for (let k in rs[0]) {
+                    data[0][k] = k
+                }
+                data = data.concat(rs)
+                this.downloadExl(data, '菜单')
+            },
+            downloadExl: function (json, downName, type) {  // 导出到excel
+                let keyMap = [] // 获取键
+                for (let k in json[0]) {
+                    keyMap.push(k)
+                }
+                /* console.info('keyMap', keyMap, json)*/
+                let tmpdata = [] // 用来保存转换好的json
+                json.map((v, i) => keyMap.map((k, j) => Object.assign({}, {
+                    v: v[k],
+                    position: (j > 25 ? this.getCharCol(j) : String.fromCharCode(65 + j)) + (i + 1)
+                }))).reduce((prev, next) => prev.concat(next)).forEach(function (v) {
+                    tmpdata[v.position] = {
+                        v: v.v
+                    }
+                })
+                let outputPos = Object.keys(tmpdata)  // 设置区域,比如表格从A1到D10
+                let tmpWB = {
+                    SheetNames: ['mySheet'], // 保存的表标题
+                    Sheets: {
+                        'mySheet': Object.assign({},
+                            tmpdata, // 内容
+                            {
+                                '!ref': outputPos[0] + ':' + outputPos[outputPos.length - 1] // 设置填充区域
+                            })
+                    }
+                }
+                let tmpDown = new Blob([this.s2ab(XLSX.write(tmpWB,
+                    {bookType: (type === undefined ? 'xlsx' : type), bookSST: false, type: 'binary'} // 这里的数据是用来定义导出的格式类型
+                ))], {
+                    type: ''
+                })  // 创建二进制对象写入转换好的字节流
+                var href = URL.createObjectURL(tmpDown)  // 创建对象超链接
+                this.outFile.download = downName + '.xlsx'  // 下载名称
+                this.outFile.href = href  // 绑定a标签
+                this.outFile.click()  // 模拟点击实现下载
+                this.downLoadFb.setOptions({type:'complete',text:'导出成功，请留意浏览器的下载文件'});
+                setTimeout(function () {  // 延时释放
+                    URL.revokeObjectURL(tmpDown) // 用URL.revokeObjectURL()来释放这个object URL
+                }, 100)
+            },
+            analyzeData: function (data) {  // 此处可以解析导入数据
+                return data
+            },
+            s2ab: function (s) { // 字符串转字符流
+                var buf = new ArrayBuffer(s.length)
+                var view = new Uint8Array(buf)
+                for (var i = 0; i !== s.length; ++i) {
+                    view[i] = s.charCodeAt(i) & 0xFF
+                }
+                return buf
+            },
+            getCharCol: function (n) { // 将指定的自然数转换为26进制表示。映射关系：[0-25] -> [A-Z]。
+                let s = ''
+                let m = 0
+                while (n > 0) {
+                    m = n % 26 + 1
+                    s = String.fromCharCode(m + 64) + s
+                    n = (n - m) / 26
+                }
+                return s
+            },
+            fixdata: function (data) {  // 文件流转BinaryString
+                var o = ''
+                var l = 0
+                var w = 10240
+                for (; l < data.byteLength / w; ++l) {
+                    o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w, l * w + w)))
+                }
+                o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w)))
+                return o
+            },
+            exportTask:function () {
+                let jsonData=[
+                    {
+                        1:'序号',
+                        2:'任务单号',
+                        3:'客户编号',
+                        4:'客户参考',
+                        5:'物料完成时间',
+                        6:'任务种类',
+                        7:'下单时间',
+                        8:'任务状态',
+                    }
+                ];
+                jsonData.push({
+                    1:1,
+                    2:this.task.taskno,
+                    3:this.task.custno,
+                    4:this.task.custbasis,
+                    5:this.task.plantime,
+                    6:this.task.resourceLabel,
+                    7:this.task.createtime,
+                    8:Vue.taskStatus(this.task.status),
+                });
+                this.downLoadFb=Vue.operationFeedback({text:'导出中...'});
+                this.downloadExl(jsonData,'任务导出表');
+            }
         },
         mounted () {
             /**/
             this.id=this.$route.params.id;
             this.account=Vue.getAccountInfo();
+            /**/
+            this.outFile = document.getElementById('downlink');
             /**/
             if(this.account.user_type=='Customer'){
                 this.getCustomerTaskDetail();
