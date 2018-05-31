@@ -324,7 +324,12 @@
                     urgent:this.isEmergency,
                     proattrs:selectedLabelStr,
                 }
-                this.picList.forEach((item,i)=>{
+                for(let i=0;i<this.picList.length;i++){
+                    let item=this.picList[i];
+                    if(!item.label){
+                        Vue.operationFeedback({type:'warn',text:'请填写所有样品图片的标签'});
+                        return;
+                    }
                     if(i==0){
                         params.custpropicone=item.filename;
                         params.custpropiconetag=item.label?item.label:null;
@@ -356,7 +361,8 @@
                         params.custpropicten=item.filename;
                         params.custpropicninetag=item.label?item.label:null;
                     }
-                })
+                }
+
                 let fb=Vue.operationFeedback({text:'保存中...'});
                 Vue.api.addTask(params).then((resp)=>{
                     if(resp.status=='success'){

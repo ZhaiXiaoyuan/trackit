@@ -1,5 +1,5 @@
 <template>
-  <div class="operation-feedback">
+  <div class="operation-feedback" id="operation-feedback">
     <div class="mask" v-if="mask"></div>
     <div class="content-block">
       <i class="icon" :class="{'loading-icon':type=='operating','complete-icon':type=='complete','clear-icon':type=='clear','warn-icon':type=='warn'}"></i>

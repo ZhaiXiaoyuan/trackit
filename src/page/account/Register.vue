@@ -64,7 +64,7 @@
         .ms-register{
             width:500px;
             height: auto;
-            padding:40px;
+            padding:30px 40px;
             border-radius: 5px;
             background: #fff;
             font-size: 16px;
@@ -103,6 +103,14 @@
         .code-form-item input{
             width: 150px;
         }
+    }
+    @media screen and (max-width: 1500px) {
+       .register-wrap{
+           .ms-register{
+               position: relative;
+               top:-40px;
+           }
+       }
     }
 </style>
 <script>
@@ -211,7 +219,7 @@
                         fb.setOptions({type:"complete",text:'注册成功'});
                         this.$router.push({name:'task'});
                     }else{
-                        fb.setOptions({type:"complete",text:resp.message});
+                        fb.setOptions({type:"warn",text:resp.message});
                     }
                 });
             }

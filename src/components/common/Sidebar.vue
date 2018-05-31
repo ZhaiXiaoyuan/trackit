@@ -1,7 +1,7 @@
 <template>
     <div class="sidebar">
         <div class="user-info">
-            <img :src="account.user_avatar?account.user_avatar:defaultAvatar">
+            <img :src="account.httpUser_avatar?account.httpUser_avatar:defaultAvatar">
             <p class="name">{{account.user_name}}</p>
         </div>
         <el-menu class="sidebar-el-menu" :default-active="onRoutes" :collapse="collapse" background-color="#fff"
