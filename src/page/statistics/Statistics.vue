@@ -41,14 +41,8 @@
                     <el-table-column prop="custbasis" label="交期达成率"  align="center"></el-table-column>
                     <el-table-column prop="plantime" width="100" label="质量达成率"  align="center"></el-table-column>
                     <el-table-column prop="resourceLabel" label="累计/单"  align="center"></el-table-column>
-                    <el-table-column label="操作" width="100"  align="center">
-                        <template slot-scope="scope">
-                            <router-link :to="'/taskDetail/'+scope.row.id" size="small">查看详情</router-link>
-                            <i class="icon emergency-icon" v-if="scope.row.urgent"></i>
-                        </template>
-                    </el-table-column>
                 </el-table>
-                <div class="pagination">
+                <!--<div class="pagination">
                     <el-pagination
                         @size-change="handleSizeChange"
                         @current-change="getList"
@@ -58,7 +52,7 @@
                         layout="total, sizes, prev, pager, next, jumper"
                         :total="pager.total">
                     </el-pagination>
-                </div>
+                </div>-->
             </div>
         </div>
     </div>
@@ -107,6 +101,9 @@
                 entryList:[{test:'1'}],
 
                 downLoadFb:null,
+
+                taskReport:null,
+                orderReport:null,
             }
         },
         created(){
@@ -124,40 +121,6 @@
                 }
                 data = data.concat(rs)
                 this.downloadExl(data, '菜单')
-            },
-            importFile: function () { // 导入excel
-                this.fullscreenLoading = true
-                let obj = this.imFile
-                if (!obj.files) {
-                    this.fullscreenLoading = false
-                    return
-                }
-                var f = obj.files[0]
-                var reader = new FileReader()
-                let $t = this
-                reader.onload = function (e) {
-                    var data = e.target.result
-                    if ($t.rABS) {
-                        $t.wb = XLSX.read(btoa(this.fixdata(data)), {  // 手动转化
-                            type: 'base64'
-                        })
-                    } else {
-                        $t.wb = XLSX.read(data, {
-                            type: 'binary'
-                        })
-                    }
-                    /*for(let i=0;i<$t.wb.SheetNames.length;i++){
-                        let json = XLSX.utils.sheet_to_json($t.wb.Sheets[$t.wb.SheetNames[i]]);
-                        $t.dealFile($t.analyzeData(json)) // analyzeData: 解析导入数据
-                    }*/
-                    let json = XLSX.utils.sheet_to_json($t.wb.Sheets[$t.wb.SheetNames[1]]);
-                    $t.dealFile($t.analyzeData(json)) // analyzeData: 解析导入数据
-                }
-                if (this.rABS) {
-                    reader.readAsArrayBuffer(f)
-                } else {
-                    reader.readAsBinaryString(f)
-                }
             },
             downloadExl: function (json, downName, type) {  // 导出到excel
                 let keyMap = [] // 获取键
@@ -198,49 +161,6 @@
                 setTimeout(function () {  // 延时释放
                     URL.revokeObjectURL(tmpDown) // 用URL.revokeObjectURL()来释放这个object URL
                 }, 100)
-            },
-            analyzeData: function (data) {  // 此处可以解析导入数据
-                return data
-            },
-            dealFile: function (data) {   // 处理导入的数据
-                console.log(data)
-                this.imFile.value = ''
-                this.fullscreenLoading = false
-                if (data.length <= 0) {
-                    this.errorDialog = true
-                    this.errorMsg = '请导入正确信息'
-                } else {
-                    this.excelData = [];
-                    data.forEach((item,key)=>{
-                            if(parseInt(item['用户账户登记'])>=1&&item.__EMPTY){
-                                this.excelData.push(
-                                    {
-                                        "bankAccount":item.__EMPTY_2,
-                                        "idCard":item.__EMPTY_5,
-                                        "bankName":item.__EMPTY,
-                                        "phoneNums":item.__EMPTY_3,
-                                        "name":item.__EMPTY_4,
-                                        "subbranch":item.__EMPTY_1,
-                                        "email":item.__EMPTY_6,
-                                        "province":'**',
-                                        "city":'**',
-                                        "county":'**',
-                                        "address":'**',
-                                    }
-                                )
-                            }
-                    })
-                    let fb=Vue.operationFeedback({text:'导入中...'});
-                    Vue.api.addUserBatch({...Vue.sessionInfo(),userData:JSON.stringify(this.excelData)}).then((resp)=>{
-                        if(resp.respStatus=='success'){
-                            this.getList();
-                            fb.setOptions({type:'complete',text:'导入成功'});
-                        }else{
-                            fb.setOptions({type:'warn',text:'导入失败，'+resp.respMsg});
-                        }
-                    });
-
-                }
             },
             s2ab: function (s) { // 字符串转字符流
                 var buf = new ArrayBuffer(s.length)
@@ -296,9 +216,9 @@
                     this.pager.loading=false;
                     if(resp.status=='success'){
                         let data=JSON.parse(resp.message);
-                        this.entryList=data.result;
-                        let pager=data.pager;
-                        this.pager.total=pager.totalRecordCount;
+                        this.taskReport=this.data.taskReport;
+                        this.orderReport=this.data.orderReport;
+                        this.entryList=[this.taskReport,this.orderReport];
                         console.log('this.entryLis:',this.entryList);
                     }
                 });

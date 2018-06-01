@@ -56,7 +56,7 @@
             let now = new Date(),hour = now.getHours();
             if(hour < 6){this.greeting='凌晨好！';}
             else if (hour < 9){this.greeting='早上好！';}
-            else if (hour < 12){this.greeting='上午好！';d}
+            else if (hour < 12){this.greeting='上午好！';}
             else if (hour < 14){this.greeting='中午好！';}
             else if (hour < 17){this.greeting='下午好！';}
             else if (hour < 19){this.greeting='傍晚好！';}
