@@ -110,12 +110,12 @@
                         index: '/msg',
                         title: '通知',
                     },
-                  /*  {
+                    {
                         code:'04',
                         icon: '#icon-biaoge',
                         index: '/statistics',
                         title: '统计报表',
-                    },*/
+                    },
                     {
                         code:'05',
                         icon: '#icon-user',
