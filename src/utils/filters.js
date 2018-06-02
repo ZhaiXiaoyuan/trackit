@@ -94,3 +94,11 @@ Vue.filter('orderStatus',function(str){
     }
     return result;
 });
+//
+Vue.filter('percentFormat',function(str){
+    if(!str){
+        return;
+    }
+    let tem=parseFloat(str.split('%')[0]);
+    return tem.toFixed(2)+'%';
+});

@@ -322,6 +322,14 @@ export default {
                 params: params
             });
         },
+        //【新】统计报表.供应商 - 客户【A+M】
+       supplierStatistics:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/rp/com/cusos',
+                params: params
+            });
+        },
     }
   },
 

@@ -9,10 +9,6 @@
         <div class="container">
             <div class="condition-panel">
                 <el-row class="type-list">
-                   <!-- <el-radio-group v-model="range" @change="rangeChange" class="cm-radio-group">
-                        <el-radio label="All">全部</el-radio>
-                        <el-radio label="Mine">我的</el-radio>
-                    </el-radio-group>-->
                     <el-button-group style="margin-left: 30px;">
                        <!-- <el-button type="primary">全部</el-button>-->
                         <el-button type="" :class="{'el-button--primary':type=='do'}" @click="setType('do')">进行中</el-button>
@@ -42,6 +38,10 @@
                             <el-button slot="append" icon="el-icon-search" @click="getList()"></el-button>
                         </el-input>
                     </div>
+                    <el-radio-group v-model="range" style="margin-left: 20px;" @change="rangeChange" class="cm-radio-group" v-if="account.user_type=='Supplier'">
+                        <el-radio label="All">全部</el-radio>
+                        <el-radio label="Mine">我的</el-radio>
+                    </el-radio-group>
                     <div style="text-align: right;margin-left: auto">
                         <el-button size="small" type="primary" v-if="account.user_type=='Customer'" @click="$router.push({name:'newTask'})">新建任务</el-button>
                         <el-button size="small" type="" @click="getAllList()">导出</el-button>

@@ -29,31 +29,46 @@
                     </div>
                     <div style="text-align: right;margin-left: auto">
                     <!--    <el-button size="small" type="primary">查询</el-button>-->
-                        <el-button size="small" type="" @click="getAllList()">导出</el-button>
+                        <el-button @click="exportOrder">导出</el-button>
                         <a id="downlink"></a>
                     </div>
                 </el-row>
             </div>
-            <div class="list-panel" v-loading="pager.loading">
+            <div class="list-panel" v-loading="pager.loading" v-if="type=='1'">
                 <el-table :data="entryList" border style="width: 100%;" ref="multipleTable">
-                    <el-table-column prop="taskno" label="类别" align="center"></el-table-column>
-                    <el-table-column prop="custno"  width="100"  label="刷选时间段/单"  align="center"></el-table-column>
-                    <el-table-column prop="custbasis" label="交期达成率"  align="center"></el-table-column>
-                    <el-table-column prop="plantime" width="100" label="质量达成率"  align="center"></el-table-column>
-                    <el-table-column prop="resourceLabel" label="累计/单"  align="center"></el-table-column>
+                    <el-table-column prop="type" label="类别" align="center"></el-table-column>
+                    <el-table-column prop="datec"  width="100"  label="筛选时间段/单"  align="center"></el-table-column>
+                    <el-table-column label="交期达成率"  align="center">
+                        <template slot-scope="scope">
+                            {{scope.row.finishcr|percentFormat}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column width="100" label="质量达成率"  align="center">
+                        <template slot-scope="scope">
+                            {{scope.row.qualitycr|percentFormat}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="allc" label="累计/单"  align="center"></el-table-column>
                 </el-table>
-                <!--<div class="pagination">
-                    <el-pagination
-                        @size-change="handleSizeChange"
-                        @current-change="getList"
-                        :current-page="pager.pageNumber"
-                        :page-sizes="[10, 20, 50, 100]"
-                        :page-size="pager.pageSize"
-                        layout="total, sizes, prev, pager, next, jumper"
-                        :total="pager.total">
-                    </el-pagination>
-                </div>-->
             </div>
+            <div class="list-panel" v-loading="pager.loading" v-if="type=='2'">
+                <el-table :data="supplierList" border style="width: 100%;" ref="multipleTable">
+                    <el-table-column prop="name" label="供应商" align="center"></el-table-column>
+                    <el-table-column prop="dateoc"  width="100"  label="筛选时间段/单"  align="center"></el-table-column>
+                    <el-table-column label="交期达成率"  align="center">
+                        <template slot-scope="scope">
+                            {{scope.row.finishocr|percentFormat}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column width="100" label="质量达成率"  align="center">
+                        <template slot-scope="scope">
+                            {{scope.row.qualityocr|percentFormat}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="alloc" label="累计/单"  align="center"></el-table-column>
+                </el-table>
+            </div>
+        </div>
         </div>
     </div>
 </template>
@@ -98,12 +113,15 @@
                     total:0,
                     loading:false
                 },
-                entryList:[{test:'1'}],
+                entryList:[],
 
                 downLoadFb:null,
 
                 taskReport:null,
                 orderReport:null,
+
+                supplierList:[],
+                downLoadFb:null,
             }
         },
         created(){
@@ -192,20 +210,26 @@
             },
 
             rangeChange:function (data) {
-                console.log('data:',data);
-                this.getList();
+                if(this.type=='1'){
+                    this.getList();
+                }else if(this.type=='2'){
+                    this.getSupplierReportList();
+                }
             },
             setType:function (value) {
                 this.type=value;
-                this.getList();
+                if(this.type=='1'){
+                    this.getList();
+                }else if(this.type=='2'){
+                    this.getSupplierReportList();
+                }
             },
             dateRageChange:function (data) {
                 this.startDate=Vue.formatDate(data[0],'yyyy-MM-dd');
                 this.endDate=Vue.formatDate(data[1],'yyyy-MM-dd');
                 this.getList();
             },
-            getList:function (pageIndex) {
-                this.pager.pageIndex=pageIndex?pageIndex:1;
+            getList:function () {
                 let params={
                     ...Vue.sessionInfo(),
                     startdate:this.startDate,
@@ -216,16 +240,52 @@
                     this.pager.loading=false;
                     if(resp.status=='success'){
                         let data=JSON.parse(resp.message);
-                        this.taskReport=this.data.taskReport;
-                        this.orderReport=this.data.orderReport;
+                        this.taskReport=data.taskReport;
+                        Object.assign(this.taskReport,{
+                            type:'任务报表',
+                            qualityc:this.taskReport.qualitytc,
+                            allc:this.taskReport.alltc,
+                            qualitycr:this.taskReport.qualitytcr,
+                            finishc:this.taskReport.finishtc,
+                            finishcr:this.taskReport.finishtcr,
+                            datec:this.taskReport.datetc,
+                        })
+                        this.orderReport=data.orderReport;
+                        Object.assign(this.orderReport,{
+                            type:'订单报表',
+                            qualityc:this.orderReport.qualityoc,
+                            allc:this.orderReport.alloc,
+                            qualitycr:this.orderReport.qualityocr,
+                            finishc:this.orderReport.finishoc,
+                            finishcr:this.orderReport.finishocr,
+                            datec:this.orderReport.dateoc,
+                        })
                         this.entryList=[this.taskReport,this.orderReport];
-                        console.log('this.entryLis:',this.entryList);
                     }
                 });
             },
-            handleSizeChange:function (data) {
-                this.pager.pageSize=data;
-                this.getList();
+            getSupplierReportList:function () {
+                let params={
+                    ...Vue.sessionInfo(),
+                    startdate:this.startDate,
+                    enddate:this.endDate,
+                }
+                this.pager.loading=true;
+                Vue.api.supplierStatistics(params).then((resp)=>{
+                    this.pager.loading=false;
+                    if(resp.status=='success'){
+                        let data=JSON.parse(resp.message);
+                        for(let key in data){
+                            let valueObj=data[key];
+                            this.supplierList.push({
+                                userId:key.split('_')[0],
+                                name:key.split('_')[1],
+                                ...valueObj
+                            })
+
+                        }
+                    }
+                });
             },
             getAllList:function (pageIndex) {
                 let params={
@@ -274,7 +334,55 @@
                     }
                 });
             },
-
+            exportOrder:function () {
+                if(this.type=='1'){
+                    let jsonData=[
+                        {
+                            1:'序号',
+                            2:'类别',
+                            3:'筛选时间段/单',
+                            4:'交期达成率',
+                            5:'质量达成率',
+                            6:'累计/单',
+                        }
+                    ];
+                    this.entryList.forEach((item,i)=>{
+                        jsonData.push({
+                            1:1,
+                            2:item.type,
+                            3:item.datec,
+                            4:item.finishcr,
+                            5:item.qualitycr,
+                            6:item.allc,
+                        });
+                    })
+                    this.downLoadFb=Vue.operationFeedback({text:'导出中...'});
+                    this.downloadExl(jsonData,'工作量统计导出表');
+                }else if(this.type=='2'){
+                    let jsonData=[
+                        {
+                            1:'序号',
+                            2:'供应商',
+                            3:'筛选时间段/单',
+                            4:'交期达成率',
+                            5:'质量达成率',
+                            6:'累计/单',
+                        }
+                    ];
+                    this.supplierList.forEach((item,i)=>{
+                        jsonData.push({
+                            1:1,
+                            2:item.name,
+                            3:item.dateoc,
+                            4:item.finishocr,
+                            5:item.qualityocr,
+                            6:item.alloc,
+                        });
+                    })
+                    this.downLoadFb=Vue.operationFeedback({text:'导出中...'});
+                    this.downloadExl(jsonData,'供应商统计导出表');
+                }
+            }
         },
         mounted () {
             //
