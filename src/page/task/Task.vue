@@ -312,7 +312,7 @@
                 this.getList();
             },
             getList:function (pageIndex) {
-                this.pager.pageIndex=pageIndex?pageIndex:1;
+                this.pager.pageNumber=pageIndex?pageIndex:1;
                 let params={
                     ...Vue.sessionInfo(),
                     range:this.range,
@@ -332,7 +332,6 @@
                         this.entryList=data.result;
                         let pager=data.pager;
                         this.pager.total=pager.totalRecordCount;
-                        console.log('this.entryLis:',this.entryList);
 
                     }
                 });

@@ -306,48 +306,7 @@
                 order:{},
                 entryList:[],
                 productList:[],
-                statusList:[
-                    {
-                        title:'订单已分配，等待确认',
-                        time:'',
-                        status:2,
-                    },
-                 /*   {
-                        title:'确认信息与风险',
-                        time:'',
-                        status:3,
-                    },*/
-                    {
-                        title:'确认接单',
-                        time:'',
-                        status:4,
-                    },
-                    {
-                        title:'确认材料',
-                        time:'',
-                        status:5,
-                    },
-                    {
-                        title:'确认大货样',
-                        time:'',
-                        status:6,
-                    },
-                   /* {
-                        title:'确认大货质量',
-                        time:'',
-                        status:7,
-                    },*/
-                    {
-                        title:'出货',
-                        time:'',
-                        status:8,
-                    },
-                    {
-                        title:'完成订单',
-                        time:'',
-                        status:9,
-                    },
-                ],
+                statusList:[],
                 statusLogs:[],
 
                 completeDialogFlag:false,
@@ -746,6 +705,49 @@
             /**/
             this.id=this.$route.params.id;
             this.account=Vue.getAccountInfo();
+            /**/
+            this.statusList=[
+                {
+                    title:'订单已分配，等待确认',
+                    time:'',
+                    status:2,
+                },
+                /*   {
+                 title:'确认信息与风险',
+                 time:'',
+                 status:3,
+                 },*/
+                {
+                    title:this.account.user_type=='Supplier'?'寄出材料':'确认接单',
+                    time:'',
+                    status:4,
+                },
+                {
+                    title:this.account.user_type=='Supplier'?'寄出大货样':'确认材料',
+                    time:'',
+                    status:5,
+                },
+                {
+                    title:this.account.user_type=='Supplier'?'检查大货样':'确认大货样',
+                    time:'',
+                    status:6,
+                },
+                /* {
+                 title:'确认大货质量',
+                 time:'',
+                 status:7,
+                 },*/
+                {
+                    title:'出货',
+                    time:'',
+                    status:8,
+                },
+                {
+                    title:'完成订单',
+                    time:'',
+                    status:9,
+                },
+            ]
             /**/
             this.outFile = document.getElementById('downlink');
             /**/
