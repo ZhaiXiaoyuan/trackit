@@ -56,10 +56,10 @@
                     <div class="block-bd">
                         <el-form :label-width="formLabelWidth" label-position="left">
                             <el-row type="flex">
-                                <el-form-item class="input-item" label="产品名称：">
+                              <!--  <el-form-item class="input-item" label="产品名称：">
                                     <el-input v-model="form.productname" :maxlength="512" placeholder=""></el-input>
-                                </el-form-item>
-                                <el-form-item class="input-item" label="产品编号：" style="margin-left: 50px;">
+                                </el-form-item>-->
+                                <el-form-item class="input-item" label="产品编号：">
                                     <el-input v-model="form.productcode" :maxlength="512" placeholder=""></el-input>
                                 </el-form-item>
                             </el-row>
@@ -210,7 +210,7 @@
                 isEmergency:1,
 
                 formObject:{
-                    "productname": null,//"产品名称",
+                 /*   "productname": null,//"产品名称",*/
                     "productcode":  null,//"产品编号",
                     "amount":  null,//"产品数量",
                     "price":  null,//"产品单价",
@@ -320,28 +320,28 @@
                         Vue.operationFeedback({type:'warn',text:'请上传相关产品的客户确认图片'});
                         return;
                     }
-                    if(!form.productname){
+                  /*  if(!form.productname){
                         Vue.operationFeedback({type:'warn',text:'请上传相关产品的产品名称'});
                         return;
-                    }
+                    }*/
                     if(!form.productcode){
-                        Vue.operationFeedback({type:'warn',text:'请上传相关产品的产品编号'});
+                        Vue.operationFeedback({type:'warn',text:'请输入相关产品的产品编号'});
                         return;
                     }
                     if(!form.price){
-                        Vue.operationFeedback({type:'warn',text:'请上传相关产品的产品单价'});
+                        Vue.operationFeedback({type:'warn',text:'请输入相关产品的产品单价'});
                         return;
                     }
                     if(!regex.float.test(form.price)){
-                        Vue.operationFeedback({type:'warn',text:'相关产品的产品单价'+regex.floatAlert});
+                        Vue.operationFeedback({type:'warn',text:'相关产品的产品单价有误，'+regex.floatAlert});
                         return;
                     }
                     if(!form.amount){
-                        Vue.operationFeedback({type:'warn',text:'请上传相关产品的产品数量'});
+                        Vue.operationFeedback({type:'warn',text:'请输入相关产品的产品数量'});
                         return;
                     }
                     if(!regex.pInt.test(form.amount)){
-                        Vue.operationFeedback({type:'warn',text:'相关产品的产品数量'+regex.pIntAlert});
+                        Vue.operationFeedback({type:'warn',text:'相关产品的产品数量有误，'+regex.pIntAlert});
                         return;
                     }
                     for(let j=0;j<form.picList.length;j++){

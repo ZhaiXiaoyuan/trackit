@@ -275,6 +275,7 @@
                     this.pager.loading=false;
                     if(resp.status=='success'){
                         let data=JSON.parse(resp.message);
+                        this.supplierList=[];
                         for(let key in data){
                             let valueObj=data[key];
                             this.supplierList.push({

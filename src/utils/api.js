@@ -330,6 +330,14 @@ export default {
                 params: params
             });
         },
+        //【旧】任务需由供应商提供的信息项【A+M】
+        getProattrs:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/task/biz/proattrs',
+                params: params
+            });
+        },
     }
   },
 
