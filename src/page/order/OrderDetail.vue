@@ -50,10 +50,10 @@
                     <div class="block-bd">
                         <el-form :label-width="formLabelWidth" label-position="left">
                             <el-row type="flex">
-                                <el-form-item class="input-item" label="产品名称：">
+                              <!--  <el-form-item class="input-item" label="产品名称：">
                                     <el-input v-model="form.productname" readonly :maxlength="512" placeholder=""></el-input>
-                                </el-form-item>
-                                <el-form-item class="input-item" label="产品编号：" style="margin-left: 50px;">
+                                </el-form-item>-->
+                                <el-form-item class="input-item" label="产品编号：">
                                     <el-input v-model="form.productcode" readonly :maxlength="512" placeholder=""></el-input>
                                 </el-form-item>
                             </el-row>
@@ -365,149 +365,6 @@
 
         },
         methods: {
-            selectFile:function (index) {
-                let file=document.getElementById('file-input-'+index).files[0];
-                let formData = new FormData();
-                let sessionInfo=Vue.sessionInfo();
-                formData.append('req_from',sessionInfo.req_from);
-                formData.append('timestamp',sessionInfo.timestamp);
-                formData.append('number',sessionInfo.number);
-                formData.append('signature',sessionInfo.signature);
-                formData.append('biztype','Task');
-                formData.append('bizid',null);
-                formData.append('fieldname',file.name);
-                formData.append('file1',file);
-                this.uploading=true;
-                Vue.api.upload(formData).then((resp)=>{
-                    this.uploading=false;
-                    if(resp.status='success'){
-                        let data=JSON.parse(resp.message);
-                        this.productFormList[index].picList.push(data);
-                    }else{
-                        Vue.operationFeedback({type:'warn',text:'上传失败'});
-                    }
-                });
-            },
-            delPic:function (index,picIndex) {
-                this.productFormList[index].picList.splice(picIndex,1);
-            },
-            save:function () {
-                if(!this.customerNo){
-                    Vue.operationFeedback({type:'warn',text:'请输入客户编号'});
-                    return;
-                }
-                if(!this.customerNote){
-                    Vue.operationFeedback({type:'warn',text:'请输入客户参考'});
-                    return;
-                }
-                if(!this.completeDate){
-                    Vue.operationFeedback({type:'warn',text:'选择预计完成时间'});
-                    return;
-                }
-                if(!this.taskType){
-                    Vue.operationFeedback({type:'warn',text:'请选择任务种类'});
-                    return;
-                }
-
-                /*if(this.picList.length==0){
-                    Vue.operationFeedback({type:'warn',text:'请上传任务样品图片'});
-                    return;
-                }
-                if(!this.custRequire){
-                        Vue.operationFeedback({type:'warn',text:'请输入客户要求栏'});
-                    return;
-                }*/
-                let params={
-                    ...Vue.sessionInfo(),
-                    taskno:this.taskNo,
-                    custno:this.customerNo,
-                    custbasis:this.customerNote,
-                    plantime:Vue.formatDate(this.completeDate,'yyyy-MM-dd'),
-                    resource:this.taskType,
-                    urgent:this.isEmergency,
-                }
-                let proinfos=[];
-                for(let i=0;i<this.productFormList.length;i++){
-                    let form=this.productFormList[i];
-                    if(form.picList.length==0){
-                        Vue.operationFeedback({type:'warn',text:'请上传相关产品的客户确认图片'});
-                        return;
-                    }
-                    if(!form.productname){
-                        Vue.operationFeedback({type:'warn',text:'请上传相关产品的产品名称'});
-                        return;
-                    }
-                    if(!form.productcode){
-                        Vue.operationFeedback({type:'warn',text:'请上传相关产品的产品编号'});
-                        return;
-                    }
-                    if(!form.price){
-                        Vue.operationFeedback({type:'warn',text:'请上传相关产品的产品单价'});
-                        return;
-                    }
-                    if(!regex.float.test(form.price)){
-                        Vue.operationFeedback({type:'warn',text:'相关产品的产品单价'+regex.floatAlert});
-                        return;
-                    }
-                    if(!form.amount){
-                        Vue.operationFeedback({type:'warn',text:'请上传相关产品的产品数量'});
-                        return;
-                    }
-                    if(!regex.pInt.test(form.amount)){
-                        Vue.operationFeedback({type:'warn',text:'相关产品的产品数量'+regex.pIntAlert});
-                        return;
-                    }
-                    for(let j=0;j<form.picList.length;j++){
-                        let item=form.picList[j];
-                        if(j==0){
-                            form.custpicone=item.filename;
-                            form.custpiconetag=item.label?item.label:null;
-                        }if(j==1){
-                            form.custpictwo=item.filename;
-                            form.custpictwotag=item.label?item.label:null;
-                        }if(j==2){
-                            form.custpicthree=item.filename;
-                            form.custpicthreetag=item.label?item.label:null;
-                        }if(j==3){
-                            form.custpicfour=item.filename;
-                            form.custpicfourtag=item.label?item.label:null;
-                        }if(j==4){
-                            form.custpicfive=item.filename;
-                            form.custpicfivetag=item.label?item.label:null;
-                        }if(j==5){
-                            form.custpicsix=item.filename;
-                            form.custpicsixtag=item.label?item.label:null;
-                        }if(j==6){
-                            form.custpicseven=item.filename;
-                            form.custpicseventag=item.label?item.label:null;
-                        }if(j==7){
-                            form.custpiceight=item.filename;
-                            form.custpiceighttag=item.label?item.label:null;
-                        }if(j==8){
-                            form.custpicnine=item.filename;
-                            form.custpicninetag=item.label?item.label:null;
-                        }if(j==9){
-                            form.custpicten=item.filename;
-                            form.custpicninetag=item.label?item.label:null;
-                        }
-                    }
-                    proinfos.push(form);
-                }
-                params.proinfos=JSON.stringify(proinfos);
-                let fb=Vue.operationFeedback({text:'保存中...'});
-                Vue.api.addOrder(params).then((resp)=>{
-                    if(resp.status=='success'){
-                        fb.setOptions({type:"complete",text:'保存成功'});
-                       /* this.$router.push({name:'order'});*/
-                    }else{
-                        fb.setOptions({type:"warn",text:resp.message});
-                    }
-                });
-
-            },
-            addProduct:function () {
-                this.productFormList.push(JSON.parse(JSON.stringify(this.formObject)));
-            },
             findStatusItem:function (value) {
                 return this.statusLogs.find(function(x) {return parseInt(x.status) == value;});
             },

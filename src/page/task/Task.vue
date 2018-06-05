@@ -38,15 +38,21 @@
                             <el-button slot="append" icon="el-icon-search" @click="getList()"></el-button>
                         </el-input>
                     </div>
-                    <el-radio-group v-model="range" style="margin-left: 20px;" @change="rangeChange" class="cm-radio-group" v-if="account.user_type=='Supplier'">
-                        <el-radio label="All">全部</el-radio>
-                        <el-radio label="Mine">我的</el-radio>
-                    </el-radio-group>
                     <div style="text-align: right;margin-left: auto">
                         <el-button size="small" type="primary" v-if="account.user_type=='Customer'" @click="$router.push({name:'newTask'})">新建任务</el-button>
                         <el-button size="small" type="" @click="getAllList()">导出</el-button>
                         <a id="downlink"></a>
                     </div>
+                </el-row>
+                <el-row class="condition-row" style="margin-top: 10px;" type="flex">
+                    <el-radio-group v-model="range" @change="rangeChange" class="cm-radio-group" style="margin-right: 20px;" v-if="account.user_type=='Supplier'">
+                        <el-radio label="All">全部</el-radio>
+                        <el-radio label="Mine">我的</el-radio>
+                    </el-radio-group>
+                    <span>类型：</span>
+                    <el-select v-model="resource" style="width: 120px;" @change="resourceChange()" placeholder="">
+                        <el-option v-for="(item,index) in resourceList" :label="item.label" :value="item.value" :key="item.value"></el-option>
+                    </el-select>
                 </el-row>
             </div>
             <div class="list-panel" v-loading="pager.loading">
@@ -123,8 +129,10 @@
                 dateRange:null,
                 startDate:null,
                 endDate:null,
+                resource:null,
                 keyword:null,
                 dateRage:null,
+                resourceList:[],
                 pager:{
                     pageNumber:1,
                     pageSize:20,
@@ -320,6 +328,7 @@
                     status:this.type,
                     beginDate:this.startDate,
                     endDate:this.endDate,
+                    resource:this.resource,
                     searchKey:this.keyword,
                     'pager.pageNumber':this.pager.pageNumber,
                     'pager.pageSize':this.pager.pageSize,
@@ -388,6 +397,24 @@
                     }
                 });
             },
+            getBasicConfig:function () {
+                let params={
+                    req_from:'mj-backend',
+                    timestamp:Vue.genTimestamp(),
+                    types:'Resource'
+                }
+                Vue.api.basicConfig(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        let data=JSON.parse(resp.message);
+                        this.resourceList=data.Resource;
+                    }else{
+
+                    }
+                });
+            },
+            resourceChange:function () {
+                this.getList();
+            }
 
         },
         mounted () {
@@ -397,6 +424,7 @@
             //
             this.outFile = document.getElementById('downlink');
             /**/
+            this.getBasicConfig();
             this.getList();
 
         },

@@ -95,6 +95,9 @@
                                 </svg>
                             </li>
                         </ul>
+                        <ul class="label-list sub-list" v-if="subList&&subList.length>0">
+                            <li v-for="(item,index) in subList" :class="{'active':item.active}" @click="selectSubLabel(index)">{{item.label}}</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -180,6 +183,11 @@
             }
         }
     }
+    .sub-list{
+        margin-top: 20px;
+        border: 1px solid #e5e5e5;
+        padding: 20px;
+    }
 </style>
 <script>
     import Vue from 'vue'
@@ -192,28 +200,13 @@
                 curDateStrArr:Vue.formatDate(new Date(),'yyyy.MM.dd').split('.'),
 
                 labelList:[
-                    {
+                  /*  {
                         label:'样品货号',
                         value:'',
                         active:false,
-                    },{
-                        label:'样品名称',
-                        value:'',
-                        active:false,
-                    },{
-                        label:'样品描述',
-                        value:'',
-                        active:false,
-                    },{
-                        label:'单重',
-                        value:'',
-                        active:false,
-                    },{
-                        label:'打样费用',
-                        value:'',
-                        active:false,
-                    }
+                    },*/
                 ],
+                subList:[],
                 newLabel:null,
                 inputValue:null,
 
@@ -267,7 +260,22 @@
                 this.picList.splice(index,1);
             },
             selectLabel:function (index) {
-                this.labelList[index].active=!this.labelList[index].active;
+                let item=this.labelList[index];
+                item.active=!item.active;
+                if(item.children&&item.children.length>0){
+                    if(item.active){
+                        this.subList=item.children;
+                    }else{
+                        this.subList=[];
+                        item.children.forEach((item,i)=>{
+                            item.active=false;
+                        })
+                    }
+                }
+            },
+            selectSubLabel:function (index) {
+                let item=this.subList[index];
+                item.active=!item.active;
             },
             addLabel:function () {
                 let str=this.newLabel;
@@ -305,11 +313,21 @@
                     return;
                 }
                 let selectedLabelStr='';
+                let temArr=[];
                 this.labelList.forEach((item,i)=>{
                     if(item.active){
-                        selectedLabelStr+=(i>0?',':'')+(i+1)+':'+item.label;
+                        if(item.children&&item.children.length>0){
+                            item.children.forEach((child,index)=>{
+                                if(item.active){
+                                    temArr.push(child.id+':'+child.label);
+                                }
+                            });
+                        }else{
+                            temArr.push(item.id+':'+item.label);
+                        }
                     }
-                })
+                });
+                selectedLabelStr=temArr.join(',');
                 if(!selectedLabelStr||selectedLabelStr==''){
                     Vue.operationFeedback({type:'warn',text:'请勾选需要供应商提供的相关信息'});
                     return;
@@ -577,11 +595,44 @@
                 });
 
             },
+            getProattrs:function () {
+                let params={
+                    ...Vue.sessionInfo(),
+                }
+                Vue.api.getProattrs(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        let data=JSON.parse(resp.message);
+                        data.forEach((item,i)=>{
+                            let temItem={
+                                id:item.id,
+                                label:item.name,
+                                value:item.code,
+                                active:false,
+                            }
+                            if(item.children&&item.children.length>0){
+                                temItem.children=[];
+                                item.children.forEach((child,index)=>{
+                                    temItem.children.push({
+                                        id:child.id,
+                                        label:child.name,
+                                        value:child.code,
+                                        active:false,
+                                    });
+                                });
+                            }
+                            this.labelList.push(temItem);
+                        })
+                    }else{
+
+                    }
+                });
+            }
         },
         mounted () {
             /**/
             this.id=this.$route.params.id;
             this.account=Vue.getAccountInfo();
+            this.getProattrs();
             /**/
             if(this.id){
                 this.getCustomerTaskDetail();

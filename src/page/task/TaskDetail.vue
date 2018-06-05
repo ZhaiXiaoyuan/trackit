@@ -98,7 +98,7 @@
                             </el-form-item>
                             <div v-loading="loadingPlan">
                                 <el-form-item label="样品图片：">
-                                    <ul class="cm-simple-list" style="float: left;">
+                                    <ul class="cm-simple-list" style="float: left;width: 800px;">
                                         <li v-for="(item,index) in sampleList">
                                             <div class="img-wrap" v-if="item.filepath">
                                                 <img :src="item.filepath" @click="viewPicModal({imgUrl:item.filepath})">
@@ -109,7 +109,7 @@
 
                                             <div class="info-list">
                                                 <div v-for="(attr) in item.attrList" style="text-align: center;">
-                                                    <span class="label" v-if="index==0">{{attr.attrName}}：</span>
+                                                    <span class="label" v-if="index==0||index==7">{{attr.attrName}}：</span>
                                                     <span>{{attr.attrValue}}</span>
                                                 </div>
                                             </div>
@@ -153,7 +153,7 @@
                                 </el-select>
                             </el-form-item>
                             <el-form-item label="样品图片：">
-                                <ul class="cm-simple-list" style="float: left;">
+                                <ul class="cm-simple-list" style="float: left;width: 800px;">
                                     <li v-for="(item,index) in sampleList">
                                         <div class="img-wrap" v-if="item.filepath">
                                             <img :src="item.filepath" @click="viewPicModal({imgUrl:item.filepath})">
@@ -163,7 +163,7 @@
                                         </div>
                                         <div class="info-list">
                                             <div v-for="(attr) in item.attrList" style="text-align: center;">
-                                                <span class="label" v-if="index==0">{{attr.attrName}}：</span>
+                                                <span class="label" v-if="index==0||index==7">{{attr.attrName}}：</span>
                                                 <span>{{attr.attrValue}}</span>
                                             </div>
                                         </div>
@@ -182,8 +182,8 @@
                     <div class="block-bd" v-if="toAddPlan">
                         <el-form ref="form" :label-width="formLabelWidth" label-position="left">
                             <el-form-item label="样品图片：">
-                                <ul class="cm-simple-list" style="float: left;">
-                                    <li v-for="(item,index) in newSampleList">
+                                <ul class="cm-simple-list" style="float: left;width: 800px;">
+                                    <li v-for="(item,index) in newSampleList" v-if="index<10">
                                         <div class="img-wrap" v-if="item.filepath">
                                             <img :src="item.filepath" @click="viewPicModal({imgUrl:item.filepath})">
                                             <i class="icon el-icon-delete del-btn" @click="delSample(index)"></i>
@@ -199,7 +199,7 @@
                                         </div>
                                         <div class="info-list" v-if="item.filepath">
                                             <div v-for="(attr) in item.attrList">
-                                                <span class="label" v-if="index==0">{{attr.attrName}}：</span>
+                                                <span class="label" v-if="index==0||index==7">{{attr.attrName}}：</span>
                                                 <input v-model="attr.attrValue" maxlength="50" type="text">
                                             </div>
                                         </div>

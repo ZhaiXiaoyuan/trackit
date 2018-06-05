@@ -16,6 +16,11 @@
                         <el-option v-for="(item,index) in userTypeList" :label="item.label" :value="item.value" :key="item.value"></el-option>
                     </el-select>
                 </el-form-item>
+                <el-form-item label="类型" v-if="role=='Supplier'">
+                    <el-select v-model="resource" placeholder="请选择类型">
+                        <el-option v-for="(item,index) in resourceList" :label="item.label" :value="item.value" :key="item.value"></el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="组别">
                     <el-select v-model="group" placeholder="请选择组别">
                         <el-option v-for="(item,index) in groupList" :label="item.label" :value="item.code" :key="item.code"></el-option>
@@ -106,10 +111,35 @@
     }
     @media screen and (max-width: 1500px) {
        .register-wrap{
+           display: block;
+           padding: 30px 0px;
+           overflow: auto;
            .ms-register{
-               position: relative;
-               top:-40px;
+               padding:20px 40px !important;
            }
+           .ms-register .el-input--small .el-input__inner{
+               height:40px !important;
+           }
+           .form-block{
+               margin: 0px auto;
+               .el-form-item{
+                   .el-form-item__label{
+                       line-height: 40px !important;
+                   }
+                   &.el-form-item{
+                       margin-top: 8px;
+                   }
+               }
+           }
+           .gen-code{
+               height: 40px;
+               line-height: 40px;
+               width: 102px !important;
+           }
+           #s-canvas{
+               height: 40px !important;
+           }
+
        }
     }
 </style>
@@ -128,9 +158,11 @@
                 groupList:[],
                 imgCode:null,
                 genCodeUrl:'/appuser/auth/mcode',
+                resourceList:[],
 
                 name:null,
                 role:null,
+                resource:null,
                 group:null,
                 phone:null,
                 pwd:null,
@@ -177,6 +209,10 @@
                     Vue.operationFeedback({type:'warn',text:'请选择角色'});
                     return;
                 }
+                if(this.role=='Supplier'&&!this.resource){
+                    Vue.operationFeedback({type:'warn',text:'请选择类型'});
+                    return;
+                }
                 if(!this.group){
                     Vue.operationFeedback({type:'warn',text:'请选择组别'});
                     return;
@@ -213,18 +249,38 @@
                     platform:'backend',
 
                 }
+                if(this.role=='Supplier'){
+                    params.resource=this.resource;
+                }
                 let fb=Vue.operationFeedback({text:'注册中...'});
                 Vue.api.register(params).then((resp)=>{
                     if(resp.status=='success'){
                         fb.setOptions({type:"complete",text:'注册成功'});
-                        this.$router.push({name:'task'});
+                        this.$router.push({name:'login'});
                     }else{
                         fb.setOptions({type:"warn",text:resp.message});
+                    }
+                });
+            },
+            getBasicConfig:function () {
+                let params={
+                    req_from:'mj-backend',
+                    timestamp:Vue.genTimestamp(),
+                    types:'Resource'
+                }
+                Vue.api.basicConfig(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        let data=JSON.parse(resp.message);
+                        this.resourceList=data.Resource;
+                    }else{
+
                     }
                 });
             }
         },
         mounted () {
+            /**/
+            this.getBasicConfig();
             /**/
             this.getRegisterInfo();
         },
