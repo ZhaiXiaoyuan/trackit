@@ -19,6 +19,7 @@
                         <el-col :span="12">
                             <span class="title">任务信息</span>
                             <i class="icon emergency-icon" v-if="task.urgent"></i>
+                            <span class="cm-link-btn" style="padding-left: 10px;font-size: 14px;" @click="getCustomerInfo()">客户信息</span>
                         </el-col>
                         <el-col :span="12" style="text-align: right;">
                             <el-button @click="exportTask">导出</el-button>
@@ -151,6 +152,7 @@
                                         :value="item.label">
                                     </el-option>
                                 </el-select>
+                                <el-button type="primary" style="margin-left: 20px;" @click="delPlan()">删除报价</el-button>
                             </el-form-item>
                             <el-form-item label="样品图片：">
                                 <ul class="cm-simple-list" style="float: left;width: 800px;">
@@ -222,7 +224,7 @@
             <!--查看供应商信息-->
             <el-dialog class="view-user-dialog" :visible.sync="dialogFormVisible" v-if="dialogFormVisible" >
                 <div class="dialog-content">
-                    <p class="title">供应商信息</p>
+                    <p class="title">{{userInfoType=='Customer'?'客户':'供应商'}}信息</p>
                     <div style="text-align: center;margin-top: 20px;margin-bottom: 10px;">
                         <img class="avatar" :src="curSupplier.httpUser_avatar?curSupplier.httpUser_avatar:defaultAvatar" alt="">
                     </div>
@@ -235,7 +237,7 @@
                         <div class="value">{{curSupplier.user_phone}}</div>
                     </div>
                     <div class="info-row">
-                        <span class="field">供应商简介：</span>
+                        <span class="field">{{userInfoType=='Customer'?'客户':'供应商'}}简介：</span>
                         <div class="value">{{curSupplier.remark}}</div>
                     </div>
                     <div style="margin-top: 40px;">
@@ -472,6 +474,8 @@
                 otherReasonFlag:false,
                 otherReason:null,
                 downLoadFb:null,
+
+                userInfoType:null,
             }
         },
         created(){
@@ -837,6 +841,10 @@
                             this.curPlan=this.planList[0];
                             this.curPlanLabel=this.curPlan.label;
                             this.getPlan(this.curPlan.id);
+                        }else{
+                            this.curPlan={};
+                            this.curPlanLabel=null;
+                            this.sampleList=[];
                         }
                     }
                 });
@@ -997,6 +1005,28 @@
                     }
                 });
             },
+            delPlan:function () {
+              if(this.curPlan&&this.curPlan.id){
+                  let params={
+                      ...Vue.sessionInfo(),
+                      quotaid:this.curPlan.id,
+                  }
+                  let fb=Vue.operationFeedback({text:'删除中...'});
+                  Vue.api.delPlan(params).then((resp)=>{
+                      if(resp.status=='success'){
+                          if(resp.status=='success'){
+                              this.getSupplierPlanList();
+                              fb.setOptions({type:"complete",text:'删除成功'});
+                          }else{
+                              fb.setOptions({type:"warn",text:resp.message});
+                          }
+                      }
+                  });
+              }else{
+                  Vue.operationFeedback({type:'warn',text:'请选择方案'});
+                  return;
+              }
+            },
             getUserInfo:function () {
                 if(!this.curSupplier||!this.curSupplier.id){
                     Vue.operationFeedback({type:'warn',text:'请先选择供应商'});
@@ -1006,6 +1036,27 @@
                     ...Vue.sessionInfo(),
                    /* unumber:this.curSupplier.id,*/
                       uid:this.curSupplier.id
+                }
+                Vue.api.getUserInfo(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        let data=JSON.parse(resp.message);
+                        Object.assign(this.curSupplier,data);
+                        this.phone=data.user_phone;
+                        this.userName=data.user_name;
+                        this.email=data.email;
+                        this.avatar=data.user_avatar;
+                        this.dialogFormVisible=true;
+                        console.log('this.curSupplier:',this.curSupplier);
+                    }else{
+
+                    }
+                });
+            },
+            getCustomerInfo:function () {
+                this.userInfoType='Customer';
+                let params={
+                    ...Vue.sessionInfo(),
+                    uid:this.task.createrid
                 }
                 Vue.api.getUserInfo(params).then((resp)=>{
                     if(resp.status=='success'){

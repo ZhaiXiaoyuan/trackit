@@ -44,8 +44,8 @@
                         <a id="downlink"></a>
                     </div>
                 </el-row>
-                <el-row class="condition-row" style="margin-top: 10px;" type="flex">
-                    <el-radio-group v-model="range" @change="rangeChange" class="cm-radio-group" style="margin-right: 20px;" v-if="account.user_type=='Supplier'">
+                <el-row class="condition-row" style="margin-top: 10px;" type="flex" align="middle">
+                    <el-radio-group v-model="range" @change="rangeChange" class="cm-radio-group" style="margin-right: 20px;position: relative;top:2px;" v-if="account.user_type=='Supplier'">
                         <el-radio label="All">全部</el-radio>
                         <el-radio label="Mine">我的</el-radio>
                     </el-radio-group>

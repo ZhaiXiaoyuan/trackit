@@ -338,6 +338,14 @@ export default {
                 params: params
             });
         },
+        //【新】供应商删除任务报价【A+M】
+        delPlan:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/task/biz/delq',
+                params: params
+            });
+        },
     }
   },
 
