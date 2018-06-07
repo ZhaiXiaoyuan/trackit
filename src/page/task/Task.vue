@@ -48,8 +48,8 @@
                         <a id="downlink"></a>
                     </div>
                 </el-row>
-                <el-row class="condition-row" style="margin-top: 10px;" type="flex">
-                    <el-radio-group v-model="range" @change="rangeChange" class="cm-radio-group" style="margin-right: 20px;" v-if="account.user_type=='Supplier'">
+                <el-row class="condition-row" style="margin-top: 10px;" type="flex" align="middle">
+                    <el-radio-group v-model="range" @change="rangeChange" class="cm-radio-group" style="margin-right: 20px;position: relative;top:2px;" v-if="account.user_type=='Supplier'">
                         <el-radio label="All">全部</el-radio>
                         <el-radio label="Mine">我的</el-radio>
                     </el-radio-group>
@@ -320,7 +320,7 @@
                 this.getList();
             },
             getList:function (pageIndex) {
-                this.pager.pageIndex=pageIndex?pageIndex:1;
+                this.pager.pageNumber=pageIndex?pageIndex:1;
                 let params={
                     ...Vue.sessionInfo(),
                     range:this.range,
@@ -341,7 +341,6 @@
                         this.entryList=data.result;
                         let pager=data.pager;
                         this.pager.total=pager.totalRecordCount;
-                        console.log('this.entryLis:',this.entryList);
 
                     }
                 });
