@@ -24,7 +24,7 @@
                     <div>
                         订单量：<span class="blue">{{pager.total}}单</span>
                     </div>
-                    <div style="margin-left: 20px;">
+                    <div style="margin-left: 15px;">
                         <span>时间:</span>
                         <el-date-picker
                             class="cm-date-picker"
@@ -36,7 +36,7 @@
                             end-placeholder="结束日期">
                         </el-date-picker>
                     </div>
-                    <span style="margin-left: 20px;">关键字：</span>
+                    <span style="margin-left: 15px;">关键字：</span>
                     <div>
                         <el-input placeholder="" style="width: 220px;" v-model="keyword" @keyup.enter.native="getList()">
                             <el-button slot="append" icon="el-icon-search" @click="getList()"></el-button>
@@ -306,9 +306,15 @@
                 this.getList();
             },
             dateRageChange:function (data) {
-                this.startDate=data?Vue.formatDate(data[0],'yyyy-MM-dd'):null;
-                this.endDate=data?Vue.formatDate(data[1],'yyyy-MM-dd'):null;
-                this.getList();
+                if(Vue.datedifference(data[0],data[1])+1>31){
+                    this.dateRage=null;
+                    Vue.operationFeedback({type:'warn',text:'最多支持筛选一个月'});
+                    return;
+                }else{
+                    this.startDate=data?Vue.formatDate(data[0],'yyyy-MM-dd'):null;
+                    this.endDate=data?Vue.formatDate(data[1],'yyyy-MM-dd'):null;
+                    this.getList();
+                }
             },
             getList:function (pageIndex) {
                 this.pager.pageNumber=pageIndex?pageIndex:1;

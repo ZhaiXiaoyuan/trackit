@@ -60,7 +60,7 @@
                     <el-table-column prop="taskno" label="任务单号" align="center"></el-table-column>
                     <el-table-column prop="custno"  width="100"  label="客户编号"  align="center"></el-table-column>
                     <el-table-column prop="custbasis" label="客户参考"  align="center"></el-table-column>
-                    <el-table-column prop="plantime" width="100" label="物料完成时间"  align="center"></el-table-column>
+                    <el-table-column prop="plantime" width="100" label="预计完成时间"  align="center"></el-table-column>
                     <el-table-column prop="resourceLabel" label="任务种类"  align="center"></el-table-column>
                     <el-table-column label="下单时间" align="center">
                         <template slot-scope="scope">
@@ -315,9 +315,15 @@
                 this.getList();
             },
             dateRageChange:function (data) {
-                this.startDate=data?Vue.formatDate(data[0],'yyyy-MM-dd'):null;
-                this.endDate=data?Vue.formatDate(data[1],'yyyy-MM-dd'):null;
-                this.getList();
+                if(Vue.datedifference(data[0],data[1])+1>31){
+                    this.dateRage=null;
+                    Vue.operationFeedback({type:'warn',text:'最多支持筛选一个月'});
+                    return;
+                }else{
+                    this.startDate=data?Vue.formatDate(data[0],'yyyy-MM-dd'):null;
+                    this.endDate=data?Vue.formatDate(data[1],'yyyy-MM-dd'):null;
+                    this.getList();
+                }
             },
             getList:function (pageIndex) {
                 this.pager.pageNumber=pageIndex?pageIndex:1;

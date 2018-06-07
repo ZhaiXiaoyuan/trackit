@@ -40,12 +40,14 @@
                     <el-table-column prop="datec"  width="100"  label="筛选时间段/单"  align="center"></el-table-column>
                     <el-table-column label="交期达成率"  align="center">
                         <template slot-scope="scope">
-                            {{scope.row.finishcr|percentFormat}}
+                           <span v-if="scope.row.finishcr!='0.0%'"> {{scope.row.finishcr|percentFormat}}</span>
+                            <span v-if="scope.row.finishcr=='0.0%'"> /</span>
                         </template>
                     </el-table-column>
                     <el-table-column width="100" label="质量达成率"  align="center">
                         <template slot-scope="scope">
-                            {{scope.row.qualitycr|percentFormat}}
+                           <span v-if="scope.row.qualitycr!='0.0%'">{{scope.row.qualitycr|percentFormat}}</span>
+                            <span v-if="scope.row.qualitycr=='0.0%'">/</span>
                         </template>
                     </el-table-column>
                     <el-table-column prop="allc" label="累计/单"  align="center"></el-table-column>
