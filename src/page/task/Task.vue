@@ -20,7 +20,7 @@
                     <div>
                         任务量：<span class="blue">{{pager.total}}单</span>
                     </div>
-                    <span style="margin-left: 20px;">时间：</span>
+                    <span style="margin-left: 15px;">时间：</span>
                     <div>
                         <el-date-picker
                             class="cm-date-picker"
@@ -32,7 +32,11 @@
                             end-placeholder="结束日期">
                         </el-date-picker>
                     </div>
-                    <span style="margin-left: 20px;">关键字：</span>
+                    <span style="margin-left: 15px;">类型：</span>
+                    <el-select v-model="resource" style="width: 95px;" @change="resourceChange()" placeholder="">
+                        <el-option v-for="(item,index) in resourceList" :label="item.label" :value="item.value" :key="item.value"></el-option>
+                    </el-select>
+                    <span style="margin-left: 15px;">关键字：</span>
                     <div>
                         <el-input placeholder="客户号/任务号/客户参考" style="width: 220px;" v-model="keyword" @keyup.enter.native="getList()">
                             <el-button slot="append" icon="el-icon-search" @click="getList()"></el-button>
@@ -49,10 +53,6 @@
                         <el-radio label="All">全部</el-radio>
                         <el-radio label="Mine">我的</el-radio>
                     </el-radio-group>
-                    <span>类型：</span>
-                    <el-select v-model="resource" style="width: 120px;" @change="resourceChange()" placeholder="">
-                        <el-option v-for="(item,index) in resourceList" :label="item.label" :value="item.value" :key="item.value"></el-option>
-                    </el-select>
                 </el-row>
             </div>
             <div class="list-panel" v-loading="pager.loading">
@@ -315,8 +315,8 @@
                 this.getList();
             },
             dateRageChange:function (data) {
-                this.startDate=Vue.formatDate(data[0],'yyyy-MM-dd');
-                this.endDate=Vue.formatDate(data[1],'yyyy-MM-dd');
+                this.startDate=data?Vue.formatDate(data[0],'yyyy-MM-dd'):null;
+                this.endDate=data?Vue.formatDate(data[1],'yyyy-MM-dd'):null;
                 this.getList();
             },
             getList:function (pageIndex) {

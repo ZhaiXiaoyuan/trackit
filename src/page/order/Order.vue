@@ -306,8 +306,8 @@
                 this.getList();
             },
             dateRageChange:function (data) {
-                this.startDate=Vue.formatDate(data[0],'yyyy-MM-dd');
-                this.endDate=Vue.formatDate(data[1],'yyyy-MM-dd');
+                this.startDate=data?Vue.formatDate(data[0],'yyyy-MM-dd'):null;
+                this.endDate=data?Vue.formatDate(data[1],'yyyy-MM-dd'):null;
                 this.getList();
             },
             getList:function (pageIndex) {
