@@ -32,6 +32,7 @@
                             <el-table-column prop="custbasis" label="客户参考"  align="center"></el-table-column>
                             <el-table-column prop="plantime" label="物料完成时间"  align="center"></el-table-column>
                             <el-table-column prop="createtime" label="下单时间" align="center"></el-table-column>
+                            <el-table-column prop="suppliername" label="供应商名称" align="center"></el-table-column>
                             <el-table-column label="任务状态"  align="center">
                                 <template slot-scope="scope">
                                     {{scope.row.status|orderStatus}}

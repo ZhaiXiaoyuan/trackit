@@ -262,7 +262,7 @@
                             finishcr:this.orderReport.finishocr,
                             datec:this.orderReport.dateoc,
                         })
-                        this.entryList=[this.taskReport,this.orderReport];
+                        this.entryList=[this.orderReport];
                     }
                 });
             },

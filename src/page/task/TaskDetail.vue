@@ -199,7 +199,7 @@
                                                 <i class="icon add-icon el-icon-circle-plus"></i>
                                             </div>
                                         </div>
-                                        <div class="info-list" v-if="item.filepath">
+                                        <div class="info-list" :class="{'hidden':newSampleList.length>1&&!item.filepath}">
                                             <div v-for="(attr) in item.attrList">
                                                 <span class="label" v-if="index==0||index==7">{{attr.attrName}}：</span>
                                                 <input v-model="attr.attrValue" maxlength="50" type="text">

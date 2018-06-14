@@ -419,7 +419,8 @@
             },
             resourceChange:function () {
                 this.getList();
-            }
+            },
+
 
         },
         mounted () {

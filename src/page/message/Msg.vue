@@ -23,18 +23,21 @@
                 </el-row>
             </div>
             <div class="list-panel" v-loading="pager.loading">
-                <el-table :data="entryList" border style="width: 100%;" ref="multipleTable" @row-click="clickRow">
+                <el-table :data="entryList" border style="width: 100%;" ref="multipleTable" @cell-click="getMsgDetail">
                     <el-table-column prop="title" label="通知标题" align="center"></el-table-column>
                     <el-table-column prop="createtime" label="通知时间"  align="center"></el-table-column>
-                    <el-table-column label="通知详情"  align="center">
-                        <template slot-scope="scope">
+                    <el-table-column label="通知详情" align="center">
+                        <template slot-scope="scope" class="detail">
 <!--
                             <span v-if="scope.row.biztype=='Order'">您的订单号为<span class="cm-link-btn" @click="$router.push({ name: 'orderDetail', params: {id:scope.row.bizid}})" style="padding: 0px 5px;">{{scope.row.bizid}}</span></span>
 -->
 <!--
                             <span v-if="scope.row.biztype=='Task'">您的任务号为<span class="cm-link-btn" @click="$router.push({ name: 'taskDetail', params: {id:scope.row.bizid}})" style="padding: 0px 5px;">{{scope.row.bizid}}</span></span>
 -->
-                            <span v-html="scope.row.content"></span>
+                            <div class="cell-content">
+                                <span v-html="scope.row.content"></span>
+                                <sup class="el-badge__content is-dot" v-if="!scope.row.isread"></sup>
+                            </div>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -51,6 +54,31 @@
                 </div>
             </div>
         </div>
+        <el-dialog
+            title="消息详情"
+            :visible.sync="detailDialog"
+            width="40%">
+            <div style="height: 350px;overflow-y: auto;">
+                <div class="block" style="padding: 20px;">
+                    <div class="block-hd" style="text-align: center;">
+                        <span class="title" style="font-size: 20px;color: #333;">{{curMsg.title}}</span>
+                        <div style="font-size: 14px;color: #999;padding-top: 10px;">
+                            <span>{{curMsg.createrName}}</span><span style="padding-left: 5px;">{{curMsg.createtime}}</span>
+                        </div>
+                    </div>
+                    <div class="block-bd" style="font-size: 16px;margin-top: 10px;color: #666;">
+                        <div v-html="curMsg.content"></div>
+                    </div>
+                    <div class="block-ft">
+
+                    </div>
+                </div>
+            </div>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="detailDialog = false">取 消</el-button>
+                <el-button type="primary" @click="detailDialog = false">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <style lang="less" rel="stylesheet/less" scoped>
@@ -75,6 +103,7 @@
 </style>
 <script>
     import Vue from 'vue'
+    import bus from '../../components/common/bus';
     let XLSX = require('xlsx');
     export default {
         data() {
@@ -88,6 +117,10 @@
                     {
                         label:'订单',
                         value:'Order ',
+                    },
+                    {
+                        label:'平台',
+                        value:'Trackit ',
                     }
                 ],
                 curTypeIndex:0,
@@ -98,6 +131,8 @@
                     loading:false
                 },
                 entryList:[{test:'1'}],
+                detailDialog:false,
+                curMsg:{},
             }
         },
         created(){
@@ -133,14 +168,37 @@
             selectTypeChange:function (data) {
                 this.getList();
             },
-            clickRow:function (row) {
+            clickRow:function (row, event, column) {
                 if(row.biztype=='Order'){
                     this.$router.push({ name: 'orderDetail', params: {id:row.bizid}})
                 }else if(row.biztype=='Task'){
                     this.$router.push({ name: 'taskDetail', params: {id:row.bizid}})
                 }
-                console.log('row:',row);
-            }
+            },
+            getMsgDetail:function (row, column, cell, event) {
+                if(cell.cellIndex<2){
+                    if(row.biztype=='Order'){
+                        this.$router.push({ name: 'orderDetail', params: {id:row.bizid}})
+                    }else if(row.biztype=='Task'){
+                        this.$router.push({ name: 'taskDetail', params: {id:row.bizid}})
+                    }
+                }
+                if(cell.cellIndex==2){
+                    let params={
+                        ...Vue.sessionInfo(),
+                        id:row.id,
+                    }
+                    Vue.api.getMsgDetail(params).then((resp)=>{
+                        if(resp.status=='success'){
+                            let data=JSON.parse(resp.message);
+                            this.curMsg=data;
+                            row.isRead=1;
+                            this.detailDialog=true;
+                            bus.$emit('refreshAccount');
+                        }
+                    });
+                }
+            },
 
         },
         mounted () {

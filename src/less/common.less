@@ -415,6 +415,12 @@ table {
                 height: 24px;
                 padding: 0px 5px;
             }
+            &.hidden{
+                input{
+                    opacity: 0;
+                    pointer-events: none;
+                }
+            }
         }
 
     }
@@ -488,4 +494,14 @@ table {
     .el-input__inner{
         width: 250px;
     }
+}
+.cell-content{
+    display: flex;
+    align-items: center;
+}
+.cell-content .is-dot{
+    margin-left: auto;
+    margin-right: 5px;
+    width: 10px;
+    height: 10px;
 }

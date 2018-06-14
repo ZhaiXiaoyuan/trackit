@@ -346,6 +346,22 @@ export default {
                 params: params
             });
         },
+        //【旧】已/未读消息通知数量【A+M】
+        getInfoCount:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/base/info/cnot',
+                params: params
+            });
+        },
+        //【旧】消息通知详情【A+M】
+        getMsgDetail:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/base/info/vnot',
+                params: params
+            });
+        },
     }
   },
 

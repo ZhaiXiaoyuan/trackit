@@ -26,6 +26,7 @@
                             <use :xlink:href="item.icon"></use>
                         </svg>
                         <span slot="title">{{ item.title }}</span>
+                        <sup class="el-badge__content msg-count" v-if="item.showCount&&msgCount>0">{{msgCount}}</sup>
                     </el-menu-item>
                 </template>
             </template>
@@ -68,9 +69,18 @@
         border-top:1px solid #f0f0f8;
         height:100%;
         li{
+            position: relative;
             height: 70px;
             line-height: 70px;
             border-bottom: 1px solid #f0f0f8;
+            .msg-count{
+                position: absolute;
+                right: 10%;
+                height: 18px;
+                top:0px;
+                bottom: 0px;
+                margin: auto;
+            }
             &:hover{
                 background: #f8f8f9 !important;
             }
@@ -109,6 +119,7 @@
                         icon: '#icon-xitongtongzhi',
                         index: '/msg',
                         title: '通知',
+                        showCount:true,
                     },
                     {
                         code:'04',
@@ -127,6 +138,8 @@
                 pageName:null,
                 account:{},
                 defaultAvatar:require('../../images/common/default-avatar.png'),
+
+                msgCount:0,
             }
         },
         computed:{
@@ -135,14 +148,34 @@
                 return this.$route.path.replace('/','');
             }
         },
+        methods:{
+            getInfoCount:function () {
+                let params={
+                    ...Vue.sessionInfo(),
+                    isread:0,
+                }
+                Vue.api.getInfoCount(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        this.msgCount=parseInt(resp.message);
+                    }else{
+
+                    }
+                });
+            }
+        },
         created(){
             // 通过 Event Bus 进行组件间通信，来折叠侧边栏
             bus.$on('collapse', msg => {
                 this.collapse = msg;
             });
+
             /*刷新用户信息*/
             bus.$on('refreshAccount', () => {
                 this.account=Vue.getAccountInfo();
+            });
+            /*刷新用户信息*/
+            bus.$on('refreshMsgCount', () => {
+                this.account=this.account>0?this.account--:0;
             });
             //
             this.account=Vue.getAccountInfo();
@@ -152,6 +185,8 @@
             console.log('this.pageName:',this.pageName);
             //
             this.items=this.itemsConfig;
+            //
+            this.getInfoCount();
         }
     }
 </script>
