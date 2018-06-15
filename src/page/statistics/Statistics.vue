@@ -15,7 +15,7 @@
                     </el-button-group>
                 </el-row>
                 <el-row class="condition-row" style="margin-top: 20px;" type="flex">
-                    <span style="margin-left: 20px;">时间：</span>
+                    <span>时间：</span>
                     <div>
                         <el-date-picker
                             class="cm-date-picker"
@@ -70,6 +70,39 @@
                     <el-table-column prop="alloc" label="累计/单"  align="center"></el-table-column>
                 </el-table>
             </div>
+
+         <!--   <div class="condition-panel" style="margin-top: 20px;border-top: 1px solid #e5e5e5">
+                <el-row class="condition-row" style="margin-top: 20px;" type="flex">
+                    <span>月度订单对比：</span>
+                    <el-date-picker
+                        v-model="selectedYear"
+                        @change="getMonthStatics"
+                        type="year"
+                        placeholder="选择年">
+                    </el-date-picker>
+                </el-row>
+            </div>
+            <div class="list-panel" v-loading="pager.loading">
+                <el-table :data="entryList" border style="width: 100%;" ref="multipleTable">
+                    <el-table-column prop="type" label="月度" align="center"></el-table-column>
+                    <el-table-column prop="datec"  label="月度订单量"  align="center"></el-table-column>
+                    <el-table-column label="交易达成率"  align="center">
+                        <template slot-scope="scope">
+                            <span v-if="scope.row.finishcr!='0.0%'"> {{scope.row.finishcr|percentFormat}}</span>
+                            <span v-if="scope.row.finishcr=='0.0%'"> /</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column width="100" label="质量达成率"  align="center">
+                        <template slot-scope="scope">
+                            <span v-if="scope.row.qualitycr!='0.0%'">{{scope.row.qualitycr|percentFormat}}</span>
+                            <span v-if="scope.row.qualitycr=='0.0%'">/</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作"  align="center">
+
+                    </el-table-column>
+                </el-table>
+            </div>-->
         </div>
         </div>
     </div>
@@ -104,6 +137,7 @@
                 listType:'first',
                 type:'1',//1:工作量统计,2:供应商
                 range:'All',
+                curDate:new Date(),
                 dateRange:null,
                 startDate:null,
                 endDate:null,
@@ -124,6 +158,8 @@
 
                 supplierList:[],
                 downLoadFb:null,
+
+                selectedYear:null,
             }
         },
         created(){
@@ -385,6 +421,20 @@
                     this.downLoadFb=Vue.operationFeedback({text:'导出中...'});
                     this.downloadExl(jsonData,'供应商统计导出表');
                 }
+            },
+
+            getMonthStatics:function (data) {
+                console.log('dddd:',this.selectedYear);
+                let params={
+                    ...Vue.sessionInfo(),
+                    year:this.selectedYear.getFullYear()
+                }
+                Vue.api.getMonthStatics(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        let data=JSON.parse(resp.message);
+                        console.log('data:',data);
+                    }
+                });
             }
         },
         mounted () {
@@ -394,8 +444,14 @@
             //
             this.outFile = document.getElementById('downlink');
             /**/
+            this.startDate=Vue.formatDate(this.curDate,'yyyy-MM-dd');
+            this.endDate=Vue.formatDate(new Date().setDate(this.curDate.getDate()-(31+1)),'yyyy-MM-dd');
+            this.dateRage=[this.startDate,this.endDate];
             this.getList();
 
+            /**/
+            this.selectedYear=this.curDate;
+            this.getMonthStatics();
         },
     }
 </script>

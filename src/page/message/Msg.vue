@@ -130,7 +130,7 @@
                     total:0,
                     loading:false
                 },
-                entryList:[{test:'1'}],
+                entryList:[],
                 detailDialog:false,
                 curMsg:{},
             }
@@ -176,7 +176,7 @@
                 }
             },
             getMsgDetail:function (row, column, cell, event) {
-                if(cell.cellIndex<2){
+                if(cell.cellIndex==0){
                     if(row.biztype=='Order'){
                         this.$router.push({ name: 'orderDetail', params: {id:row.bizid}})
                     }else if(row.biztype=='Task'){
@@ -192,11 +192,13 @@
                         if(resp.status=='success'){
                             let data=JSON.parse(resp.message);
                             this.curMsg=data;
-                            row.isRead=1;
                             this.detailDialog=true;
-                            bus.$emit('refreshAccount');
                         }
                     });
+                    bus.$emit('refreshMsgCount');
+                    this.entryList.find((item)=>{
+                        return item.id==row.id;
+                    }).isread=1;
                 }
             },
 
