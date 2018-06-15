@@ -51,6 +51,11 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="allc" label="累计/单"  align="center"></el-table-column>
+                    <el-table-column label="操作"  align="center">
+                        <template slot-scope="scope">
+                            <div class="cm-link-btn" @click="toOrder()">查看明细</div>
+                        </template>
+                    </el-table-column>
                 </el-table>
             </div>
             <div class="list-panel" v-loading="pager.loading" v-if="type=='2'">
@@ -68,10 +73,15 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="alloc" label="累计/单"  align="center"></el-table-column>
+                    <el-table-column label="操作"  align="center">
+                        <template slot-scope="scope">
+                            <div class="cm-link-btn" @click="toOrder(scope.row.userId)">查看明细</div>
+                        </template>
+                    </el-table-column>
                 </el-table>
             </div>
 
-         <!--   <div class="condition-panel" style="margin-top: 20px;border-top: 1px solid #e5e5e5">
+            <div class="condition-panel" style="margin-top: 20px;border-top: 1px solid #e5e5e5">
                 <el-row class="condition-row" style="margin-top: 20px;" type="flex">
                     <span>月度订单对比：</span>
                     <el-date-picker
@@ -83,26 +93,22 @@
                 </el-row>
             </div>
             <div class="list-panel" v-loading="pager.loading">
-                <el-table :data="entryList" border style="width: 100%;" ref="multipleTable">
-                    <el-table-column prop="type" label="月度" align="center"></el-table-column>
-                    <el-table-column prop="datec"  label="月度订单量"  align="center"></el-table-column>
-                    <el-table-column label="交易达成率"  align="center">
+                <el-table :data="monthEntryList" border style="width: 100%;" ref="multipleTable">
+                    <el-table-column label="月度" align="center">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.finishcr!='0.0%'"> {{scope.row.finishcr|percentFormat}}</span>
-                            <span v-if="scope.row.finishcr=='0.0%'"> /</span>
+                            <span>{{parseInt(scope.row.propString1.split('-')[1])}}月</span>
                         </template>
                     </el-table-column>
-                    <el-table-column width="100" label="质量达成率"  align="center">
-                        <template slot-scope="scope">
-                            <span v-if="scope.row.qualitycr!='0.0%'">{{scope.row.qualitycr|percentFormat}}</span>
-                            <span v-if="scope.row.qualitycr=='0.0%'">/</span>
-                        </template>
-                    </el-table-column>
+                    <el-table-column prop="propInt1"  label="月度订单量"  align="center"></el-table-column>
+                    <el-table-column prop="propString2" label="交易达成率"  align="center"></el-table-column>
+                    <el-table-column prop="propString3" label="质量达成率"  align="center"></el-table-column>
                     <el-table-column label="操作"  align="center">
-
+                        <template slot-scope="scope">
+                            <div class="cm-link-btn" @click="toMonthOrder(scope.row.propString1)">查看明细</div>
+                        </template>
                     </el-table-column>
                 </el-table>
-            </div>-->
+            </div>
         </div>
         </div>
     </div>
@@ -160,6 +166,7 @@
                 downLoadFb:null,
 
                 selectedYear:null,
+                monthEntryList:[],
             }
         },
         created(){
@@ -323,6 +330,7 @@
                             })
 
                         }
+                        console.log('test:',this.supplierList);
                     }
                 });
             },
@@ -432,9 +440,23 @@
                 Vue.api.getMonthStatics(params).then((resp)=>{
                     if(resp.status=='success'){
                         let data=JSON.parse(resp.message);
-                        console.log('data:',data);
+                        this.monthEntryList=data;
+                        console.log(' this.monthEntryList:', this.monthEntryList);
                     }
                 });
+            },
+
+            toOrder:function (supplierId) {
+                if(supplierId){
+                    this.$router.push({name:'order',params:{startDate:this.startDate,endDate:this.endDate,supplierId:supplierId}});
+                }else{
+                    this.$router.push({name:'order',params:{startDate:this.startDate,endDate:this.endDate}});
+                }
+            },
+            toMonthOrder:function (dateStr) {
+                var dateStrArr=dateStr.split('-');
+                var dayCount = new Date(dateStrArr[0],dateStrArr[1], 0).getDate();
+                this.$router.push({name:'order',params:{startDate:dateStr+'-01',endDate:dateStr+'-'+dayCount}});
             }
         },
         mounted () {
@@ -444,8 +466,8 @@
             //
             this.outFile = document.getElementById('downlink');
             /**/
-            this.startDate=Vue.formatDate(this.curDate,'yyyy-MM-dd');
-            this.endDate=Vue.formatDate(new Date().setDate(this.curDate.getDate()-(31+1)),'yyyy-MM-dd');
+            this.startDate=Vue.formatDate(new Date().setDate(this.curDate.getDate()-(31+1)),'yyyy-MM-dd');
+            this.endDate=Vue.formatDate(this.curDate,'yyyy-MM-dd');
             this.dateRage=[this.startDate,this.endDate];
             this.getList();
 

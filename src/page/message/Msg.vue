@@ -104,7 +104,6 @@
 <script>
     import Vue from 'vue'
     import bus from '../../components/common/bus';
-    let XLSX = require('xlsx');
     export default {
         data() {
             return {

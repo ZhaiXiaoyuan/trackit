@@ -48,6 +48,12 @@
                         <a id="downlink"></a>
                     </div>
                 </el-row>
+                <el-row class="condition-row" style="margin-top: 10px;" type="flex" v-if="supplier">
+                    <div>
+                        供应商：<span class="blue">{{supplier.user_name}} {{supplier.user_phone}}</span>
+                        <i class="icon el-icon-error cm-btn" style="color: #666;" @click="clearSupplier()"></i>
+                    </div>
+                </el-row>
             </div>
             <div class="list-panel" v-loading="pager.loading">
                 <el-table :data="entryList" border style="width: 100%;" ref="multipleTable">
@@ -123,6 +129,8 @@
                 startDate:null,
                 endDate:null,
                 keyword:null,
+                supplierId:null,
+                supplier:null,
                 dateRage:null,
                 pager:{
                     pageNumber:1,
@@ -306,15 +314,16 @@
                 this.getList();
             },
             dateRageChange:function (data) {
-                if(Vue.datedifference(data[0],data[1])+1>31){
-                    this.dateRage=null;
-                    Vue.operationFeedback({type:'warn',text:'最多支持筛选一个月'});
-                    return;
-                }else{
-                    this.startDate=data?Vue.formatDate(data[0],'yyyy-MM-dd'):null;
-                    this.endDate=data?Vue.formatDate(data[1],'yyyy-MM-dd'):null;
-                    this.getList();
+                if(data){
+                    if(Vue.datedifference(data[0],data[1])+1>31){
+                        this.dateRage=null;
+                        Vue.operationFeedback({type:'warn',text:'最多支持筛选一个月'});
+                        return;
+                    }
                 }
+                this.startDate=data?Vue.formatDate(data[0],'yyyy-MM-dd'):null;
+                this.endDate=data?Vue.formatDate(data[1],'yyyy-MM-dd'):null;
+                this.getList();
             },
             getList:function (pageIndex) {
                 this.pager.pageNumber=pageIndex?pageIndex:1;
@@ -325,6 +334,7 @@
                     beginDate:this.startDate,
                     endDate:this.endDate,
                     searchKey:this.keyword,
+                    supplierid:this.supplierId,
                     'pager.pageNumber':this.pager.pageNumber,
                     'pager.pageSize':this.pager.pageSize,
                 }
@@ -337,6 +347,21 @@
                         let pager=data.pager;
                         this.pager.total=pager.totalRecordCount;
                         console.log('this.entryLis:',this.entryList);
+
+                    }
+                });
+            },
+            getUserInfo:function () {
+                let params={
+                    ...Vue.sessionInfo(),
+                    uid:this.supplierId
+                }
+                Vue.api.getUserInfo(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        let data=JSON.parse(resp.message);
+                        this.supplier=data;
+                        console.log('this.supplier:',this.supplier);
+                    }else{
 
                     }
                 });
@@ -390,6 +415,11 @@
                     }
                 });
             },
+            clearSupplier:function () {
+                this.supplierId=null;
+                this.supplier=null;
+                this.getList();
+            }
 
         },
         mounted () {
@@ -400,6 +430,15 @@
             this.imFile = document.getElementById('imFile');
             this.outFile = document.getElementById('downlink');
             /**/
+            if(this.$route.params.startDate){
+                this.startDate=this.$route.params.startDate;
+                this.endDate=this.$route.params.endDate;
+                this.dateRage=[this.startDate,this.endDate];
+            }
+            if(!!this.$route.params.supplierId){
+                this.supplierId=this.$route.params.supplierId;
+                this.getUserInfo();
+            }
             this.getList();
             /**/
             if(this.account.user_type=='Customer'){

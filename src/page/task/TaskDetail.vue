@@ -269,7 +269,7 @@
                             <p>其他原因：</p>
                         </div>
                         <div class="panel-bd">
-                            <textarea v-model="otherReason" maxlength="1024"  cols="30" rows="10"></textarea>
+                            <textarea v-model="otherReason"  type="textarea" class="cm-textarea-box"  maxlength="1024"  cols="30" rows="10"></textarea>
                         </div>
                     </div>
                 </div>
@@ -338,36 +338,6 @@
             &.active{
                 border: 1px solid #409EFF;
                 color: #409EFF;
-            }
-        }
-    }
-    .view-user-dialog{
-        .dialog-content{
-            padding: 10px 20px;
-            text-align: center;
-            .title{
-                font-size: 20px;
-                color: #666;
-            }
-            .avatar{
-                width: 80px;
-                height: 80px;
-                border-radius: 50%;
-            }
-            .info-row{
-                padding: 5px 0px;
-                display: flex;
-                .field{
-                    flex: 1;
-                    text-align: right;
-                }
-                .value{
-                    padding-left: 10px;
-                    flex: 3.5;
-                    text-align: left;
-                    word-break: break-all;
-                }
-
             }
         }
     }

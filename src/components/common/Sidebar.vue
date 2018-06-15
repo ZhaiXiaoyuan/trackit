@@ -175,7 +175,9 @@
             });
             /*刷新用户信息*/
             bus.$on('refreshMsgCount', () => {
-                this.msgCount=this.msgCount>0?this.msgCount--:0;
+                if(this.msgCount){
+                    this.msgCount--;
+                }
             });
             //
             this.account=Vue.getAccountInfo();

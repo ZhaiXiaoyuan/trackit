@@ -12,6 +12,9 @@
                 <el-col :span="12">
                     <el-button type="primary" icon="el-icon-back" @click="$router.go(-1)">返回</el-button>
                 </el-col>
+                <el-col :span="12" style="text-align: right;">
+                    <el-button type="" icon="el-icon-edit-outline" @click="toEdit()"  v-if="account.user_type=='Customer'&&order.status!=9">编辑</el-button>
+                </el-col>
             </el-row>
             <div class="container-bd">
                 <div class="block">
@@ -32,7 +35,11 @@
                             <el-table-column prop="custbasis" label="客户参考"  align="center"></el-table-column>
                             <el-table-column prop="plantime" label="物料完成时间"  align="center"></el-table-column>
                             <el-table-column prop="createtime" label="下单时间" align="center"></el-table-column>
-                            <el-table-column prop="suppliername" label="供应商名称" align="center"></el-table-column>
+                            <el-table-column label="供应商名称" align="center">
+                                <template slot-scope="scope">
+                                    <span class="cm-link-btn" @click="getUserInfo()">{{scope.row.suppliername}}</span>
+                                </template>
+                            </el-table-column>
                             <el-table-column label="任务状态"  align="center">
                                 <template slot-scope="scope">
                                     {{scope.row.status|orderStatus}}
@@ -81,10 +88,10 @@
                                </ul>
                             </el-form-item>
                             <el-form-item class="row-input-item" label="产品描述：">
-                                <el-input v-model="form.productdesc" readonly :maxlength="1024"></el-input>
+                                <el-input v-model="form.productdesc"  type="textarea" class="cm-textarea-box" readonly :maxlength="1024"></el-input>
                             </el-form-item>
                             <el-form-item class="row-input-item" label="客户要求栏：">
-                                <el-input v-model="form.custrequire" readonly :maxlength="1024"></el-input>
+                                <el-input v-model="form.custrequire" type="textarea" class="cm-textarea-box" readonly :maxlength="1024"></el-input>
                             </el-form-item>
                         </el-form>
                     </div>
@@ -104,10 +111,11 @@
                                     <span class="index">{{index+1}}</span>
                                     <p class="title" :class="{'lg':index==0}">{{item.title}}</p>
                                     <p class="time">{{item.time}}</p>
+                                    <p class="desc" style="color: #409EFF;padding-top: 5px;" v-if="index==(statusList.length-1)&&order.status==9">{{order.finishRemark}}</p>
                                 </div>
                             </li>
                         </ul>
-                        <p v-if="order.status==10" style="text-align: center;font-size: 20px;color: #F56C6C;">订单已取消</p>
+                        <p v-if="order.status==10" style="text-align: center;font-size: 20px;">订单已取消</p>
                     </div>
                 </div>
             </div>
@@ -154,6 +162,35 @@
                 <el-button type="" style="width: 80px;" @click="completeDialogFlag=false">取消</el-button>
                 <el-button type="primary" style="margin-left: 40px;" @click="complete()">确认完成</el-button>
             </el-row>
+        </el-dialog>
+
+        <!--查看供应商信息-->
+        <el-dialog class="view-user-dialog" :visible.sync="dialogFormVisible" v-if="dialogFormVisible" >
+            <div class="dialog-content">
+                <p class="title">供应商信息</p>
+                <div style="text-align: center;margin-top: 20px;margin-bottom: 10px;">
+                    <img class="avatar" :src="curSupplier.httpUser_avatar?curSupplier.httpUser_avatar:defaultAvatar" alt="">
+                </div>
+                <div class="info-row">
+                    <span class="field">名称：</span>
+                    <div class="value">{{curSupplier.user_name}}</div>
+                </div>
+                <div class="info-row">
+                    <span class="field">联系方式：</span>
+                    <div class="value">{{curSupplier.user_phone}}</div>
+                </div>
+                <div class="info-row">
+                    <span class="field">供应商简介：</span>
+                    <div class="value">{{curSupplier.remark}}</div>
+                </div>
+                <div style="margin-top: 40px;">
+                    <el-button type="primary" @click="dialogFormVisible=false">关闭</el-button>
+                </div>
+            </div>
+            <!--<div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="addLabel()">确定</el-button>
+            </div>-->
         </el-dialog>
     </div>
 </template>
@@ -316,6 +353,7 @@
 
                 downLoadFb:null,
 
+                curSupplier:null,
             }
         },
         created(){
@@ -337,6 +375,7 @@
                   if(resp.status=='success'){
                       this.order=JSON.parse(resp.message);
                       this.order.status=parseInt(this.order.status);
+                      console.log('this.order:',this.order);
                       this.entryList.push(this.order);
                       this.productList=this.order.products;
                       this.statusLogs=this.order.statusLogs;
@@ -557,7 +596,27 @@
                 });
                 this.downLoadFb=Vue.operationFeedback({text:'导出中...'});
                 this.downloadExl(jsonData,'订单导出表');
-            }
+            },
+            toEdit:function () {
+                console.log('this.id:',this.id);
+                this.$router.push({ name: 'newOrder', params: {id:this.id}});
+            },
+            getUserInfo:function () {
+                let params={
+                    ...Vue.sessionInfo(),
+                    /* unumber:this.curSupplier.id,*/
+                    uid:this.order.supplierid
+                }
+                Vue.api.getUserInfo(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        let data=JSON.parse(resp.message);
+                        this.curSupplier=data;
+                        this.dialogFormVisible=true;
+                    }else{
+
+                    }
+                });
+            },
         },
         mounted () {
             /**/

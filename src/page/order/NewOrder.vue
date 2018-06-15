@@ -4,7 +4,8 @@
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>Trackit</el-breadcrumb-item>
                 <el-breadcrumb-item>订单</el-breadcrumb-item>
-                <el-breadcrumb-item>新建订单</el-breadcrumb-item>
+                <el-breadcrumb-item vif="!id">新建订单</el-breadcrumb-item>
+                <el-breadcrumb-item vif="id">编辑订单</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
@@ -79,7 +80,7 @@
                                <ul class="cm-pic-list" style="float: left;">
                                    <li v-for="(item,picIndex) in form.picList">
                                        <img :src="item.filepath">
-                                       <i class="icon el-icon-delete del-btn" @click="delPic(index,picIndex)"></i>
+                                       <i class="icon el-icon-delete del-btn" style="color:#48b4ff" @click="delPic(index,picIndex)"></i>
                                        <div class="input-wrap">
                                            <input type="text" v-model="item.label" maxlength="20" placeholder="请输入标签">
                                        </div>
@@ -93,10 +94,10 @@
                                </div>
                             </el-form-item>
                             <el-form-item class="row-input-item" label="产品描述：">
-                                <el-input v-model="form.productdesc" :maxlength="1024"></el-input>
+                                <el-input v-model="form.productdesc"  type="textarea" class="cm-textarea-box"  :maxlength="1024"></el-input>
                             </el-form-item>
                             <el-form-item class="row-input-item" label="客户要求栏：">
-                                <el-input v-model="form.custrequire" :maxlength="1024"></el-input>
+                                <el-input v-model="form.custrequire"  type="textarea" class="cm-textarea-box"  :maxlength="1024"></el-input>
                             </el-form-item>
                         </el-form>
                     </div>
@@ -116,9 +117,13 @@
                     </div>
                 </div>
             </div>
-            <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;">
+            <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;" v-if="!id">
                 <el-button type="primary" @click="save()">确认发布并分配</el-button>
                 <el-button type="danger" style="width: 116px;" @click="$router.go(-1)">取消发布</el-button>
+            </el-row>
+            <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;" v-if="id">
+                <el-button type="primary" style="width: 116px;" @click="save()">保存</el-button>
+                <el-button type="danger" style="width: 116px;" @click="$router.go(-1)">取消</el-button>
             </el-row>
         </div>
     </div>
@@ -195,6 +200,8 @@
     export default {
         data() {
             return {
+                id:null,
+
                 dialogFormVisible: false,
                 formLabelWidth:'120px',
 
@@ -216,33 +223,13 @@
                     "price":  null,//"产品单价",
                     "productdesc":  null,//"产品描述",
                     "custrequire":  null,//"客户要求",
-
                     "picList":[
                         /*{"filepath":"http://120.79.17.251:8000/zfiles/Pic2018052101004353020.jpg","filename":"Pic2018052101004353020.jpg",label:'标题'}*/
                     ],
-
-                   /* "custpicfour":  null,//"产品确认图片4",
-                    "custpicfourtag":  null,//"产品确认图片4tag",
-                    "custpicthree":  null,//"产品确认图片3",
-                    "custpicthreetag":  null,//"产品确认图片3tag",
-                    "custpicsix":  null,//"产品确认图片6",
-                    "custpicsixtag":  null,//"产品确认图片6tag",
-                    "custpiceight":  null,//"产品确认图片8",
-                    "custpiceighttag":  null,//"产品确认图片8tag",
-                    "custpicseven":  null,//"产品确认图片7",
-                    "custpicseventag":  null,//"产品确认图片7tag",
-                    "custpicnine":  null,//"产品确认图片9",
-                    "custpicninetag":  null,//"产品确认图片9tag",
-                    "custpictwo":  null,//"产品确认图片2",
-                    "custpictwotag":  null,//"产品确认图片2tag",
-                    "custpicten":  null,//"产品确认图片10",
-                    "custpictentag":  null,//"产品确认图片10tag",
-                    "custpicone":  null,//"产品确认图片1",
-                    "custpiconetag":  null,//"产品确认图片1tag",
-                    "custpicfivetag":  null,//"产品确认图片5tag",
-                    "custpicfive":  null,//"产品确认图片5",*/
                 },
                 productFormList:[],
+
+                productList:[],
             }
         },
         created(){
@@ -382,26 +369,139 @@
                 }
                 params.proinfos=JSON.stringify(proinfos);
                 let fb=Vue.operationFeedback({text:'保存中...'});
-                Vue.api.addOrder(params).then((resp)=>{
-                    if(resp.status=='success'){
-                        let data=JSON.parse(resp.message);
-                        fb.setOptions({type:"complete",text:'保存成功'});
-                        this.$router.push({name:'allocateOrder',params:{id:data.id}});
-                    }else{
-                        fb.setOptions({type:"warn",text:resp.message});
-                    }
-                });
+                if(!this.id){//新增
+                    Vue.api.addOrder(params).then((resp)=>{
+                        if(resp.status=='success'){
+                            let data=JSON.parse(resp.message);
+                            fb.setOptions({type:"complete",text:'保存成功'});
+                            this.$router.push({name:'allocateOrder',params:{id:data.id}});
+                        }else{
+                            fb.setOptions({type:"warn",text:resp.message});
+                        }
+                    });
+                }else{//编辑
+                    params.id=this.id;
+                    Vue.api.updateOrder(params).then((resp)=>{
+                        if(resp.status=='success'){
+                            fb.setOptions({type:"complete",text:'保存成功'});
+                            this.$router.push({name:'orderDetail',params:{id:this.id}});
+                        }else{
+                            fb.setOptions({type:"warn",text:resp.message});
+                        }
+                    });
+                }
 
             },
             addProduct:function () {
                 this.productFormList.push(JSON.parse(JSON.stringify(this.formObject)));
             },
+
+            findStatusItem:function (value) {
+                return this.statusLogs.find(function(x) {return parseInt(x.status) == value;});
+            },
+            getOrderDetail:function () {
+                let params={
+                    ...Vue.sessionInfo(),
+                    ordezid:this.id,
+                }
+                Vue.api.getOrderDetail(params).then((resp)=>{
+                    if(resp.status=='success'){
+                        this.order=JSON.parse(resp.message);
+                        console.log('this.order:',this.order);
+                        this.order.status=parseInt(this.order.status);
+                        this.taskNo=this.order.taskno&&this.order.taskno!='undefined'?this.order.taskno:null;
+                        this.customerNo=this.order.custno;
+                        this.customerNote=this.order.custbasis;
+                        this.completeDate=this.order.plantime;
+                        this.isEmergency=this.order.urgent;
+
+                        this.productList=this.order.products;
+                        this.productList.forEach((product,i)=>{
+                            product.picList=[];
+                            if(product.custpicone){
+                                product.picList.push({
+                                    filepath:Vue.basicConfig.imgPrefix+product.custpicone,
+                                    filename:product.custpicone,
+                                    label:product.custpiconetag
+                                });
+                            }
+                            if(product.custpictwo){
+                                product.picList.push({
+                                    filepath:Vue.basicConfig.imgPrefix+product.custpictwo,
+                                    filename:product.custpictwo,
+                                    label:product.custpictwotag
+                                });
+                            }
+                            if(product.custpicthree){
+                                product.picList.push({
+                                    filepath:Vue.basicConfig.imgPrefix+product.custpicthree,
+                                    filename:product.custpicthree,
+                                    label:product.custpicthreetag
+                                });
+                            }
+                            if(product.custpicfour){
+                                product.picList.push({
+                                    filepath:Vue.basicConfig.imgPrefix+product.custpicfour,
+                                    filename:product.custpicfour,
+                                    label:product.custpicfourtag
+                                });
+                            }
+                            if(product.custpicfive){
+                                product.picList.push({
+                                    filepath:Vue.basicConfig.imgPrefix+product.custpicfive,
+                                    filename:product.custpicfive,
+                                    label:product.custpicfivetag
+                                });
+                            }
+                            if(product.custpicsix){
+                                product.picList.push({
+                                    filepath:Vue.basicConfig.imgPrefix+product.custpicsix,
+                                    filename:product.custpicsix,
+                                    label:product.custpicsixtag
+                                });
+                            }
+                            if(product.custpicseven){
+                                product.picList.push({
+                                    filepath:Vue.basicConfig.imgPrefix+product.custpicseven,
+                                    filename:product.custpicseven,
+                                    label:product.custpicseventag
+                                });
+                            }
+                            if(product.custpiceight){
+                                product.picList.push({
+                                    filepath:Vue.basicConfig.imgPrefix+product.custpiceight,
+                                    filename:product.custpiceight,
+                                    label:product.custpiceighttag
+                                });
+                            }
+                            if(product.custpicnine){
+                                product.picList.push({
+                                    filepath:Vue.basicConfig.imgPrefix+product.custpicnine,
+                                    filename:product.custpicnine,
+                                    label:product.custpicninetag
+                                });
+                            }
+                            if(product.custpicten){
+                                product.picList.push({
+                                    filepath:Vue.basicConfig.imgPrefix+product.custpicten,
+                                    filename:product.custpicten,
+                                    label:product.custpicninetag
+                                });
+                            }
+                            this.productFormList.push(JSON.parse(JSON.stringify(product)));
+                        })
+                    }
+                });
+            },
         },
         mounted () {
             /**/
-            this.taskNo=this.$route.params.taskNo;
-            /**/
-            this.addProduct();
+            this.id=this.$route.params.id;
+            if(this.id){
+                this.getOrderDetail();
+            }else{
+                this.addProduct();
+            }
         },
     }
 </script>

@@ -58,7 +58,6 @@
 </style>
 <script>
     import Vue from 'vue'
-    let XLSX = require('xlsx');
     export default {
         data() {
             return {

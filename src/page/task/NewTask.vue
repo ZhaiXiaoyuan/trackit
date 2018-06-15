@@ -54,7 +54,7 @@
                                <ul class="cm-pic-list" style="float: left;">
                                    <li v-for="(item,index) in picList">
                                        <img :src="item.filepath" @click="viewPicModal({imgUrl:item.filepath})">
-                                       <i class="icon el-icon-delete del-btn" @click="delPic(index)"></i>
+                                       <i class="icon el-icon-delete del-btn" style="color:#48b4ff;" @click="delPic(index)"></i>
                                        <div class="input-wrap">
                                            <input type="text" v-model="item.label" maxlength="20" placeholder="请输入标签">
                                        </div>
@@ -68,7 +68,7 @@
                                </div>
                             </el-form-item>
                             <el-form-item class="row-input-item" label="客户要求栏：">
-                                <el-input v-model="custRequire" :maxlength="1024"></el-input>
+                                <el-input type="textarea" v-model="custRequire" :maxlength="1024" class="cm-textarea-box"></el-input>
                             </el-form-item>
                             <el-form-item label="任务是否紧急：">
                                 <el-radio-group v-model="isEmergency" size="medium">

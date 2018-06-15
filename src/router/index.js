@@ -25,12 +25,12 @@ export default new Router({
                     component: resolve => require(['../page/task/TaskDetail.vue'], resolve)
                 },
                 {
-                    path: '/order',
+                    path: '/order/:startDate?/:endDate?/:supplierId?',
                     name:'order',
                     component: resolve => require(['../page/order/Order.vue'], resolve)
                 },
                 {
-                    path: '/newOrder/:taskNo?',
+                    path: '/newOrder/:id?',
                     name:'newOrder',
                     component: resolve => require(['../page/order/NewOrder.vue'], resolve)
                 },

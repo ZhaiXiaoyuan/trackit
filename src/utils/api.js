@@ -370,6 +370,14 @@ export default {
                 params: params
             });
         },
+        //【旧】客户修改订单-客户调用【A+M】
+        updateOrder:function (params) {
+            return Vue.http.ajax({
+                method: 'post',
+                url: basicUrl+'/ordez/biz/update',
+                params: params
+            });
+        },
     }
   },
 
