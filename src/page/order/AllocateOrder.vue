@@ -135,7 +135,6 @@
 </style>
 <script>
     import Vue from 'vue'
-    import $ from 'jquery'
 
     export default {
         data() {

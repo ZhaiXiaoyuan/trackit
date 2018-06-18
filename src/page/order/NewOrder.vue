@@ -4,14 +4,14 @@
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>Trackit</el-breadcrumb-item>
                 <el-breadcrumb-item>订单</el-breadcrumb-item>
-                <el-breadcrumb-item vif="!id">新建订单</el-breadcrumb-item>
-                <el-breadcrumb-item vif="id">编辑订单</el-breadcrumb-item>
+                <el-breadcrumb-item v-if="!id">新建订单</el-breadcrumb-item>
+                <el-breadcrumb-item v-if="id">编辑订单</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
             <el-row class="container-hd">
                 <el-col :span="12">
-                    <el-button type="primary" icon="el-icon-back" @click="$router.go(-1)">返回</el-button>
+                    <el-button type="primary" icon="el-icon-back" @click="back()">返回</el-button>
                 </el-col>
             </el-row>
             <div class="container-bd">
@@ -125,6 +125,11 @@
                 <el-button type="primary" style="width: 116px;" @click="save()">保存</el-button>
                 <el-button type="danger" style="width: 116px;" @click="$router.go(-1)">取消</el-button>
             </el-row>
+
+            <div class="right-handle-list" v-if="!id">
+                <el-button class="handle-btn" type="primary" icon="el-icon-edit" circle @click="saveTem()"></el-button>
+                <el-button class="handle-btn" type="" icon="el-icon-delete" circle @click="clearTem()"></el-button>
+            </div>
         </div>
     </div>
 </template>
@@ -493,6 +498,60 @@
                     }
                 });
             },
+
+            back:function () {
+                if(!this.id&&this.customerNo){
+                    this.$confirm('是否要保存草稿?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        this.saveTem();
+                        this.$message({
+                            type: 'success',
+                            message: '草稿保存成功!'
+                        });
+                        this.$router.go(-1);
+                    }).catch(() => {
+                        this.$router.go(-1);
+                    });
+                }else{
+                    this.$router.go(-1);
+                }
+            },
+            saveTem:function () {
+                let temOrder={
+                    customerNo:this.customerNo,
+                    customerNote:this.customerNote,
+                    completeDate:this.completeDate,
+                    isEmergency:this.isEmergency,
+                    productFormList:this.productFormList,
+
+                };
+                localStorage.setItem('temOrder',JSON.stringify(temOrder));
+                this.$message({
+                    message: '草稿保存成功',
+                    type: 'success'
+                });
+            },
+            readTem:function () {
+                let temOrder=localStorage.getItem('temOrder')?JSON.parse(localStorage.getItem('temOrder')):null;
+                if(temOrder){
+                    Object.assign(this,temOrder);
+                }else{
+                    this.customerNo=null;
+                    this.customerNote=null;
+                    this.completeDate=null;
+                    this.isEmergency=1;
+                    this.productFormList=[];
+                    this.addProduct();
+                }
+            },
+            clearTem:function () {
+                localStorage.setItem('temOrder','');
+                //
+                this.readTem();
+            },
         },
         mounted () {
             /**/
@@ -500,7 +559,7 @@
             if(this.id){
                 this.getOrderDetail();
             }else{
-                this.addProduct();
+                this.readTem();
             }
         },
     }

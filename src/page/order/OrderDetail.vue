@@ -576,29 +576,50 @@
             exportOrder:function () {
                 let jsonData=[
                     {
-                        1:'序号',
-                        2:'订单号',
-                        3:'客户编号',
-                        4:'客户参考',
-                        5:'预计完成时间',
-                        6:'下单时间',
-                        7:'订单状态',
+                        1:'订单号',
+                        2:'客户编号',
+                        3:'客户参考',
+                        4:'预计完成时间',
+                        5:'下单时间',
+                        6:'订单状态',
+                        7:''
                     }
                 ];
                 jsonData.push({
-                    1:1,
-                    2:this.order.orderno,
-                    3:this.order.custno,
-                    4:this.order.custbasis,
-                    5:this.order.plantime,
-                    6:this.order.createtime,
-                    7:Vue.orderStatus(this.order.status),
+                /*    1:1,*/
+                    1:this.order.orderno,
+                    2:this.order.custno,
+                    3:this.order.custbasis,
+                    4:this.order.plantime,
+                    5:this.order.createtime,
+                    6:Vue.orderStatus(this.order.status),
                 });
+                jsonData.push({});
+                jsonData.push({
+                    1:'序号',
+                    2:'产品编号',
+                    3:'产品单价',
+                    4:'产品数量',
+                    5:'产品总价',
+                    6:'产品描述',
+                    7:'客户要求栏',
+                });
+                this.productList.forEach((item,i)=>{
+                    console.log('item:',item);
+                    jsonData.push({
+                        1:i+1,
+                        2:item.productcode,
+                        3:item.price,
+                        4:item.amount,
+                        5:item.total,
+                        6:item.productdesc,
+                        7:item.custrequire,
+                    })
+                })
                 this.downLoadFb=Vue.operationFeedback({text:'导出中...'});
                 this.downloadExl(jsonData,'订单导出表');
             },
             toEdit:function () {
-                console.log('this.id:',this.id);
                 this.$router.push({ name: 'newOrder', params: {id:this.id}});
             },
             getUserInfo:function () {

@@ -11,7 +11,7 @@
         <div class="container">
             <el-row class="container-hd">
                 <el-col :span="12">
-                    <el-button type="primary" icon="el-icon-back" @click="$router.go(-1)">返回</el-button>
+                    <el-button type="primary" icon="el-icon-back" @click="back()">返回</el-button>
                 </el-col>
             </el-row>
             <div class="container-bd">
@@ -106,6 +106,10 @@
                 <el-button type="primary" @click="update()" v-if="id">确认发布</el-button>
                 <el-button type="" @click="$router.go(-1)">取消发布</el-button>
             </el-row>
+            <div class="right-handle-list" v-if="!id">
+                <el-button class="handle-btn" type="primary" icon="el-icon-edit" circle @click="saveTem()"></el-button>
+                <el-button class="handle-btn" type="" icon="el-icon-delete" circle @click="clearTem()"></el-button>
+            </div>
         </div>
         <el-dialog title="新建信息标签" class="add-label-dialog" :visible.sync="dialogFormVisible" v-if="dialogFormVisible" >
             <div style="text-align: center">
@@ -385,6 +389,7 @@
                 Vue.api.addTask(params).then((resp)=>{
                     if(resp.status=='success'){
                         fb.setOptions({type:"complete",text:'保存成功'});
+                        this.clearTem();
                         this.$router.push({name:'task'});
                     }else{
                         fb.setOptions({type:"warn",text:resp.message});
@@ -602,6 +607,7 @@
                 Vue.api.getProattrs(params).then((resp)=>{
                     if(resp.status=='success'){
                         let data=JSON.parse(resp.message);
+                        this.labelList=[];
                         data.forEach((item,i)=>{
                             let temItem={
                                 id:item.id,
@@ -622,21 +628,121 @@
                             }
                             this.labelList.push(temItem);
                         })
+                        //
+                        if(this.id){
+                            this.getCustomerTaskDetail();
+                        }else{
+                            /**/
+                            this.readTem();
+                        }
                     }else{
 
                     }
                 });
-            }
+            },
+            back:function () {
+                if(!this.id&&this.customerNo){
+                    this.$confirm('是否要保存草稿?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        this.saveTem();
+                        this.$message({
+                            type: 'success',
+                            message: '草稿保存成功!'
+                        });
+                        this.$router.go(-1);
+                    }).catch(() => {
+                        this.$router.go(-1);
+                    });
+                }else{
+                    this.$router.go(-1);
+                }
+            },
+            saveTem:function () {
+                let temTask={
+                    customerNo:this.customerNo,
+                    customerNote:this.customerNote,
+                    completeDate:this.completeDate,
+                    taskType:this.taskType,
+                    isEmergency:this.isEmergency,
+                    custRequire:this.custRequire,
+                    picList:this.picList
+                };
+                let temArr=[];
+                this.labelList.forEach((item,i)=>{
+                    if(item.active){
+                        if(item.children&&item.children.length>0){
+                            item.children.forEach((child,index)=>{
+                                if(item.active){
+                                    temArr.push(child);
+                                }
+                            });
+                        }else{
+                            temArr.push(item);
+                        }
+                    }
+                });
+                temTask.proattrs=temArr;
+                localStorage.setItem('temTask',JSON.stringify(temTask));
+                this.$message({
+                    message: '草稿保存成功',
+                    type: 'success'
+                });
+            },
+            readTem:function () {
+                let temTask=localStorage.getItem('temTask')?JSON.parse(localStorage.getItem('temTask')):null;
+                if(temTask){
+                    this.customerNo=temTask.customerNo;
+                    this.customerNote=temTask.customerNote;
+                    this.completeDate=temTask.completeDate;
+                    this.taskType=temTask.taskType;
+                    this.isEmergency=temTask.isEmergency;
+                    this.custRequire=temTask.custRequire;
+                    this.picList=temTask.picList;
+                    let proattrs=temTask.proattrs;
+                    if(proattrs&&proattrs.length>0){
+                        for(let i=0;i<proattrs.length;i++){
+                            let attr=proattrs[i];
+                            for(let j=0;j<this.labelList.length;j++){
+                                let label=this.labelList[j];
+                                if(attr.label==label.label){
+                                    label.active=true;
+                                    break;
+                                }else if(j==this.labelList.length-1){
+                                    this.labelList.push({
+                                        label:attr.label,
+                                        value:'',
+                                        active:true,
+                                    })
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    this.customerNo=null;
+                    this.customerNote=null;
+                    this.completeDate=null;
+                    this.taskType='Buliao';
+                    this.isEmergency=1;
+                    this.custRequire=null;
+                    this.picList=[];
+                }
+            },
+            clearTem:function () {
+                localStorage.setItem('temTask','');
+                //
+                this.getProattrs();
+            },
         },
         mounted () {
             /**/
             this.id=this.$route.params.id;
             this.account=Vue.getAccountInfo();
             this.getProattrs();
+
             /**/
-            if(this.id){
-                this.getCustomerTaskDetail();
-            }
         },
     }
 </script>
