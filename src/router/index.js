@@ -25,7 +25,7 @@ export default new Router({
                     component: resolve => require(['../page/task/TaskDetail.vue'], resolve)
                 },
                 {
-                    path: '/order/:startDate?/:endDate?/:supplierId?',
+                    path: '/order/:startDate?/:endDate?/:supplierId?/:type?',
                     name:'order',
                     component: resolve => require(['../page/order/Order.vue'], resolve)
                 },

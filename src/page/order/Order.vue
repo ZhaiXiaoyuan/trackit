@@ -439,6 +439,9 @@
                 this.supplierId=this.$route.params.supplierId;
                 this.getUserInfo();
             }
+            if(this.$route.params.type){
+                this.type=this.$route.params.type;
+            }
             this.getList();
             /**/
             if(this.account.user_type=='Customer'){

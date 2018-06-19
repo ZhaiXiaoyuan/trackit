@@ -448,15 +448,15 @@
 
             toOrder:function (supplierId) {
                 if(supplierId){
-                    this.$router.push({name:'order',params:{startDate:this.startDate,endDate:this.endDate,supplierId:supplierId}});
+                    this.$router.push({name:'order',params:{startDate:this.startDate,endDate:this.endDate,supplierId:supplierId,type:9}});
                 }else{
-                    this.$router.push({name:'order',params:{startDate:this.startDate,endDate:this.endDate}});
+                    this.$router.push({name:'order',params:{startDate:this.startDate,endDate:this.endDate,type:9}});
                 }
             },
             toMonthOrder:function (dateStr) {
                 var dateStrArr=dateStr.split('-');
                 var dayCount = new Date(dateStrArr[0],dateStrArr[1], 0).getDate();
-                this.$router.push({name:'order',params:{startDate:dateStr+'-01',endDate:dateStr+'-'+dayCount}});
+                this.$router.push({name:'order',params:{startDate:dateStr+'-01',endDate:dateStr+'-'+dayCount,type:9}});
             }
         },
         mounted () {
