@@ -24,14 +24,14 @@ module.exports = {
       ? config.build.assetsPublicPath
       : config.dev.assetsPublicPath
   },
-   plugins: [ 
-           new webpack.ProvidePlugin({ 
-                 $:"jquery", 
-                 jQuery:"jquery", 
+   plugins: [
+        new webpack.ProvidePlugin({
+                 $:"jquery",
+                 jQuery:"jquery",
                 "windows.jQuery":"jquery"
         }),
         /*new BundleAnalyzerPlugin() */
-      ], 
+      ],
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {

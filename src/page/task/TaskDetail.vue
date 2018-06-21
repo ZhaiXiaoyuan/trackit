@@ -10,7 +10,7 @@
         <div class="container">
             <el-row class="container-hd">
                 <el-col :span="12">
-                    <el-button type="primary" icon="el-icon-back" @click="$router.go(-1)">返回</el-button>
+                    <el-button type="primary" icon="el-icon-back" @click="back()">返回</el-button>
                 </el-col>
             </el-row>
             <div class="container-bd">
@@ -141,7 +141,7 @@
                         <span class="title">报价方案</span>
                     </div>
                     <!--展示-->
-                    <div class="block-bd" v-if="!toAddPlan">
+                    <div class="block-bd" v-if="!toAddPlanFlag">
                         <el-form ref="form" :label-width="formLabelWidth" label-position="left">
                             <el-form-item class="row-input-item">
                                 <el-select v-model="curPlanLabel" @change="supplierSelectPlan" placeholder="请选择方案">
@@ -177,18 +177,18 @@
                             </el-form-item>
                         </el-form>
                         <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;">
-                            <el-button type="primary" @click="toAddPlan=true">我要报价</el-button>
+                            <el-button type="primary" @click="toAddPlan()">我要报价</el-button>
                         </el-row>
                     </div>
                     <!--新增-->
-                    <div class="block-bd" v-if="toAddPlan">
+                    <div class="block-bd" v-if="toAddPlanFlag">
                         <el-form ref="form" :label-width="formLabelWidth" label-position="left">
                             <el-form-item label="样品图片：">
                                 <ul class="cm-simple-list" style="float: left;width: 800px;">
                                     <li v-for="(item,index) in newSampleList" v-if="index<10">
                                         <div class="img-wrap" v-if="item.filepath">
                                             <img :src="item.filepath" @click="viewPicModal({imgUrl:item.filepath})">
-                                            <i class="icon el-icon-delete del-btn" @click="delSample(index)"></i>
+                                            <i class="icon el-icon-delete del-btn" style="color: #48b4ff" @click="delSample(index)"></i>
                                             <div class="input-wrap">
                                                 <input type="text" v-model="item.label" maxlength="20">
                                             </div>
@@ -214,8 +214,12 @@
                         </el-form>
                         <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;">
                             <el-button type="primary" @click="addPlan()">确认报价</el-button>
-                            <el-button type="danger" style="width: 80px;text-align: center;" @click="toAddPlan=false">取消</el-button>
+                            <el-button type="danger" style="width: 80px;text-align: center;" @click="cancelAddPlan()">取消</el-button>
                         </el-row>
+                        <div class="right-handle-list">
+                            <el-button class="handle-btn" type="primary" icon="el-icon-edit" circle @click="saveTem()"></el-button>
+                            <el-button class="handle-btn" type="" icon="el-icon-delete" circle @click="clearTem()"></el-button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -403,7 +407,7 @@
                 curPlan:{},
                 curPlanLabel:null,
                 planList:[],
-                toAddPlan:false,
+                toAddPlanFlag:false,
                 sampleList:[],
                 uploading:false,
                 proattrs:[],
@@ -875,8 +879,14 @@
                     this.newSampleList.splice(index,1);
                 }
             },
+            toAddPlan:function () {
+              this.toAddPlanFlag=true;
+              this.readTem();
+            },
+            cancelAddPlan:function () {
+                this.toAddPlanFlag=false;
+            },
             addPlan:function () {
-                console.log(233);
                 if(!this.feedbackText){
                     Vue.operationFeedback({type:'warn',text:'请输入跟单反馈栏'});
                     return;
@@ -949,7 +959,8 @@
                                 attrList:JSON.parse(this.proattrs),
                             }];
                             this.feedbackText=null;
-                            this.toAddPlan=false;
+                            this.clearTem();
+                            this.toAddPlanFlag=false;
                             this.getSupplierPlanList();
                         }else{
                             fb.setOptions({type:"warn",text:resp.message});
@@ -1194,7 +1205,43 @@
                 });
                 this.downLoadFb=Vue.operationFeedback({text:'导出中...'});
                 this.downloadExl(jsonData,'任务导出表');
-            }
+            },
+            saveTem:function () {
+                let temPlan={
+                    newSampleList:this.newSampleList,
+                    feedbackText:this.feedbackText,
+                };
+                localStorage.setItem('temPlan'+this.id,JSON.stringify(temPlan));
+                this.$message({
+                    message: '草稿保存成功',
+                    type: 'success'
+                });
+            },
+            readTem:function () {
+                let temPlan=localStorage.getItem('temPlan'+this.id)?JSON.parse(localStorage.getItem('temPlan'+this.id)):null;
+                console.log('temPlan:',temPlan);
+                if(temPlan){
+                    this.newSampleList=temPlan.newSampleList;
+                    this.feedbackText=temPlan.feedbackText;
+                }else{
+                    this.newSampleList=[{
+                        filepath:'',
+                        filename:'',
+                        attrList:JSON.parse(this.proattrs),
+                    }];
+                    this.feedbackText=null;
+                }
+            },
+            clearTem:function () {
+                localStorage.setItem('temPlan'+this.id,'');
+                this.readTem();
+            },
+            back:function () {
+                if(this.newSampleList&&this.newSampleList.length>0&&this.newSampleList[0].filepath){
+                    this.saveTem();
+                }
+                this.$router.go(-1);
+            },
         },
         mounted () {
             /**/

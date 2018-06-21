@@ -79,7 +79,7 @@
                         </el-form>
                     </div>
                 </div>
-                <div class="block">
+                <div class="block" v-if="!id">
                     <div class="block-hd">
                         <svg class="icon blue-icon" aria-hidden="true">
                             <use xlink:href="#icon-xuanzeyixuan"></use>
