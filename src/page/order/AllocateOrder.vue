@@ -36,7 +36,7 @@
                     <div class="block-bd">
                         <el-radio-group v-model="selectedId">
                             <div class="item-list">
-                                <div class="list-hd" style="padding: 10px 0px;color: #666;font-size: 20px;">
+                                <div class="list-hd" style="padding: 10px 0px 30px 0px;color: #666;font-size: 20px;">
                                    关联供应商列表
                                 </div>
                                 <ul class="list-bd" style="padding-left: 20px;">
