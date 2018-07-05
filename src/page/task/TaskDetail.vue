@@ -31,7 +31,7 @@
                             <el-table-column prop="taskno" label="任务单号" align="center"></el-table-column>
                             <el-table-column prop="custno" label="客户编号"  align="center"></el-table-column>
                             <el-table-column prop="custbasis" label="客户参考"  align="center"></el-table-column>
-                            <el-table-column prop="plantime" label="物料完成时间"  align="center"></el-table-column>
+                            <el-table-column prop="plantime" label="预计完成时间"  align="center"></el-table-column>
                             <el-table-column prop="resourceLabel" label="任务种类"  align="center"></el-table-column>
                             <el-table-column prop="createtime" label="下单时间" align="center"></el-table-column>
                             <el-table-column label="任务状态"  align="center">
@@ -117,7 +117,7 @@
                                         </li>
                                     </ul>
                                 </el-form-item>
-                                <el-form-item class="row-input-item" label="跟单反馈栏：">
+                                <el-form-item class="row-input-item" label="供应商反馈栏：">
                                     <span v-if="selectedPlan">{{selectedPlan.feedback}}</span>
                                 </el-form-item>
                             </div>
@@ -172,7 +172,7 @@
                                     </li>
                                 </ul>
                             </el-form-item>
-                            <el-form-item class="row-input-item" label="跟单反馈栏：">
+                            <el-form-item class="row-input-item" label="供应商反馈栏：">
                                 <span>{{curPlan.feedback}}</span>
                             </el-form-item>
                         </el-form>
@@ -208,7 +208,7 @@
                                     </li>
                                 </ul>
                             </el-form-item>
-                            <el-form-item class="row-input-item" label="跟单反馈栏：">
+                            <el-form-item class="row-input-item" label="供应商反馈栏：">
                                 <textarea class="cm-textarea" maxlength="1024" v-model="feedbackText" cols="30" rows="10"></textarea>
                             </el-form-item>
                         </el-form>
@@ -606,6 +606,8 @@
             /**/
             attrFormat:function (picName,proattrs) {
                 let temArr=[];
+                console.log('picName:',picName);
+                console.log('proattrs:',proattrs);
                 proattrs.forEach((item,i)=>{
                     if(picName==item.image){
                         temArr.push(item);
@@ -708,6 +710,7 @@
                                 label:data.samplepictentag&&data.samplepictentag!='undefined'?data.samplepictentag:'',
                             });
                         }
+                        console.log('this.sampleList:',this.sampleList);
                     }
                 });
             },
@@ -888,7 +891,7 @@
             },
             addPlan:function () {
                 if(!this.feedbackText){
-                    Vue.operationFeedback({type:'warn',text:'请输入跟单反馈栏'});
+                    Vue.operationFeedback({type:'warn',text:'请输入供应商反馈栏'});
                     return;
                 }
                 let params={
@@ -1187,7 +1190,7 @@
                         2:'任务单号',
                         3:'客户编号',
                         4:'客户参考',
-                        5:'物料完成时间',
+                        5:'预计完成时间',
                         6:'任务种类',
                         7:'下单时间',
                         8:'任务状态',
