@@ -556,6 +556,7 @@
         mounted () {
             /**/
             this.id=this.$route.params.id;
+            this.taskNo=this.$route.params.taskNo;
             if(this.id){
                 this.getOrderDetail();
             }else{
