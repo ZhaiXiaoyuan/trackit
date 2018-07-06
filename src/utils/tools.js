@@ -45,8 +45,8 @@ export default {
         //
       Vue.tools = {
           basicConfig:{
-              basicUrl:process.env.NODE_ENV=='development'?'/api':'http://trackit.51plus.net/trackitapps',
-              imgPrefix:'http://trackit.51plus.net/zfiles/'
+              basicUrl:process.env.NODE_ENV=='development'?'/api':'http://www.trackkit.cn/apps',
+              imgPrefix:'http://www.trackkit.cn/afiles/manage/'
           },
         /*生成请求时间戳*/
         genTimestamp:function () {
