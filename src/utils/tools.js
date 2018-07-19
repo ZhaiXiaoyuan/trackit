@@ -44,10 +44,18 @@ export default {
         }
         //
       Vue.tools = {
+          //生产机
           basicConfig:{
-              basicUrl:process.env.NODE_ENV=='development'?'/api':'http://www.trackkit.cn/apps',
-              imgPrefix:'http://www.trackkit.cn/afiles/manage/'
+              basicUrl:false&&process.env.NODE_ENV=='development'?'/api':'http://www.trackkit.cn/apps',
+              imgPrefix:'http://www.trackkit.cn/zfiles/',
+              avatarPrefix:'http://www.trackkit.cn/afiles/manage/',
           },
+          //测试机
+         /* basicConfig:{
+              basicUrl:process.env.NODE_ENV=='development'?'/api':'http://trackit.51plus.net/trackitapps',
+              imgPrefix:'http://trackit.51plus.net/zfiles/',
+              avatarPrefix:'http://trackit.51plus.net/zfiles/',
+          },*/
         /*生成请求时间戳*/
         genTimestamp:function () {
           return Math.ceil(new Date().getTime()/1000)

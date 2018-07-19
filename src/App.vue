@@ -31,8 +31,11 @@
                 timestamp:Vue.genTimestamp(),
                 types:'Resource,TaskCancelReason,TaskRedoReason '
             }
-            Vue.api.basicConfig(params).then(()=>{
-
+            Vue.api.basicConfig(params).then((resp)=>{
+                console.log('resp:',resp);
+                if(resp.status=='success'){
+                    localStorage.setItem('configData',resp.message);
+                }
             });
         },
     }

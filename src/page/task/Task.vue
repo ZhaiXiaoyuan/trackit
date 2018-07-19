@@ -2,7 +2,7 @@
     <div class="table">
         <div class="crumbs">
             <el-breadcrumb separator="-">
-                <el-breadcrumb-item>Trackit</el-breadcrumb-item>
+                <el-breadcrumb-item>Trackkit</el-breadcrumb-item>
                 <el-breadcrumb-item class="active">任务</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -330,7 +330,6 @@
                 let params={
                     ...Vue.sessionInfo(),
                     range:this.range,
-                    resource:'',
                     status:this.type,
                     beginDate:this.startDate,
                     endDate:this.endDate,
@@ -359,10 +358,10 @@
                 let params={
                     ...Vue.sessionInfo(),
                     range:this.range,
-                    resource:'',
                     status:this.type,
                     beginDate:this.startDate,
                     endDate:this.endDate,
+                    resource:this.resource,
                     searchKey:this.keyword,
                     'pager.pageNumber':1,
                     'pager.pageSize':this.pager.total,

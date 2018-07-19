@@ -2,14 +2,14 @@
     <div class="cm-page-content-min center">
         <div class="crumbs">
             <el-breadcrumb separator="-">
-                <el-breadcrumb-item>Trackit</el-breadcrumb-item>
+                <el-breadcrumb-item>Trackkit</el-breadcrumb-item>
                 <el-breadcrumb-item class="active">个人中心</el-breadcrumb-item>
                 <el-breadcrumb-item class="active">意见反馈</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
             <div class="from">
-                <textarea v-model="advice"  cols="30" rows="10" maxlength="2048" placeholder="请写下您对Trackit的意见反馈，我们将第一时间回复！"></textarea>
+                <textarea v-model="advice"  cols="30" rows="10" maxlength="2048" placeholder="请写下您对Trackkit的意见反馈，我们将第一时间回复！"></textarea>
                 <el-row style="text-align: center;margin-top: 30px;padding-bottom: 20px;">
                     <el-button type="primary"  @click="save()">提交</el-button>
                     <el-button type="" @click="$router.go(-1)">返回</el-button>

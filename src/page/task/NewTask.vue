@@ -2,7 +2,7 @@
     <div class="page-content new-task">
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item>Trackit</el-breadcrumb-item>
+                <el-breadcrumb-item>Trackkit</el-breadcrumb-item>
                 <el-breadcrumb-item>任务</el-breadcrumb-item>
                 <el-breadcrumb-item v-if="!id">新建任务</el-breadcrumb-item>
                 <el-breadcrumb-item v-if="id">编辑任务</el-breadcrumb-item>

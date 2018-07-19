@@ -2,7 +2,7 @@
     <div class="table">
         <div class="crumbs">
             <el-breadcrumb separator="-">
-                <el-breadcrumb-item>Trackit</el-breadcrumb-item>
+                <el-breadcrumb-item>Trackkit</el-breadcrumb-item>
                 <el-breadcrumb-item class="active">通知</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -119,7 +119,7 @@
                     },
                     {
                         label:'平台',
-                        value:'Trackit ',
+                        value:'Trackkit ',
                     }
                 ],
                 curTypeIndex:0,

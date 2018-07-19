@@ -40,7 +40,7 @@ export default {
     }
 
     /**/
-    let basicUrl=process.env.NODE_ENV=='development'?'/api':'http://www.trackkit.cn/apps';
+    let basicUrl=Vue.basicConfig.basicUrl;
     Vue.api={
         //登录
         login:function (params) {

@@ -2,7 +2,7 @@
     <div class="cm-page-content-min center">
         <div class="crumbs">
             <el-breadcrumb separator="-">
-                <el-breadcrumb-item>Trackit</el-breadcrumb-item>
+                <el-breadcrumb-item>Trackkit</el-breadcrumb-item>
                 <el-breadcrumb-item class="active">个人中心</el-breadcrumb-item>
             </el-breadcrumb>
         </div>

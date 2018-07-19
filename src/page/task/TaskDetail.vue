@@ -2,7 +2,7 @@
     <div class="page-content new-task">
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item>Trackit</el-breadcrumb-item>
+                <el-breadcrumb-item>Trackkit</el-breadcrumb-item>
                 <el-breadcrumb-item>任务</el-breadcrumb-item>
                 <el-breadcrumb-item>任务详情</el-breadcrumb-item>
             </el-breadcrumb>
@@ -414,37 +414,9 @@
                 newSampleList:[],
                 feedbackText:'',
 
+                configData:null,
                 cancelTaskDialogFlag:false,
-                labelList:[
-                    {
-                        label:'不接近客人要的',
-                        selected:false,
-                    },
-                    {
-                        label:'价格太高',
-                        selected:false,
-                    },
-                    {
-                        label:'打版时间太长',
-                        selected:false,
-                    },
-                    {
-                        label:'打版费用太高',
-                        selected:false,
-                    },
-                    {
-                        label:'大货起订量太大',
-                        selected:false,
-                    },
-                    {
-                        label:'大货货期太长',
-                        selected:false,
-                    },
-                    {
-                        label:'客人要其他选择',
-                        selected:false,
-                    },
-                ],
+                labelList:[],
                 otherReasonFlag:false,
                 otherReason:null,
                 downLoadFb:null,
@@ -1252,6 +1224,45 @@
             this.account=Vue.getAccountInfo();
             /**/
             this.outFile = document.getElementById('downlink');
+            /**/
+            this.configData=JSON.parse(localStorage.getItem('configData'));
+            if(this.configData&&this.configData.TaskCancelReason.length>0){
+                this.configData.TaskCancelReason.forEach((item,i)=>{
+                    item.selected=false;
+                    this.labelList.push(JSON.parse(JSON.stringify(item)));
+                })
+            }else{
+                this.labelList=[
+                    {
+                        label:'不接近客人要的',
+                        selected:false,
+                    },
+                    {
+                        label:'价格太高',
+                        selected:false,
+                    },
+                    {
+                        label:'打版时间太长',
+                        selected:false,
+                    },
+                    {
+                        label:'打版费用太高',
+                        selected:false,
+                    },
+                    {
+                        label:'大货起订量太大',
+                        selected:false,
+                    },
+                    {
+                        label:'大货货期太长',
+                        selected:false,
+                    },
+                    {
+                        label:'客人要其他选择',
+                        selected:false,
+                    },
+                ];
+            }
             /**/
             if(this.account.user_type=='Customer'){
                 this.getCustomerTaskDetail();

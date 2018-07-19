@@ -197,8 +197,16 @@
                     Vue.operationFeedback({type:'warn',text:'请输入密码'});
                     return;
                 }
+                if(this.pwd.length<6){
+                    Vue.operationFeedback({type:'warn',text:'密码长度至少为6'});
+                    return;
+                }
                 if(!this.rePwd){
                     Vue.operationFeedback({type:'warn',text:'请重复密码'});
+                    return;
+                }
+                if(this.rePwd.length<6){
+                    Vue.operationFeedback({type:'warn',text:'重复密码长度至少为6'});
                     return;
                 }
                 if(this.rePwd!=this.pwd){

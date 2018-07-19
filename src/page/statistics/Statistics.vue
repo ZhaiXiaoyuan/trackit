@@ -2,7 +2,7 @@
     <div class="table">
         <div class="crumbs">
             <el-breadcrumb separator="-">
-                <el-breadcrumb-item>Trackit</el-breadcrumb-item>
+                <el-breadcrumb-item>Trackkit</el-breadcrumb-item>
                 <el-breadcrumb-item class="active">统计报表</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -331,53 +331,6 @@
 
                         }
                         console.log('test:',this.supplierList);
-                    }
-                });
-            },
-            getAllList:function (pageIndex) {
-                let params={
-                    ...Vue.sessionInfo(),
-                    range:this.range,
-                    resource:'',
-                    status:this.type,
-                    beginDate:this.startDate,
-                    endDate:this.endDate,
-                    searchKey:this.keyword,
-                    'pager.pageNumber':1,
-                    'pager.pageSize':this.pager.total,
-                }
-                this.downLoadFb=Vue.operationFeedback({text:'导出中...'});
-                Vue.api.getTaskList(params).then((resp)=>{
-                    if(resp.status=='success'){
-                        let data=JSON.parse(resp.message);
-                        let allList=data.result;
-                        let jsonData=[
-                            {
-                                1:'序号',
-                                2:'任务单号',
-                                3:'客户编号',
-                                4:'客户参考',
-                                5:'预计完成时间',
-                                6:'任务种类',
-                                7:'下单时间',
-                                8:'任务状态',
-                            }
-                        ];
-                        allList.forEach((item,i)=>{
-                            jsonData.push({
-                                1:i+1,
-                                2:item.taskno,
-                                3:item.custno,
-                                4:item.custbasis,
-                                5:item.plantime,
-                                6:item.resourceLabel,
-                                7:item.createtime,
-                                8:Vue.taskStatus(item.status),
-                            });
-                        });
-                        this.downloadExl(jsonData,'任务导出表');
-                    }else{
-                        this.downLoadFb.setOptions({type:'warn',text:'导出失败，'+resp.respMsg});
                     }
                 });
             },

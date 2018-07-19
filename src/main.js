@@ -20,8 +20,8 @@ Vue.use(vueResource);
 Vue.use(vueCookie);
 
 /*---安装自定义插件---*/
-Vue.use(api);
 Vue.use(tools);
+Vue.use(api);
 Vue.use(components);
 
 //使用钩子函数对路由进行权限跳转

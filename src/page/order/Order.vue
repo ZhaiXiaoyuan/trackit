@@ -2,7 +2,7 @@
     <div class="table">
         <div class="crumbs">
             <el-breadcrumb separator="-">
-                <el-breadcrumb-item>Trackit</el-breadcrumb-item>
+                <el-breadcrumb-item>Trackkit</el-breadcrumb-item>
                 <el-breadcrumb-item class="active">订单</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -379,6 +379,7 @@
                     beginDate:this.startDate,
                     endDate:this.endDate,
                     searchKey:this.keyword,
+                    supplierid:this.supplierId,
                     'pager.pageNumber':1,
                     'pager.pageSize':this.pager.total,
                 }
